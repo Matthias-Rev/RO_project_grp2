@@ -1,4 +1,6 @@
 import random
+import algo_genetic
+from utils import *
 
 
 def deplacement_aleatoire(matrice):
@@ -32,19 +34,8 @@ def deplacement_aleatoire(matrice):
 
     return coordonnees_visitees
 
+algo = algo_genetic.Individual_algo_genetic(returnMatrix(), Map(readMapFile(mapfile)))
 
-def lire_fichier_matrice(nom_fichier):
-    matrice = []
-    with open(nom_fichier, 'r') as f:
-        ligne = f.readline()
-        while ligne:
-            ligne_matrice = []
-            for caractere in ligne.strip():
-                if caractere.isdigit():
-                    ligne_matrice.append(int(caractere))
-            if ligne_matrice:
-                matrice.append(ligne_matrice)
-            ligne = f.readline()
-    return matrice
+#algo.chooseFirstCandidate()
 
-print(lire_fichier_matrice("Cost_map.txt"))
+#algo.objectDistance((-10,10))
