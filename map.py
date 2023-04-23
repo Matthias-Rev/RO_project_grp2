@@ -40,3 +40,8 @@ class Map:
 
     def returnHouses(self):
         return self.m_houses_pos
+    
+    def changeGrid(self, tuple, char):
+        i = tuple[0]
+        j = tuple[1]
+        self.m_grid[i][j] = char

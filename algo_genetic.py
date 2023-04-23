@@ -48,7 +48,7 @@ class Individual_algo_genetic:
                 randomCandidate = self.m_map.returnGrid()[i][j]
                 if randomCandidate == ' ' and self.putParcel():
                     candidateOk = True
-                    randomCandidate = 'x'
+                    self.m_map.changeGrid((i,j), 'x')
                     candidate = (i,j)
                     listParcel.append(candidate)
         print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
