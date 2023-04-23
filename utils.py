@@ -67,6 +67,9 @@ def returnMatrix():
     readFile(costfile)
     readFile(prodfile)
     return matrix
+
+def returnNbParcel():
+    return len(Parcel_listParcel)
     
 # readFile(costfile)
 # readFile(prodfile)

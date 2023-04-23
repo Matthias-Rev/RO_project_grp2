@@ -3,7 +3,8 @@ import math
 
 class Individual_algo_genetic:
 
-    def __init__(self, m_map_parcel, map):
+    def __init__(self, m_map_parcel, map, nbParcel):
+        self.m_nb_parcel = nbParcel
         self.m_map_parcel = m_map_parcel
         self.m_map_production = 0 #m_map_production
         self.m_map_cost = 0 #m_map_cost
@@ -13,9 +14,14 @@ class Individual_algo_genetic:
         self.m_totalCompacity = 0
         #distance entre les zones habitées
         #compacité ???? -> surface d'une "nasse"
+
+        self.m_parcels_placed = []
     
     def showMatrix(self):
         return self.m_map.returnGrid()
+    
+    def returnNbParcel(self):
+        return self.m_nb_parcel
     
     #define the compacity
     def coefCompact(self, highestNasse, allParcel):
@@ -27,24 +33,46 @@ class Individual_algo_genetic:
         while not candidateOk:
             i = random.randint(0, len(self.m_map.returnGrid())-1)
             j = random.randint(0, len(self.m_map.returnGrid()[i])-1)
-            if self.m_map.returnGrid()[i][j] == ' ':
+            if self.m_map.returnGrid()[i][j] == ' ' and self.putParcel():
                 candidateOk = True
                 print("position : ",i,j)
-                # #for element in self.m_map.m_roads_pos:
-                # #posNearestObj = min(abs(self.m_map.m_roads_pos[i]-(i,j)))
-                # #posNearestObj = min(self.m_map.m_roads_pos, key=lambda pos: ((pos[0] - i) ** 2 + (pos[1] - j) ** 2) ** 0.5)
-
-                # # Calcul de la distance entre deux positions représentées par des tuples
-                # pos1 = self.m_map.m_roads_pos[i]
-                # pos2 = (i, j)
-                # #distance = math.dist(pos1, pos2)
-                # # Trouver la position de l'objet le plus proche
-                # #posNearestObj = min(self.m_map.m_roads_pos, key=lambda pos: math.dist(pos, (i, j)))
-
-
-                # #print(f"posMax = {posNearestObj}")
-                # self.objectDistance((i,j), self.m_map.returnRoads()[i][0], i)
     
+    #create our individual
+    def chooseCandidate(self):
+        listParcel = []
+        while self.m_totalCost < 499 and self.returnNbParcel()>0:
+            candidateOk = False
+            while not candidateOk:
+                i = random.randint(0, len(self.m_map.returnGrid())-1)
+                j = random.randint(0, len(self.m_map.returnGrid()[i])-1)
+                randomCandidate = self.m_map.returnGrid()[i][j]
+                if randomCandidate == ' ' and self.putParcel():
+                    candidateOk = True
+                    randomCandidate = 'x'
+                    candidate = (i,j)
+                    listParcel.append(candidate)
+        print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
+        return listParcel
+
+    #define if a parcel is checked
+    def putParcel(self):
+        parcelOk = False
+        while not parcelOk:
+            i = random.randint(0, len(self.m_map_parcel)-1)
+            j = random.randint(0, len(self.m_map_parcel[i])-1)
+            randomParcel = self.m_map_parcel[i][j]
+            #peut rentrer dans une boucle infinie => 500+1 (ou : self.m_totalCost < 499)
+            if not randomParcel.parcelPlaced() and ((randomParcel.returnCost()+self.m_totalCost)<=500):
+                # print("cost = ", randomParcel.returnCost()+self.m_totalCost)
+                # if randomParcel.returnCost()+self.m_totalCost <= 500:
+                randomParcel.parcelPlaced(True)
+                parcelOk = True
+                self.m_totalCost += randomParcel.returnCost()
+                self.m_totalProd += randomParcel.returnProd()
+                self.m_nb_parcel -= 1
+        return True 
+
+    ### in process...
     def objectDistance(self, objectA=(0,0), objectB=(0,0), i=0):
         print("object = ", self.m_map.m_roads_pos[i])
         print(f"difference ligne = {abs(objectA[0]-objectB[0])}, difference col = {abs(objectA[1]-objectB[1])}")
