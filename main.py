@@ -1,4 +1,7 @@
 import random
+from algo_genetic import *
+import Individual
+from utils import *
 
 
 def deplacement_aleatoire(matrice):
@@ -47,4 +50,20 @@ def lire_fichier_matrice(nom_fichier):
             ligne = f.readline()
     return matrice
 
-print(lire_fichier_matrice("Cost_map.txt"))
+lire_fichier_matrice("./donnes_V3/Cost_map.txt")
+Matrix = returnMatrix()
+Instance_Map = Map(readMapFile(mapfile))
+print(Instance_Map.returnGrid())
+
+#algo = Individual.Individual_algo_genetic(Matrix, Instance_Map, 0)
+#test = Algo_genetic(1,5,0.80,0.20,Matrix,Instance_Map,returnNbParcel())
+#test.genetic_algorithm()
+
+# algo.returnNbParcel()
+#a = algo.chooseCandidate()
+#matrix[0][90]
+
+#print(a)
+# print(len(a))
+#algo.putParcel()
+#algo.objectDistance((-10,10))
