@@ -38,8 +38,13 @@ algo = algo_genetic.Individual_algo_genetic(returnMatrix(), Map(readMapFile(mapf
 
 # algo.returnNbParcel()
 a = algo.chooseCandidate()
+# print(len(a)==len(set(a)))
 
-# print(a)
+# # print(a)
 # print(len(a))
-#algo.putParcel()
-#algo.objectDistance((-10,10))
+# print(len(set(a)))
+# # for elem in a:
+# #     if 
+# #algo.putParcel()
+# #algo.objectDistance((-10,10))
+
