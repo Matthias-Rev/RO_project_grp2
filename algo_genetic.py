@@ -1,11 +1,9 @@
 import random 
-import math
-import utils 
+
 class Individual_algo_genetic:
 
-    def __init__(self, m_map_parcel, map, nbParcel):
+    def __init__(self, map, nbParcel):
         self.m_nb_parcel = nbParcel
-        self.m_map_parcel = m_map_parcel
         self.m_map = map
         self.m_totalCost = 0                        #must be <500.000
         self.m_totalProd = 0
@@ -28,39 +26,36 @@ class Individual_algo_genetic:
     #create our individual
     def chooseCandidate(self):
         listParcel = []
-        while self.m_totalCost+int(next(iter(utils.costDic))) <= 50:
+        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:
             candidateOk = False
             while not candidateOk:
                 i = random.randint(0, len(self.m_map.returnGrid())-1)
                 j = random.randint(0, len(self.m_map.returnGrid()[i])-1)
-                randomCandidate = self.m_map.returnGrid()[i][j]
-                if randomCandidate == ' ' and self.putParcel():
+                randomCandidate = self.m_map.returnObject(i,j)
+                if randomCandidate.returnType() == ' ' and self.putParcel(randomCandidate):
                     candidateOk = True
-                    self.m_map.changeGrid((i,j), 'x')
+                    randomCandidate.changeTypeElem('x')
                     candidate = (i,j)
-                    listParcel.append(candidate)
+                    listParcel.append(randomCandidate)
         print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
         return listParcel
 
     #define if a parcel is checked
-    def putParcel(self):
-        parcelOk = False
-        while not parcelOk:
-            randomParcel = 0
-            i = random.randint(0, len(self.m_map_parcel)-1)
-            j = random.randint(0, len(self.m_map_parcel[i])-1)
-            randomParcel = self.m_map_parcel[i][j]
-            if not randomParcel.parcelPlaced() and ((randomParcel.returnCost()+self.m_totalCost)<=50):
-                self.m_map_parcel[i][j].parcelPlaced(True)
-                utils.costDic[str(randomParcel.returnCost())] -=1
-                if utils.costDic[str(randomParcel.returnCost())] == 0:
-                    print("mort de la clé:", utils.costDic[str(randomParcel.returnCost())])
-                    utils.costDic.pop(randomParcel.returnCost())
-                parcelOk = True
-                self.m_totalCost += randomParcel.returnCost()
-                self.m_totalProd += randomParcel.returnProd()
-                self.m_nb_parcel -= 1
-        return True 
+    def putParcel(self, parcelCandidate):
+        if not parcelCandidate.parcelPlaced() and ((parcelCandidate.returnCost()+self.m_totalCost)<=50):
+            parcelCandidate.parcelPlaced(True)
+            self.m_map.returnDic()[str(parcelCandidate.returnCost())] -=1
+            if self.m_map.returnDic()[str(parcelCandidate.returnCost())] == 0:
+                print("mort de la clé:", self.m_map.returnDic()[str(parcelCandidate.returnCost())])
+                self.m_map.returnDic().pop(parcelCandidate.returnCost())
+            self.m_totalCost += parcelCandidate.returnCost()
+            self.m_totalProd += parcelCandidate.returnProd()
+            self.m_nb_parcel -= 1
+            #parcel checked
+            return True 
+        
+        #if constraints are not met
+        return False
 
     ### in process...
     def objectDistance(self, objectA=(0,0), objectB=(0,0), i=0):

@@ -34,10 +34,10 @@ def deplacement_aleatoire(matrice):
 
     return coordonnees_visitees
 
-algo = algo_genetic.Individual_algo_genetic(returnMatrix(), Map(readMapFile(mapfile)), returnNbParcel())
+algo = algo_genetic.Individual_algo_genetic(Map(constructMap(), costDic), returnNbParcel())
 
-# algo.returnNbParcel()
 a = algo.chooseCandidate()
+
 # print(len(a)==len(set(a)))
 
 # # print(a)
