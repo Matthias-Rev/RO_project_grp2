@@ -35,7 +35,6 @@ def deplacement_aleatoire(matrice):
 
     return coordonnees_visitees
 
-
 def lire_fichier_matrice(nom_fichier):
     matrice = []
     with open(nom_fichier, 'r') as f:
@@ -53,14 +52,16 @@ def lire_fichier_matrice(nom_fichier):
 lire_fichier_matrice("./donnes_V3/Cost_map.txt")
 Matrix = returnMatrix()
 Instance_Map = Map(readMapFile(mapfile))
-print(Instance_Map.returnGrid())
+#Instance_Map.posInit()
+#print(Instance_Map.returnGrid())
 
 #algo = Individual.Individual_algo_genetic(Matrix, Instance_Map, 0)
-#test = Algo_genetic(1,5,0.80,0.20,Matrix,Instance_Map,returnNbParcel())
-#test.genetic_algorithm()
+test = Algo_genetic(1,10,0.80,0.20,Matrix,Instance_Map,utils.costDic)
+liste_pop =test.genetic_algorithm()
 
 # algo.returnNbParcel()
 #a = algo.chooseCandidate()
+#print(a)
 #matrix[0][90]
 
 #print(a)
