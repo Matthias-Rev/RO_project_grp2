@@ -18,8 +18,7 @@ def readFile(f):
             index = 0        # index in Parcel_listParcel
             while line:
                     lineMatrix = []
-                    element = file.read(1)
-                    for element in line.strip():
+                    for element in line.strip('\n'):
                         if f == costfile :
                             Parcel_listParcel.append(Parcel(int(element)))
                             costParcelDic(element)
@@ -48,8 +47,7 @@ def readMapFile(f):
             index = 0        # index in Parcel_listParcel
             while line:
                     lineMatrix = []
-                    element = file.read(1)
-                    for element in line.strip():
+                    for element in line.strip('\n'):
                         if f == mapfile:
                             lineMatrix.append(element)
                     line = file.readline()
@@ -83,12 +81,18 @@ def returnCostDic():
 # readFile(costfile)
 # readFile(prodfile)
 # print(costDic)
-# matrrixA = returnMatrix()
+matrrixA = returnMatrix()
 # el = matrrixA[0][0]
-
+# print(len(matrrixA))
+# print(len(matrrixA[0]))
+# print(len(matrrixA[1]))
+# print(matrrixA[0][169].returnCost())
 # # print(el)
 
-# mapp = Map(readMapFile(mapfile))
+# mapp = (readMapFile(mapfile))
+# print(len(mapp))
+# print(len(mapp[0]))
+# print(len(mapp[69]))
 
 # mapp.printRoads(1)
 
