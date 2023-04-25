@@ -55,11 +55,11 @@ class Individual_algo_genetic:
             #print("waiting here")
             candidateOk = False
             while not candidateOk:
-                print(len(self.m_map.returnGrid()),"self map len")
+                #print(len(self.m_map.returnGrid()),"self map len")
                 #print("waiting candidate ok")
                 i = random.randint(0, len(self.m_map.returnGrid())-1)
                 j = random.randint(0, len(self.m_map.returnGrid()[i])-1)
-                print(len(self.m_map.returnGrid()[i]),"length list")
+                #print(len(self.m_map.returnGrid()[i]),"length list")
                 randomCandidate = self.m_map.returnGrid()[i][j]
                 #print(randomCandidate)
                 if randomCandidate == ' ' and self.putParcel(i,j):
@@ -72,17 +72,17 @@ class Individual_algo_genetic:
 
     #define if a parcel is checked
     def putParcel(self,i,j):
-        print(len(self.m_map_parcel))
-        print(i," ",j)
+        #print(len(self.m_map_parcel))
+        #print(i," ",j)
         randomParcel = self.m_map_parcel[i][j]
         if (randomParcel.returnCost()+self.m_totalCost)<=50:
             self.m_map_parcel[i][j].parcelPlaced(True)
             self.m_dic_utils[str(randomParcel.returnCost())] -=1
             if self.m_dic_utils[str(randomParcel.returnCost())] == 0:
-                print(randomParcel.returnCost(), "le random parcel cost")
-                print(str(randomParcel.returnCost()), "le random parcel cost en string")
+                #print(randomParcel.returnCost(), "le random parcel cost")
+                #print(str(randomParcel.returnCost()), "le random parcel cost en string")
                 print("mort de la clé:", self.m_dic_utils[str(randomParcel.returnCost())])
-                print(self.m_dic_utils)
+                #print(self.m_dic_utils)
                 self.m_dic_utils.pop(str(randomParcel.returnCost()))
             self.m_totalCost += randomParcel.returnCost()
             self.m_totalProd += randomParcel.returnProd()
@@ -92,9 +92,9 @@ class Individual_algo_genetic:
     def draw_matrix(self):
         # Define the matrix
         matrix = self.m_map.returnGrid()
-        print(matrix)
-        for i in self.m_listParcel:
-            print(i[1],i[0])
+        #print(matrix)
+        #for i in self.m_listParcel:
+            #print(i[1],i[0])
 
         # Define the color map for the matrix values
         color_dict = {'C': 'red', 'R': 'grey', 'x': 'green'}  # Rename the dictionary to "color_dict"

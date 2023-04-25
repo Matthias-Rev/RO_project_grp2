@@ -80,8 +80,10 @@ class Algo_genetic:
 
         for gen in range(self.m_iter_max):
             self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]
+            print(self.m_scores)
             for i in range(self.m_n_pop):
                 #print(f"{i} individu {self.m_scores[i]} score")
+                print(i)
                 if self.m_scores[i] > best_eval:
                     best, best_eval = self.m_pop[i], self.m_scores[i]
                     print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
@@ -97,7 +99,8 @@ class Algo_genetic:
                     self.mutation(c, self.m_r_mut)
                     children.append(c)
             # replace population
-        self.m_pop = children
-        self.m_scores = []
-        best.draw_matrix()
-        return [best, best_eval]
+            self.m_pop = children
+            self.m_scores = []
+            self.m_n_pop = len(children)
+        #best.draw_matrix()
+        return self.m_pop
