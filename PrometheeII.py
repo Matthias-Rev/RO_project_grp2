@@ -12,6 +12,10 @@ class PrometheeII:
         self.discordance_matrix = None
         self.better_id = None
         self.pareto_border = None
+        
+     def build_matrix(self, instances):
+        matrix = np.array([[p.productivity, p.compacity, p.farfromtown] for p in instances])
+     return matrix
 
     def normalize_matrix(self):
         self.normal_matrix = (self.matrix - self.matrix.min(axis=0)) / (
