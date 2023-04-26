@@ -8,15 +8,13 @@ import matplotlib.pyplot as plt
 from matplotlib import colors
 
 class Algo_genetic:
-    def __init__(self, nbr_iter,n_pop,r_cross,r_mut,matrix,mapfile, dic_utils) -> None:
+    def __init__(self, nbr_iter,n_pop,r_cross,r_mut,mapfile) -> None:
         self.m_iter_max = nbr_iter
         self.m_n_pop = n_pop
         self.m_r_cross = r_cross
         self.m_r_mut = r_mut
         self.m_score = []
         self.m_pop = []
-        self.m_matrix = matrix
-        self.m_dic_utils = dic_utils
         self.m_mapfile = mapfile
     
     def selection(self, k=3):
@@ -37,8 +35,8 @@ class Algo_genetic:
         parent_tupple2 = p2.returnList_Parcel()
         # check for recombination
         if random.uniform(0, 1) < r_cross:
-            c1 = Individual.Individual_algo_genetic(self.m_matrix,self.m_mapfile,self.m_dic_utils,parent_tupple1)
-            c2 = Individual.Individual_algo_genetic(self.m_matrix,self.m_mapfile,self.m_dic_utils,parent_tupple2)
+            c1 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple1)
+            c2 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple2)
         # select crossover point that is not on the end of the string
             #print(len(c1.returnList_Parcel()),"len du candidat")
             cut_gene_pt = random.randint(1, len(c1.returnList_Parcel())-1)
@@ -62,7 +60,14 @@ class Algo_genetic:
             # check for a mutation
             if random.uniform(0, 1) < r_mut:
                 #flip tupple
-                list_propriety[i] = (random.randint(0,len(utils.matrix[1])),list_propriety[i][1])
+                #list_propriety[i] = (random.randint(0,len(utils.matrix[1])),list_propriety[i][1])
+                # print(self.m_mapfile.returnGrid()[31][159])
+                # print(len(self.m_mapfile.returnGrid()[1]),"length")
+                # print(random.randint(0,len(self.m_mapfile.returnGrid()[1])),"random number for x")
+                # print(list_propriety[i].returnPosition()[1],"return Position")
+                #print()
+                #self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[0]][len(self.m_mapfile.returnGrid()[1])]
+                list_propriety[i] = self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[1]][random.randint(0,len(utils.matrix[1])-1)]
                 
     
     def genetic_algorithm(self):
@@ -71,7 +76,7 @@ class Algo_genetic:
 
         for i in range(self.m_n_pop):
             #print("Candidate",i)
-            indiv_map = Individual.Individual_algo_genetic(self.m_matrix, self.m_mapfile,self.m_dic_utils.copy())
+            indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
             indiv_map.chooseCandidate()
             #print(indiv_map.returnList_Parcel(),"candidate début")
             self.m_pop.append(indiv_map)
@@ -80,10 +85,8 @@ class Algo_genetic:
 
         for gen in range(self.m_iter_max):
             self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]
-            print(self.m_scores)
             for i in range(self.m_n_pop):
                 #print(f"{i} individu {self.m_scores[i]} score")
-                print(i)
                 if self.m_scores[i] > best_eval:
                     best, best_eval = self.m_pop[i], self.m_scores[i]
                     print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
@@ -102,5 +105,6 @@ class Algo_genetic:
             self.m_pop = children
             self.m_scores = []
             self.m_n_pop = len(children)
-        #best.draw_matrix()
+            print(len(best.returnList_Parcel()))
+            best.draw_matrix()
         return self.m_pop

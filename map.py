@@ -1,13 +1,30 @@
+
 class Map:
-    def __init__(self, map):
-        self.m_grid = map
+    def __init__(self, grid, dictionnary):
+        self.m_grid = grid
         self.m_roads_pos = []
         self.m_roads_Colpos = {}
         self.m_houses_pos = []
         self.m_houses_Colpos = {}
 
+        self.m_cost = 0
+        self.m_prod  = 0
+        self.m_Put = False
+
+        self.m_costDic = dictionnary
+
         self.posInit()
 
+    
+    def returnDic(self):
+        return self.m_costDic
+
+    def returnCostDic(self):
+        return self.costDic
+    
+    def returnObject(self, i,j):
+        return self.m_grid[i][j]
+    
     def posInit(self):
         j = 0
         for line in self.m_grid:
@@ -17,7 +34,7 @@ class Map:
             for element in line:
                 if element == "R":
                     lineRoads.append((j,i))
-                    #if i not in dico_
+                    #if is not in dico_
                 elif element == "C":
                     lineHouses.append((j,i))
                 i += 1
@@ -28,9 +45,11 @@ class Map:
 
     def printRoads(self, i=0, j=0):
         print(self.m_roads_pos[i])
+        return 0
     
     def printHouses(self, i=0, j=0):
         print(self.m_houses_pos[i])
+        return 0
 
     def returnGrid(self):
         return self.m_grid
@@ -45,3 +64,4 @@ class Map:
         i = tuple[0]
         j = tuple[1]
         self.m_grid[i][j] = char
+        return 0

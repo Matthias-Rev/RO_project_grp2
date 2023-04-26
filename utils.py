@@ -114,18 +114,23 @@ def readFile(f):
     try:
         with open(f, "r") as file:
             line = file.readline()
-            index = 0        # index in Parcel_listParcel
+            index = 0
+            colindex = 0        # index in Parcel_listParcel
+            lineIndex = 0
             while line:
                     lineMatrix = []
                     for element in line.strip('\n'):
                         if f == costfile :
-                            Parcel_listParcel.append(Parcel(int(element)))
+                            Parcel_listParcel.append(Parcel(colindex, lineIndex, int(element)))
                             costParcelDic(element)
+                            colindex += 1
                         elif f == prodfile :
-                            parcel = Parcel_listParcel[index]
+                            parcel =  Parcel_listParcel[index]
                             parcel.changeProd(int(element))
                             lineMatrix.append(parcel)
                             index += 1
+                    colindex = 0
+                    lineIndex += 1
                     line = file.readline()
                     if f == prodfile:
                         matrix.append(lineMatrix)
@@ -143,12 +148,15 @@ def readMapFile(f):
         with open(f, "r") as file:
             map = []
             line = file.readline()
-            index = 0        # index in Parcel_listParcel
+            index = 0
             while line:
                     lineMatrix = []
                     for element in line.strip('\n'):
                         if f == mapfile:
-                            lineMatrix.append(element)
+                            parcel =  Parcel_listParcel[index]
+                            parcel.changeTypeElem(element)
+                            lineMatrix.append(parcel)
+                            index += 1
                     line = file.readline()
                     if f == mapfile:
                         map.append(lineMatrix)
@@ -159,11 +167,10 @@ def readMapFile(f):
         if f == mapfile:
             print("Error : mapfile_path wrong")
     
-def returnMatrix():
+def constructMap():
     readFile(costfile)
     readFile(prodfile)
-    
-    return matrix
+    return readMapFile(mapfile)
 
 def returnNbParcel():
     return len(Parcel_listParcel)
@@ -173,11 +180,3 @@ def costParcelDic(cost):
         costDic[cost] +=1
     else:
         costDic[cost] = 1
-def returnCostDic():
-    return costDic
-#readMapFile(mapfile)
-
-# readFile(costfile)
-# readFile(prodfile)
-# print(costDic)
-matrrixA = returnMatrix()
