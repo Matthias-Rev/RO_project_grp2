@@ -34,7 +34,7 @@ def deplacement_aleatoire(matrice):
 
     return coordonnees_visitees
 
-algo = algo_genetic.Individual_algo_genetic(Map(constructMap(), costDic), returnNbParcel())
+algo = algo_genetic.Individual_algo_genetic(Map(constructMap(), costDic))
 
 a = algo.chooseCandidate()
 
@@ -43,7 +43,9 @@ a = algo.chooseCandidate()
 # # print(a)
 # print(len(a))
 # print(len(set(a)))
-# # for elem in a:
+# for elem in a:
+#     print(elem.returnPosition())
+#     print(elem.returnType())
 # #     if 
 # #algo.putParcel()
 # #algo.objectDistance((-10,10))

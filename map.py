@@ -17,6 +17,10 @@ class Map:
     
     def returnDic(self):
         return self.m_costDic
+    
+    def restoreDic(self, initialDic):
+        self.m_costDic = initialDic
+        return 0
 
     def returnCostDic(self):
         return self.costDic

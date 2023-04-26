@@ -1,9 +1,9 @@
 import random 
+import copy
 
 class Individual_algo_genetic:
 
-    def __init__(self, map, nbParcel):
-        self.m_nb_parcel = nbParcel
+    def __init__(self, map):
         self.m_map = map
         self.m_totalCost = 0                        #must be <500.000
         self.m_totalProd = 0
@@ -26,6 +26,7 @@ class Individual_algo_genetic:
     #create our individual
     def chooseCandidate(self):
         listParcel = []
+        restoreDic = copy.copy(self.m_map.returnDic())
         while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:
             candidateOk = False
             while not candidateOk:
@@ -35,9 +36,9 @@ class Individual_algo_genetic:
                 if randomCandidate.returnType() == ' ' and self.putParcel(randomCandidate):
                     candidateOk = True
                     randomCandidate.changeTypeElem('x')
-                    candidate = (i,j)
                     listParcel.append(randomCandidate)
         print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
+        self.cleanIndividual(listParcel, restoreDic)
         return listParcel
 
     #define if a parcel is checked
@@ -50,13 +51,19 @@ class Individual_algo_genetic:
                 self.m_map.returnDic().pop(parcelCandidate.returnCost())
             self.m_totalCost += parcelCandidate.returnCost()
             self.m_totalProd += parcelCandidate.returnProd()
-            self.m_nb_parcel -= 1
             #parcel checked
             return True 
-        
         #if constraints are not met
         return False
-
+    
+    def cleanIndividual(self, listeParcelObj, initialDoc):
+        for elem in listeParcelObj:
+            elem.changeTypeElem(' ')
+        self.m_totalCost = 0
+        self.m_totalProd = 0
+        self.m_map.restoreDic(initialDoc)
+        return 0 
+        
     ### in process...
     def objectDistance(self, objectA=(0,0), objectB=(0,0), i=0):
         print("object = ", self.m_map.m_roads_pos[i])
