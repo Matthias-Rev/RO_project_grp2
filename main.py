@@ -36,7 +36,10 @@ def deplacement_aleatoire(matrice):
 
 algo = algo_genetic.Individual_algo_genetic(Map(constructMap(), costDic))
 
-a = algo.chooseCandidate()
+i = 0
+while i < 200:
+    a = algo.chooseCandidate()
+    i += 1
 
 # print(len(a)==len(set(a)))
 

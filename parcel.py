@@ -30,6 +30,8 @@ class Parcel:
     def parcelPlaced(self, placed=False):
         if placed == True:
             self.m_Put = True
+        elif placed == False:
+            self.m_Put = False
         return self.m_Put
     
     def returnPosition(self):

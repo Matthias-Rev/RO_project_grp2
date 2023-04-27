@@ -27,7 +27,7 @@ class Individual_algo_genetic:
     def chooseCandidate(self):
         listParcel = []
         restoreDic = copy.copy(self.m_map.returnDic())
-        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:
+        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) < 50:
             candidateOk = False
             while not candidateOk:
                 i = random.randint(0, len(self.m_map.returnGrid())-1)
@@ -59,6 +59,7 @@ class Individual_algo_genetic:
     def cleanIndividual(self, listeParcelObj, initialDoc):
         for elem in listeParcelObj:
             elem.changeTypeElem(' ')
+            elem.parcelPlaced(False)
         self.m_totalCost = 0
         self.m_totalProd = 0
         self.m_map.restoreDic(initialDoc)
