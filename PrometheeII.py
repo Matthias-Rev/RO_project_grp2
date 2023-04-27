@@ -7,6 +7,7 @@ import numpy as np
 class PrometheeII:
 
     def __init__(self, matrix):
+
         self.matrix = np.array(matrix)
         self.normal_matrix = None
         self.concordance_matrix = None

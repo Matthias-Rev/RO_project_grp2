@@ -1,7 +1,5 @@
 from parcel import Parcel
 from map import Map
-import numpy as np
-
 
 costfile = "./donnes_V2/Cost_map.txt"
 prodfile = "./donnes_V2/Production_map.txt"
@@ -9,7 +7,6 @@ mapfile = "./donnes_V2/Usage_map.txt"
 #mapfile = "./donnes_V2/Map2.txt"
 
 Parcel_listParcel = []
-matrix = []
 costDic = {}
 
 # read costfile and prodfile
@@ -35,11 +32,7 @@ def readFile(f):
                     colindex = 0
                     lineIndex += 1
                     line = file.readline()
-                    if f == prodfile:
-                        matrix.append(lineMatrix)
-
-
-                
+                    
     except FileNotFoundError:
         if f == costfile:
             print("Error : prodfile_path wrong")
@@ -71,6 +64,8 @@ def readMapFile(f):
             print("Error : mapfile_path wrong")
     
 def constructMap():
+    Parcel_listParcel = []
+    costDic = {}
     readFile(costfile)
     readFile(prodfile)
     return readMapFile(mapfile)
@@ -83,38 +78,4 @@ def costParcelDic(cost):
         costDic[cost] +=1
     else:
         costDic[cost] = 1
-    
-def constructMap():
-    readFile(costfile)
-    readFile(prodfile)
-    return readMapFile(mapfile)
 
-def constructMapV2():
-    read_CP_File(costfile,prodfile)
-    return read_U_file(mapfile)
-
-def read_CP_File(name_cost,name_prod):
-    matrix = np.array([], dtype=int)
-    with open(name_cost, 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            line = line.strip()
-            for number in line:
-                print(number)
-                #Parcel_listParcel.append(Parcel(colindex, lineIndex, int(element)))
-                #costParcelDic(element)
-            row = np.array(list(line), dtype=int)
-            matrix = np.append(matrix, row)
-    matrix = matrix.reshape((len(lines), -1))
-
-def read_U_file(name_file):
-    matrix = np.empty((0,), dtype='object')
-    with open(name_file, 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            chars = list(line.rstrip('\n'))
-            row = np.array(chars, dtype='object')
-            matrix = np.append(matrix, row)
-        rows = len(lines)
-        cols = max(len(line.rstrip('\n')) for line in lines)
-        matrix = matrix.reshape((rows, cols))

@@ -72,6 +72,7 @@ class Algo_genetic:
     
     def genetic_algorithm(self):
 
+
         self.m_pop = list()
 
         for i in range(self.m_n_pop):

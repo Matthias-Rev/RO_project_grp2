@@ -1,5 +1,5 @@
-R  C RR  C
-R CCC      
+R  C RR  C 
+R CCC     
 RRRRRRRCC 
 R CCC     
 RRRR  C   
