@@ -1,55 +1,61 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-# Test matrix,it will be the solution of the Gen Algo
-matrix = np.array([[4, 3, 7],
-                    [3, 5, 6],
-                    [6, 2, 8],
-                    [7, 4, 5]])
 
-# Normalisation of the matrix
-NormalMatrix = (matrix - matrix.min(axis=0)) / (matrix.max(axis=0) - matrix.min(axis=0))
 
-# Calcul of concordance matrix and discordance matrix
-concordance_matrix = np.zeros((matrix.shape[0], matrix.shape[0]))
-discordance_matrix = np.zeros((matrix.shape[0], matrix.shape[0]))
+class PrometheeII:
 
-for i in range(matrix.shape[0]):
-    for j in range(matrix.shape[0]):
-        if i != j:
-            concordance_i_j = np.sum(NormalMatrix[j] >= NormalMatrix[i]) / matrix.shape[1]
-            concordance_matrix[i, j] = concordance_i_j
-            discordance_i_j = np.max(NormalMatrix[j] - NormalMatrix[i])
-            discordance_matrix[i, j] = discordance_i_j
+    def __init__(self, matrix):
+        self.matrix = matrix
+        self.normal_matrix = None
+        self.concordance_matrix = None
+        self.discordance_matrix = None
+        self.better_id = None
+        self.pareto_border = None
+        
+     def build_matrix(self, instances):
+        matrix = np.array([[p.productivity, p.compacity, p.farfromtown] for p in instances])
+     return matrix
 
-# Upgrade Id
-better_id = np.zeros(matrix.shape[0])
+    def normalize_matrix(self):
+        self.normal_matrix = (self.matrix - self.matrix.min(axis=0)) / (
+                    self.matrix.max(axis=0) - self.matrix.min(axis=0))
 
-for i in range(matrix.shape[0]):
-    somme_concordance_i = np.sum(concordance_matrix[i])
-    somme_discordance_i = np.sum(concordance_matrix[i])
-    better_id[i] = somme_concordance_i / (somme_concordance_i + somme_discordance_i)
+    def calculate_concordance_and_discordance_matrices(self):
+        self.concordance_matrix = np.zeros((self.matrix.shape[0], self.matrix.shape[0]))
+        self.discordance_matrix = np.zeros((self.matrix.shape[0], self.matrix.shape[0]))
+        for i in range(self.matrix.shape[0]):
+            for j in range(self.matrix.shape[0]):
+                if i != j:
+                    concordance_i_j = np.sum(self.normal_matrix[j] >= self.normal_matrix[i]) / self.matrix.shape[1]
+                    self.concordance_matrix[i, j] = concordance_i_j
+                    discordance_i_j = np.max(self.normal_matrix[j] - self.normal_matrix[i])
+                    self.discordance_matrix[i, j] = discordance_i_j
 
-# Definition of the id list of the pareto optimal solution
-Pareto_Border = []
+    def upgrade_id(self):
+        self.better_id = np.zeros(self.matrix.shape[0])
+        for i in range(self.matrix.shape[0]):
+            somme_concordance_i = np.sum(self.concordance_matrix[i])
+            somme_discordance_i = np.sum(self.discordance_matrix[i])
+            self.better_id[i] = somme_concordance_i / (somme_concordance_i + somme_discordance_i)
 
-for i in range(matrix.shape[0]):
-    is_pareto_solution = True
-    for j in range(matrix.shape[0]):
-        if i != j:
-            if better_id[j] > better_id[i]:
-                is_pareto_solution = False
-                break
-    if is_pareto_solution:
-        Pareto_Border.append(i)
+    def find_pareto_border(self):
+        self.pareto_border = []
+        for i in range(self.matrix.shape[0]):
+            is_pareto_solution = True
+            for j in range(self.matrix.shape[0]):
+                if i != j:
+                    if self.better_id[j] > self.better_id[i]:
+                        is_pareto_solution = False
+                        break
+            if is_pareto_solution:
+                self.pareto_border.append(i)
 
-# Show Graph
-    points = []
-    for i in Pareto_Border:
-        points.append(tuple(matrix[i]))
-
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
-plt.show()
-
+    def show_3d_graph(self):
+        points = []
+        for i in self.pareto_border:
+            points.append(tuple(self.matrix[i]))
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
+        plt.show()
