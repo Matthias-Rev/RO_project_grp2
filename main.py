@@ -3,6 +3,7 @@ from algo_genetic import *
 import Individual
 from utils import *
 from PrometheeII import *
+import numpy as np
 
 
 def deplacement_aleatoire(matrice):
@@ -50,16 +51,18 @@ def lire_fichier_matrice(nom_fichier):
             ligne = f.readline()
     return matrice
 
-lire_fichier_matrice("./donnes_V3/Cost_map.txt")
+#lire_fichier_matrice("./donnes_V3/Cost_map.txt")
 Instance_Map=Map(constructMap(), costDic)
+
+
+# Print the resulting matrix
 #Instance_Map = Map(readMapFile(mapfile))
 #Instance_Map.posInit()
 #print(Instance_Map.returnGrid())
 
 #algo = Individual.Individual_algo_genetic(Matrix, Instance_Map, 0)
-test = Algo_genetic(10,100,0.80,0.20,Instance_Map)
+test = Algo_genetic(5,1000,0.80,0.20,Instance_Map)
 liste_pop =test.genetic_algorithm()
-#print(liste_pop)
 
 promethe = PrometheeII([1,2])
 print(promethe.build_matrix(liste_pop))

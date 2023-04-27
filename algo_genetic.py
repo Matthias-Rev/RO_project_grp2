@@ -75,13 +75,14 @@ class Algo_genetic:
         self.m_pop = list()
 
         for i in range(self.m_n_pop):
-            #print("Candidate",i)
+            print("Candidate",i)
             indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
             indiv_map.chooseCandidate()
             #print(indiv_map.returnList_Parcel(),"candidate début")
             self.m_pop.append(indiv_map)
         
-        best, best_eval = 0, self.m_pop[0].returnM_totalCost()+self.m_pop[0].returnM_totalProd()
+        best, best_eval = self.m_pop[0], self.m_pop[0].returnM_totalCost()+self.m_pop[0].returnM_totalProd()
+        print(best,"init")
 
         for gen in range(self.m_iter_max):
             self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]
@@ -105,6 +106,7 @@ class Algo_genetic:
             self.m_pop = children
             self.m_scores = []
             self.m_n_pop = len(children)
-            print(len(best.returnList_Parcel()))
-            best.draw_matrix()
+            #print(len(best.returnList_Parcel()))
+            #print(best,"end")
+            #best.draw_matrix()
         return self.m_pop

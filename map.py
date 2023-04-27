@@ -1,4 +1,3 @@
-
 class Map:
     def __init__(self, grid, dictionnary):
         self.m_grid = grid
@@ -18,6 +17,10 @@ class Map:
     
     def returnDic(self):
         return self.m_costDic
+    
+    def restoreDic(self, initialDic):
+        self.m_costDic = initialDic
+        return 0
 
     def returnCostDic(self):
         return self.costDic
