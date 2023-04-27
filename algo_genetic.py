@@ -1,90 +1,113 @@
-import random 
-import copy
+import random
+from copy import copy
+import Individual
+import utils
+import map
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import colors
 
-class Individual_algo_genetic:
+class Algo_genetic:
+    def __init__(self, nbr_iter,n_pop,r_cross,r_mut,mapfile) -> None:
+        self.m_iter_max = nbr_iter
+        self.m_n_pop = n_pop
+        self.m_r_cross = r_cross
+        self.m_r_mut = r_mut
+        self.m_score = []
+        self.m_pop = []
+        self.m_mapfile = mapfile
+    
+    def selection(self, k=3):
+        # select a parent from the population
+        # first random selection
+        selection_ix = random.randint(0,len(self.m_pop)-1)
+        for ix in np.random.randint(0, len(self.m_pop)-1, k-1):
+        # check if better (e.g. perform a tournament)
+            if self.m_scores[ix] < self.m_scores[selection_ix]:
+                selection_ix = ix
+        return self.m_pop[selection_ix]
 
-    def __init__(self, map):
-        self.m_map = map
-        self.m_totalCost = 0                        #must be <500.000
-        self.m_totalProd = 0
-        self.m_totalCompacity = 0
-        #distance entre les zones habitées
-        #compacité ???? -> surface d'une "nasse"
+    def crossover(self,p1, p2, r_cross):
+        # here we copy the parent to create 2 children
+        # r_cross is the crossover rate (normally equal to 80%)
+        # children are copies of parents by default
+        parent_tupple1 = p1.returnList_Parcel()
+        parent_tupple2 = p2.returnList_Parcel()
+        # check for recombination
+        if random.uniform(0, 1) < r_cross:
+            c1 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple1)
+            c2 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple2)
+        # select crossover point that is not on the end of the string
+            #print(len(c1.returnList_Parcel()),"len du candidat")
+            cut_gene_pt = random.randint(1, len(c1.returnList_Parcel())-1)
+            # perform crossover
+            #c1.m_listParcel = parent_tupple1[:pt] + parent_tupple2[pt:]
+            #c2.m_listParcel = parent_tupple2[:pt] + parent_tupple1[pt:]
 
-        self.m_parcels_placed = []
+            #print(parent_tupple1[:pt] + parent_tupple2[pt:],"new tupple c1")
+            #print(parent_tupple2[:pt] + parent_tupple1[pt:],"new tupple c2")
+            c1.changeParcel(parent_tupple1[:cut_gene_pt] + parent_tupple2[cut_gene_pt:])
+            c2.changeParcel( parent_tupple2[:cut_gene_pt] + parent_tupple1[cut_gene_pt:])
+            return [c1, c2]
+        return []
     
-    def showMatrix(self):
-        return self.m_map.returnGrid()
-    
-    def returnNbParcel(self):
-        return self.m_nb_parcel
-    
-    #define the compacity
-    def coefCompact(self, highestNasse, allParcel):
-        return highestNasse/allParcel
-    
-    #create our individual
-    def chooseCandidate(self):
-        listParcel = []
-        restoreDic = copy.copy(self.m_map.returnDic())
-        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) < 50:
-            candidateOk = False
-            while not candidateOk:
-                i = random.randint(0, len(self.m_map.returnGrid())-1)
-                j = random.randint(0, len(self.m_map.returnGrid()[i])-1)
-                randomCandidate = self.m_map.returnObject(i,j)
-                if randomCandidate.returnType() == ' ' and self.putParcel(randomCandidate):
-                    candidateOk = True
-                    randomCandidate.changeTypeElem('x')
-                    listParcel.append(randomCandidate)
-        print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
-        self.cleanIndividual(listParcel, restoreDic)
-        return listParcel
-
-    #define if a parcel is checked
-    def putParcel(self, parcelCandidate):
-        if not parcelCandidate.parcelPlaced() and ((parcelCandidate.returnCost()+self.m_totalCost)<=50):
-            parcelCandidate.parcelPlaced(True)
-            self.m_map.returnDic()[str(parcelCandidate.returnCost())] -=1
-            if self.m_map.returnDic()[str(parcelCandidate.returnCost())] == 0:
-                print("mort de la clé:", self.m_map.returnDic()[str(parcelCandidate.returnCost())])
-                self.m_map.returnDic().pop(parcelCandidate.returnCost())
-            self.m_totalCost += parcelCandidate.returnCost()
-            self.m_totalProd += parcelCandidate.returnProd()
-            #parcel checked
-            return True 
-        #if constraints are not met
-        return False
-    
-    def cleanIndividual(self, listeParcelObj, initialDoc):
-        for elem in listeParcelObj:
-            elem.changeTypeElem(' ')
-            elem.parcelPlaced(False)
-        self.m_totalCost = 0
-        self.m_totalProd = 0
-        self.m_map.restoreDic(initialDoc)
-        return 0 
-        
-    ### in process...
-    def objectDistance(self, objectA=(0,0), objectB=(0,0), i=0):
-        print("object = ", self.m_map.m_roads_pos[i])
-        print(f"difference ligne = {abs(objectA[0]-objectB[0])}, difference col = {abs(objectA[1]-objectB[1])}")
-    
-    ### in process...
-    def findNearestObj(self, posActualObj=(0,0),typeTargetObj=' '):
-        found = False
-        distance = 0
-        while not found:
-            if typeTargetObj == 'R':
-                self.m_map.m_roads_pos
+    def mutation(self,children, r_mut):
+        # take the tupple of parcelle
+        # check if a random number is less than r_mut (nearly 20%)
+        # if yes then we flip the gene (but in our case we take the line and take another parcelle)
+        list_propriety = children.returnList_Parcel()
+        for i in range(len(list_propriety)):
+            # check for a mutation
+            if random.uniform(0, 1) < r_mut:
+                #flip tupple
+                #list_propriety[i] = (random.randint(0,len(utils.matrix[1])),list_propriety[i][1])
+                # print(self.m_mapfile.returnGrid()[31][159])
+                # print(len(self.m_mapfile.returnGrid()[1]),"length")
+                # print(random.randint(0,len(self.m_mapfile.returnGrid()[1])),"random number for x")
+                # print(list_propriety[i].returnPosition()[1],"return Position")
+                #print()
+                #self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[0]][len(self.m_mapfile.returnGrid()[1])]
+                list_propriety[i] = self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[1]][random.randint(0,len(utils.matrix[1])-1)]
                 
-            
+    
+    def genetic_algorithm(self):
 
 
+        self.m_pop = list()
 
-
-
-
-
-
+        for i in range(self.m_n_pop):
+            print("Candidate",i)
+            indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
+            indiv_map.chooseCandidate()
+            #print(indiv_map.returnList_Parcel(),"candidate début")
+            self.m_pop.append(indiv_map)
         
+        best, best_eval = self.m_pop[0], self.m_pop[0].returnM_totalCost()+self.m_pop[0].returnM_totalProd()
+        print(best,"init")
+
+        for gen in range(self.m_iter_max):
+            self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]
+            for i in range(self.m_n_pop):
+                #print(f"{i} individu {self.m_scores[i]} score")
+                if self.m_scores[i] > best_eval:
+                    best, best_eval = self.m_pop[i], self.m_scores[i]
+                    print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
+
+                selected = [self.selection() for _ in range(self.m_n_pop)]
+
+            children = list()
+            for i in range(0, self.m_n_pop-1, 2):
+                p1, p2 = selected[i], selected[i+1]
+                #print(p1,p2)
+            
+                for c in self.crossover(p1, p2, self.m_r_cross):
+                    self.mutation(c, self.m_r_mut)
+                    children.append(c)
+            # replace population
+            self.m_pop = children
+            self.m_scores = []
+            self.m_n_pop = len(children)
+            #print(len(best.returnList_Parcel()))
+            #print(best,"end")
+            #best.draw_matrix()
+        return self.m_pop

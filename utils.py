@@ -32,7 +32,7 @@ def readFile(f):
                     colindex = 0
                     lineIndex += 1
                     line = file.readline()
-
+                    
     except FileNotFoundError:
         if f == costfile:
             print("Error : prodfile_path wrong")
@@ -78,5 +78,4 @@ def costParcelDic(cost):
         costDic[cost] +=1
     else:
         costDic[cost] = 1
-
 

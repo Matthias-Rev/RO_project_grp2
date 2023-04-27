@@ -1,10 +1,17 @@
 import random 
+import math
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+#from matplotlib import colors
+import utils
 import copy
 
 class Individual_algo_genetic:
 
-    def __init__(self, map):
+    def __init__(self, map,listParcel=[]):
         self.m_map = map
+        self.m_listParcel = listParcel
         self.m_totalCost = 0                        #must be <500.000
         self.m_totalProd = 0
         self.m_totalCompacity = 0
@@ -13,11 +20,28 @@ class Individual_algo_genetic:
 
         self.m_parcels_placed = []
     
+    def returnList_Parcel(self):
+        return self.m_listParcel
+        
+    #define the compacity
+    def coefCompact(self, highestNasse, allParcel):
+        return highestNasse/allParcel
+    
+    def returnM_totalCost(self):
+        return self.m_totalCost
+    
+    def returnM_totalProd(self):
+        return self.m_totalProd
+    
+    def changeParcel(self, new_parcel):
+        #print(new_parcel)
+        self.m_listParcel = new_parcel
+        for parcel in self.m_listParcel:
+            self.m_totalCost+=parcel.returnCost()
+            self.m_totalProd+=parcel.returnProd()
+    
     def showMatrix(self):
         return self.m_map.returnGrid()
-    
-    def returnNbParcel(self):
-        return self.m_nb_parcel
     
     #define the compacity
     def coefCompact(self, highestNasse, allParcel):
@@ -25,7 +49,8 @@ class Individual_algo_genetic:
     
     #create our individual
     def chooseCandidate(self):
-        listParcel = []
+
+        self.m_listParcel = []
         restoreDic = copy.copy(self.m_map.returnDic())
         while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:
             candidateOk = False
@@ -42,14 +67,17 @@ class Individual_algo_genetic:
         self.cleanIndividual(listParcel, restoreDic)
         return listParcel
 
+
     #define if a parcel is checked
     def putParcel(self, parcelCandidate):
         if not parcelCandidate.parcelPlaced() and ((parcelCandidate.returnCost()+self.m_totalCost)<=50):
             parcelCandidate.parcelPlaced(True)
             self.m_map.returnDic()[str(parcelCandidate.returnCost())] -=1
             if self.m_map.returnDic()[str(parcelCandidate.returnCost())] == 0:
+
                 #print("mort de la clé:", parcelCandidate.returnCost())
                 self.m_map.returnDic().pop(str(parcelCandidate.returnCost()))
+                
             self.m_totalCost += parcelCandidate.returnCost()
             self.m_totalProd += parcelCandidate.returnProd()
             #parcel checked
@@ -78,14 +106,41 @@ class Individual_algo_genetic:
         while not found:
             if typeTargetObj == 'R':
                 self.m_map.m_roads_pos
-                
             
+    def draw_matrix(self):
 
+        # Define the dimensions of the map
+        matrix = self.m_map.returnGrid()
+        y =len(matrix)
+        x = len(matrix[0])
 
+        # Define the colors for each letter
+        colors = {
+            "R": "grey",
+            "C": "white",
+            "x": "red",
+            " ": "black"
+        }
 
+        # Define the colormap
+        cmap = matplotlib.colors.ListedColormap(list(colors.values()))
 
-
-
-
-
+        # Create the image array
+        data = np.zeros((y, x), dtype=int)
+        for i in range(y):
+            for j in range(x):
+                char = matrix[i][j].returnType()
+                if char != 'x':
+                    color = list(colors.keys()).index(char) + 1
+                    data[i, j] = color
+                else:
+                    data[i, j] = "4"
         
+        for instane_parcel in self.returnList_Parcel():
+            data[instane_parcel.returnPosition()[1],instane_parcel.returnPosition()[0]] = 3
+
+        # Display the image
+        plt.figure(figsize=(10, 5))
+        plt.imshow(data, cmap=cmap, interpolation="nearest")
+        plt.axis("off")
+        plt.show()

@@ -68,4 +68,4 @@ class Map:
         j = tuple[1]
         self.m_grid[i][j] = char
         return 0
-    
+
