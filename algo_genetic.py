@@ -67,7 +67,7 @@ class Algo_genetic:
                 # print(list_propriety[i].returnPosition()[1],"return Position")
                 #print()
                 #self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[0]][len(self.m_mapfile.returnGrid()[1])]
-                list_propriety[i] = self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[1]][random.randint(0,len(utils.matrix[1])-1)]
+                list_propriety[i] = self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[1]][random.randint(0,len(self.m_mapfile.returnGrid())-1)]
                 
     
     def genetic_algorithm(self):

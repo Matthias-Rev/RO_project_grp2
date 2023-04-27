@@ -61,11 +61,11 @@ class Individual_algo_genetic:
                 if randomCandidate.returnType() == ' ' and str(randomCandidate.returnCost()) in self.m_map.returnDic().keys() and self.putParcel(randomCandidate):
                     candidateOk = True
                     randomCandidate.changeTypeElem('x')
-                    listParcel.append(randomCandidate)
+                    self.m_listParcel.append(randomCandidate)
         #print(self.m_map.returnGrid())
         print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
-        self.cleanIndividual(listParcel, restoreDic)
-        return listParcel
+        self.cleanIndividual(self.m_listParcel, restoreDic)
+        return self.m_listParcel
 
 
     #define if a parcel is checked
