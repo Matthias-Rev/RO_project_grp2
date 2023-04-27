@@ -1,13 +1,12 @@
 from parcel import Parcel
 from map import Map
 
-costfile = "./donnes_V3/Cost_map.txt"
-prodfile = "./donnes_V3/Production_map.txt"
-mapfile = "./donnes_V3/Usage_map.txt"
+costfile = "./donnes_V2/Cost_map.txt"
+prodfile = "./donnes_V2/Production_map.txt"
+mapfile = "./donnes_V2/Usage_map.txt"
 #mapfile = "./donnes_V2/Map2.txt"
 
 Parcel_listParcel = []
-matrix = []
 costDic = {}
 
 # read costfile and prodfile
@@ -33,11 +32,7 @@ def readFile(f):
                     colindex = 0
                     lineIndex += 1
                     line = file.readline()
-                    if f == prodfile:
-                        matrix.append(lineMatrix)
 
-
-                
     except FileNotFoundError:
         if f == costfile:
             print("Error : prodfile_path wrong")
@@ -69,6 +64,8 @@ def readMapFile(f):
             print("Error : mapfile_path wrong")
     
 def constructMap():
+    Parcel_listParcel = []
+    costDic = {}
     readFile(costfile)
     readFile(prodfile)
     return readMapFile(mapfile)
