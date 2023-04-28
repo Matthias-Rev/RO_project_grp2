@@ -7,16 +7,18 @@ import numpy as np
 class PrometheeII:
 
     def __init__(self, matrix):
-
         self.matrix = np.array(matrix)
+        self.weights = None
         self.normal_matrix = None
         self.concordance_matrix = None
         self.discordance_matrix = None
         self.better_id = None
         self.pareto_border = None
-        
-    def build_matrix(self, instances):
-        self.matrix = np.array([[p.returnM_totalCost(), p.returnM_totalProd()] for p in instances])
+
+    def build_matrix(self, instances, weights):
+        self.matrix = np.array(
+            [[p.returnM_totalCost(), p.returnM_totalProd(), weights[i]] for i, p in enumerate(instances)])
+        self.weights = np.array(weights)
         return self.matrix
 
     def normalize_matrix(self):
@@ -26,21 +28,20 @@ class PrometheeII:
     def calculate_concordance_and_discordance_matrices(self):
         self.concordance_matrix = np.zeros((self.matrix.shape[0], self.matrix.shape[0]))
         self.discordance_matrix = np.zeros((self.matrix.shape[0], self.matrix.shape[0]))
-        for i in range(self.matrix.shape[0]-1):
-            for j in range(self.matrix.shape[0]-1):
+        for i in range(self.matrix.shape[0] - 1):
+            for j in range(self.matrix.shape[0] - 1):
                 if i != j:
-                    concordance_i_j = np.sum(self.normal_matrix[j] >= self.normal_matrix[i]) / self.matrix.shape[1]
+                    concordance_i_j = np.sum(self.weights * (self.normal_matrix[j] >= self.normal_matrix[i])) / np.sum(
+                        self.weights)
                     self.concordance_matrix[i, j] = concordance_i_j
-                    discordance_i_j = np.max(self.normal_matrix[j] - self.normal_matrix[i])
+                    discordance_i_j = np.max((self.normal_matrix[j] - self.normal_matrix[i]) * self.weights)
                     self.discordance_matrix[i, j] = discordance_i_j
 
     def upgrade_id(self):
         self.better_id = np.zeros(self.matrix.shape[0])
-        for i in range(self.matrix.shape[0]-1):
-            #print(self.concordance_matrix[i])
+        for i in range(self.matrix.shape[0] - 1):
             somme_concordance_i = np.sum(self.concordance_matrix[i])
             somme_discordance_i = np.sum(self.discordance_matrix[i])
-            #print(somme_concordance_i + somme_discordance_i)
             self.better_id[i] = somme_concordance_i / (somme_concordance_i + somme_discordance_i)
 
     def find_pareto_border(self):
@@ -59,8 +60,7 @@ class PrometheeII:
         points = []
         for i in self.pareto_border:
             points.append(tuple(self.matrix[i]))
-        print(points,"point")
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.scatter([p[0] for p in points], [p[1] for p in points]) #, [p[2] for p in points]
+        ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
         plt.show()
