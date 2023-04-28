@@ -17,7 +17,7 @@ class Algo_genetic:
         self.m_pop = []
         self.m_mapfile = mapfile
     
-    def selection(self, k=3):
+    def selection_tournament(self, k=3):
         # select a parent from the population
         # first random selection
         selection_ix = random.randint(0,len(self.m_pop)-1)
@@ -76,16 +76,19 @@ class Algo_genetic:
         self.m_pop = list()
 
         for i in range(self.m_n_pop):
-            print("Candidate",i)
+            #print("Candidate",i)
             indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
             indiv_map.chooseCandidate()
             #print(indiv_map.returnList_Parcel(),"candidate début")
             self.m_pop.append(indiv_map)
         
         best, best_eval = self.m_pop[0], self.m_pop[0].returnM_totalCost()+self.m_pop[0].returnM_totalProd()
-        print(best,"init")
+        #print(best,"init")
 
         for gen in range(self.m_iter_max):
+            print(f"=========== {gen} generation ===========")
+            print(f"population: {self.m_n_pop}")
+
             self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]
             for i in range(self.m_n_pop):
                 #print(f"{i} individu {self.m_scores[i]} score")
@@ -93,7 +96,7 @@ class Algo_genetic:
                     best, best_eval = self.m_pop[i], self.m_scores[i]
                     print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
 
-                selected = [self.selection() for _ in range(self.m_n_pop)]
+                selected = [self.selection_tournament() for _ in range(self.m_n_pop)]
 
             children = list()
             for i in range(0, self.m_n_pop-1, 2):
