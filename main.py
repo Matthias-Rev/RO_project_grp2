@@ -14,7 +14,8 @@ Instance_Map=Map(constructMap(), costDic)
 #print(Instance_Map.returnGrid())
 
 #algo = Individual.Individual_algo_genetic(Matrix, Instance_Map, 0)
-test = Algo_genetic(100,500,0.90,0.50,Instance_Map)
+#TODO elite ?, the best indivual disapeared during the evolution ????
+test = Algo_genetic(100,100,0.90,0.50,Instance_Map)
 liste_pop =test.genetic_algorithm()
 
 print(len(liste_pop))

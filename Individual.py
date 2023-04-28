@@ -89,8 +89,6 @@ class Individual_algo_genetic:
         for elem in listeParcelObj:
             elem.changeTypeElem(' ')
             elem.parcelPlaced(False)
-        self.m_totalCost = 0
-        self.m_totalProd = 0
         self.m_map.restoreDic(initialDoc)
         return 0 
         
