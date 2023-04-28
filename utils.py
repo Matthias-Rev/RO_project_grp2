@@ -4,7 +4,6 @@ from map import Map
 costfile = "./donnes_V2/Cost_map.txt"
 prodfile = "./donnes_V2/Production_map.txt"
 mapfile = "./donnes_V2/Usage_map.txt"
-#mapfile = "./donnes_V2/Map2.txt"
 
 Parcel_listParcel = []
 costDic = {}
