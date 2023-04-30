@@ -33,9 +33,16 @@ class Individual_algo_genetic:
     def returnM_totalProd(self):
         return self.m_totalProd
     
-    def changeParcel(self, new_parcel):
+    def returnM_totalComp(self):
+        return self.m_totalCompacity
+    
+    def changeParcel(self,crossover ,new_parcel=[]):
         #print(new_parcel)
-        self.m_listParcel = new_parcel
+        #self.m_totalCompacity=random.randint(1,10)
+        self.m_totalCost=0
+        self.m_totalProd=0
+        if crossover == True:
+            self.m_listParcel = new_parcel
         for parcel in self.m_listParcel:
             self.m_totalCost+=parcel.returnCost()
             self.m_totalProd+=parcel.returnProd()
@@ -49,7 +56,7 @@ class Individual_algo_genetic:
     
     #create our individual
     def chooseCandidate(self):
-
+        #self.m_totalCompacity=random.randint(1,10)
         self.m_listParcel = []
         restoreDic = copy.copy(self.m_map.returnDic())
         while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:

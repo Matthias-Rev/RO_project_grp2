@@ -16,7 +16,7 @@ class PrometheeII:
         self.pareto_border = None
         
     def build_matrix(self, instances):
-        self.matrix = np.array([[p.returnM_totalCost(), p.returnM_totalProd()] for p in instances])
+        self.matrix = np.array([[p.returnM_totalCost(), p.returnM_totalProd()] for p in instances])#,p.returnM_totalComp()
         return self.matrix
 
     def normalize_matrix(self):
