@@ -21,6 +21,9 @@ class Algo_genetic:
         self.m_total_score = 0
         self.m_prob = []
         self.m_cumulative_prob = []
+
+        #elitism
+        self.m_listElitism = []
     
     def selection_tournament(self, k=3):
         # select a parent from the population
@@ -52,6 +55,13 @@ class Algo_genetic:
                 if self.m_cumulative_prob[i-1] < r <= self.m_cumulative_prob[i]:
                     return self.m_pop[i]
 
+    def add_elitism(self,elit_indiv):
+        self.m_listElitism.append(elit_indiv)
+    
+    def next_generation(self,list_input):
+        for elite in self.m_listElitism:
+            list_input.append(elite)
+
     def crossover(self,p1, p2, r_cross):
         # here we copy the parent to create 2 children
         # r_cross is the crossover rate (normally equal to 80%)
@@ -62,6 +72,8 @@ class Algo_genetic:
         #create 2 children every time, but the r_cross indicate that the children is a mix of the parent
         c1 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple1)
         c2 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple2)
+        c1.changeParcel(False)
+        c2.changeParcel(False)
         # check for recombination
         if random.uniform(0, 1) < r_cross:
         # select crossover point that is not on the end of the string
@@ -73,8 +85,8 @@ class Algo_genetic:
 
             #print(parent_tupple1[:pt] + parent_tupple2[pt:],"new tupple c1")
             #print(parent_tupple2[:pt] + parent_tupple1[pt:],"new tupple c2")
-            c1.changeParcel(parent_tupple1[:cut_gene_pt] + parent_tupple2[cut_gene_pt:])
-            c2.changeParcel( parent_tupple2[:cut_gene_pt] + parent_tupple1[cut_gene_pt:])
+            c1.changeParcel(True,parent_tupple1[:cut_gene_pt] + parent_tupple2[cut_gene_pt:])
+            c2.changeParcel(True,parent_tupple2[:cut_gene_pt] + parent_tupple1[cut_gene_pt:])
         return [c1, c2]
     
     def mutation(self,children, r_mut):
@@ -94,8 +106,12 @@ class Algo_genetic:
                 #print()
                 #self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[0]][len(self.m_mapfile.returnGrid()[1])]
                 list_propriety[i] = self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[1]][random.randint(0,len(self.m_mapfile.returnGrid())-1)]
-                
-    
+
+    def print_pop(self):
+        for indiv in self.m_pop:
+            print(f"Le score de l'individu {indiv.returnM_totalCost()+indiv.returnM_totalProd()}")
+        return            
+        
     def genetic_algorithm(self):
 
 
@@ -108,7 +124,7 @@ class Algo_genetic:
             #print(indiv_map.returnList_Parcel(),"candidate début")
             self.m_pop.append(indiv_map)
         
-        best, best_eval = self.m_pop[0], self.m_pop[0].returnM_totalCost()+self.m_pop[0].returnM_totalProd()
+        best, best_eval = self.m_pop[0], self.m_pop[0].returnM_totalCost()+self.m_pop[0].returnM_totalProd()+self.m_pop[0].returnM_totalComp()
         #print(best,"init")
 
         for gen in range(self.m_iter_max):
@@ -116,7 +132,7 @@ class Algo_genetic:
             print(f"population: {self.m_n_pop}")
 
             for individual in self.m_pop:
-                score = individual.m_totalCost+individual.m_totalProd
+                score = individual.m_totalCost+individual.m_totalProd+individual.returnM_totalComp()
                 self.m_scores.append(score)
                 self.m_total_score += score
             
@@ -127,6 +143,7 @@ class Algo_genetic:
                 #print(f"{i} individu {self.m_scores[i]} score")
                 if self.m_scores[i] > best_eval:
                     best, best_eval = self.m_pop[i], self.m_scores[i]
+                    self.add_elitism(self.m_pop[i])
                     print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
 
             #selected = [self.selection_wheel() for _ in range(self.m_n_pop)]
@@ -142,12 +159,14 @@ class Algo_genetic:
                     children.append(c)
             
             # replace population
+            #self.print_pop()
             self.m_pop = children
+            self.next_generation(children)
             self.m_scores = []
             self.m_n_pop = len(children)
             #print(len(best.returnList_Parcel()))
             #print(best,"end")
             #best.draw_matrix()
         for indiv in self.m_pop:
-            print(indiv.returnM_totalCost()+indiv.returnM_totalProd())
+            print(indiv.returnM_totalCost()+indiv.returnM_totalProd()+indiv.returnM_totalComp())
         return self.m_pop
