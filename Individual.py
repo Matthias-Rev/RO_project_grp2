@@ -1,4 +1,5 @@
-import random 
+import random
+import compacity 
 from parcel import Parcel
 import numpy as np
 import matplotlib
@@ -8,6 +9,7 @@ import copy
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib.collections import PolyCollection
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 class Individual_algo_genetic:
 
@@ -17,6 +19,8 @@ class Individual_algo_genetic:
         self.m_totalCost = 0                        #must be <500.000
         self.m_totalProd = 0
         self.m_totalCompacity = 0
+        self.m_totalArea = map.returnTotalArea()
+
         #distance entre les zones habitées
         #compacité ???? -> surface d'une "nasse"
 
@@ -46,8 +50,34 @@ class Individual_algo_genetic:
         return self.m_map.returnGrid()
     
     #define the compacity
-    def coefCompact(self, highestNasse, allParcel):
-        return highestNasse/allParcel
+    def compacity(self, listParcels):
+        listObjet = compacity.recoveryCoords(listParcels)
+        #Maj de l'emplacement dans le sens anti-horlogique par aprtitionnement
+        AHSortList = compacity.Partitionning(listObjet)
+
+        listObjet = set(listObjet)
+        AHSortList = set(AHSortList)
+        listObjet.difference_update(AHSortList)
+        listObjet = list(listObjet)
+        AHSortList = list(AHSortList)
+
+        #Tri des listes par ligne
+        listObjet = compacity.returnSortLineList(listObjet)
+        AHSortList.append(listObjet[0])
+        AHSortList.append(listObjet[-1])
+        AHSortList = compacity.returnSortLineList(AHSortList)
+
+        #Tri des partitions de liste par colones
+        listObjet = compacity.returnPartialColSort2(listObjet, 'L')
+        AHSortList = compacity.returnPartialColSort2(AHSortList, 'R')
+
+        compacity.returnVisitedPoint(listObjet)
+        compacity.returnVisitedPoint(AHSortList)
+
+        print(listObjet)
+        print(AHSortList)
+
+        return (compacity.returnSurface(listObjet,AHSortList)/self.m_totalArea)*100
     
     #create our individual
     def chooseCandidate(self):
@@ -66,7 +96,7 @@ class Individual_algo_genetic:
                     self.m_listParcel.append(randomCandidate)
         #print(self.m_map.returnGrid())
         print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
-        self.returnCompacity(self.m_listParcel)
+        self.compacity(self.m_listParcel)
         self.cleanIndividual(self.m_listParcel, restoreDic)
         return self.m_listParcel
 
@@ -110,24 +140,7 @@ class Individual_algo_genetic:
     def returnCompacity(self, listParcel):
 
         listParcelcopy = copy.copy(listParcel)
-        printList=[]
-        for elem in listParcel:
-            printList.append(elem.returnPosition())
-
-        # Convertir la liste en un tableau NumPy 2D
-        coords_array = np.array(printList)
-
-        # Créer une liste de faces pour la surface polygonale
-        faces = [[i for i in range(len(printList))]]
-
-        # Créer la surface polygonale à partir des points et des faces
-        poly = PolyCollection([coords_array], facecolors='blue', alpha=0.5)
-
-        # Créer le graphique et afficher la surface polygonale
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.add_collection3d(poly, zs=0)
-        plt.show()
+        
         
         #print(printList)
         
@@ -158,7 +171,34 @@ class Individual_algo_genetic:
         lowMidParcelA  = min(lowestMidColParcel, key = Parcel.returnLinePosition); lowMidParcelB  = max(lowestMidColParcel, key = Parcel.returnLinePosition)
         highMidParcelA  = min(highestMidColParcel, key = Parcel.returnLinePosition); highMidParcelB  = max(highestMidColParcel, key = Parcel.returnLinePosition)
         
+        picliste = [lowParcelA, lowMidParcelA, highParcelA,highMidParcelA]
+        printList=[]
+        for elem in picliste:
+            printList.append(elem.returnPosition())
         print(printList)
+
+        x = []
+        y = []
+        for elem in printList:
+            x.append(elem[0])
+            y.append(elem[1])
+        # Tracer les points
+        plt.scatter(x, y)
+
+        # Créer la surface à partir des coordonnées
+        plt.fill_between(x, y, color='blue', alpha=0.2)
+
+        # Calculer l'aire de la surface
+        area = np.abs(np.trapz(y, x))
+
+        # Afficher l'aire sur le graphique
+        plt.text(2, 2, f'Aire = {area}', fontsize=12)
+
+        # Afficher le graphique
+        plt.show()
+
+
+        self.draw_matrix()
 
 
     def draw_matrix(self):

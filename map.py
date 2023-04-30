@@ -12,8 +12,13 @@ class Map:
 
         self.m_costDic = dictionnary
 
+        self.m_total_area = len(grid)*len(grid[0])
+
         self.posInit()
 
+    def returnTotalArea(self):
+        area = len(self.m_grid)*len(self.m_grid[0])
+        return area
     
     def returnDic(self):
         return self.m_costDic
