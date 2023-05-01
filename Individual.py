@@ -20,6 +20,8 @@ class Individual_algo_genetic:
         self.m_totalProd = 0
         self.m_totalCompacity = 0
         self.m_totalArea = map.returnTotalArea()
+        self.m_CluserList = []
+        self.m_minDistHabitation = 0
 
         #distance entre les zones habitées
         #compacité ???? -> surface d'une "nasse"
@@ -74,8 +76,8 @@ class Individual_algo_genetic:
         compacity.returnVisitedPoint(listObjet)
         compacity.returnVisitedPoint(AHSortList)
 
-        print(listObjet)
-        print(AHSortList)
+        # print(listObjet)
+        # print(AHSortList)
 
         return (compacity.returnSurface(listObjet,AHSortList)/self.m_totalArea)*100
     
@@ -84,7 +86,8 @@ class Individual_algo_genetic:
         if len(self.m_listParcel) == 0:
             self.m_listParcel = []
         restoreDic = copy.copy(self.m_map.returnDic())
-        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:
+        randomNumber = random.randint(1,5)
+        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50 and len(self.m_listParcel) < randomNumber:
             candidateOk = False
             while not candidateOk:
                 i = random.randint(0, len(self.m_map.returnGrid())-1)
@@ -94,9 +97,11 @@ class Individual_algo_genetic:
                     candidateOk = True
                     randomCandidate.changeTypeElem('x')
                     self.m_listParcel.append(randomCandidate)
-        #print(self.m_map.returnGrid())
+
+        self.choosePosition()
         print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
-        self.compacity(self.m_listParcel)
+        self.m_minDistHabitation = self.moyenne_min_dist_parcel()
+        self.m_totalCompacity = self.compacity(self.m_listParcel)
         self.cleanIndividual(self.m_listParcel, restoreDic)
         return self.m_listParcel
 
@@ -238,3 +243,57 @@ class Individual_algo_genetic:
         plt.imshow(data, cmap=cmap, interpolation="nearest")
         plt.axis("off")
         plt.show()
+
+
+    def choosePosition(self):
+
+        allCluster = []
+        i = 0
+        while i<len(self.m_listParcel):
+            allCluster.append([self.m_listParcel[i]])
+            i +=1
+
+        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:
+            # print("lowest key = ",int(next(iter(self.m_map.returnDic()))))
+            candidateOk = False
+            # Choix aléatoire d'un cluster dans la liste
+            cluster = random.choice(allCluster)
+            parcelChoice = random.choice(cluster)
+            col, row = parcelChoice.returnPosition()
+            i,j = col,row
+            while not candidateOk:
+                randomCol = random.randint(-1,1)
+                randomRow = random.randint(-1,1)
+                if (i + randomCol) < self.m_map.returnWidth()-1 and (i + randomCol) >= 0: 
+                    i += randomCol
+                if (j + randomRow) < self.m_map.returnHeigth()-1 and (j + randomRow) >= 0: 
+                    j += randomRow
+                randomCandidate = self.m_map.returnObject(j,i)
+                if randomCandidate.returnType() == ' ' and str(randomCandidate.returnCost()) in self.m_map.returnDic().keys() and self.putParcel(randomCandidate):
+                    randomCandidate.changeTypeElem('x')
+                    self.m_listParcel.append(randomCandidate)
+                    cluster.append(randomCandidate)
+                    candidateOk = True
+        
+        self.m_CluserList = allCluster
+
+        return 0
+
+    def min_dist_parcel(self,group_taken_parcel):
+        min_distances = []
+        habitate_parcel=self.m_map.returnHouses()
+        for p in group_taken_parcel:
+            distances_p = []
+            for hLine in habitate_parcel:
+                for h in hLine:
+                    distances_p.append(np.linalg.norm(np.array(p.returnPosition()) - np.array(h)))
+            min_distances.append(min(distances_p))
+            occur_nb = len(min_distances)
+            return min(min_distances) / occur_nb
+
+    def moyenne_min_dist_parcel(self):
+        coeff_dist = []
+        for p in self.m_CluserList:
+            dist_p = self.min_dist_parcel(p)
+            coeff_dist.append(dist_p)
+        return sum(coeff_dist) / len(coeff_dist)
