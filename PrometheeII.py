@@ -16,7 +16,7 @@ class PrometheeII:
         self.pareto_border = None
         
     def build_matrix(self, instances):
-        self.matrix = np.array([[p.returnM_totalCost(), p.returnM_totalProd()] for p in instances])
+        self.matrix = np.array([[p.returnM_totalComp(), p.returnM_totalComp(), p.return_m_minDistHabitation()] for p in instances])
         return self.matrix
 
     def normalize_matrix(self):
@@ -62,5 +62,5 @@ class PrometheeII:
         print(points,"point")
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.scatter([p[0] for p in points], [p[1] for p in points]) #, [p[2] for p in points]
+        ax.scatter([p[0] for p in points], [p[1] for p in points],[p[2] for p in points]) #, [p[2] for p in points]
         plt.show()
