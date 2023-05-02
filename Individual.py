@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import copy
+import math
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -54,7 +55,7 @@ class Individual_algo_genetic:
     #define the compacity
     def compacity(self, listParcels):
         listObjet = compacity.recoveryCoords(listParcels)
-        #Maj de l'emplacement dans le sens anti-horlogique par aprtitionnement
+        #Maj de l'emplacement dans le sens anti-horlogique par partitionnement
         AHSortList = compacity.Partitionning(listObjet)
 
         listObjet = set(listObjet)
@@ -65,8 +66,11 @@ class Individual_algo_genetic:
 
         #Tri des listes par ligne
         listObjet = compacity.returnSortLineList(listObjet)
-        AHSortList.append(listObjet[0])
-        AHSortList.append(listObjet[-1])
+        
+        if len(AHSortList) > 0:
+            recoveryElem = AHSortList[0]
+            AHSortList[0] = listObjet[0]
+            AHSortList.append(recoveryElem)
         AHSortList = compacity.returnSortLineList(AHSortList)
 
         #Tri des partitions de liste par colones
@@ -76,10 +80,14 @@ class Individual_algo_genetic:
         compacity.returnVisitedPoint(listObjet)
         compacity.returnVisitedPoint(AHSortList)
 
-        # print(listObjet)
-        # print(AHSortList)
+        #Ajout de la jonction entre les deux parties
+        junctionList = compacity.returnJunctionSurface(listObjet,AHSortList)
 
-        return (compacity.returnSurface(listObjet,AHSortList)/self.m_totalArea)*100
+        print(listObjet)
+        print(AHSortList)
+        print(junctionList)
+
+        return (compacity.returnSurface(listObjet,AHSortList,junctionList)/self.m_totalArea)*100
     
     #create our individual
     def chooseCandidate(self):
@@ -100,10 +108,10 @@ class Individual_algo_genetic:
 
         self.choosePosition()
         print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
-        self.m_minDistHabitation = self.moyenne_min_dist_parcel()
-        self.m_totalCompacity = self.compacity(self.m_listParcel)
-        self.cleanIndividual(self.m_listParcel, restoreDic)
-        return self.m_listParcel
+        #self.m_minDistHabitation = self.moyenne_min_dist_parcel()
+        self.m_totalCompacity = self.compacity(self.m_CluserList)
+        self.cleanIndividual(self.m_CluserList, restoreDic)
+        return self.m_CluserList
 
     #define if a parcel is checked
     def putParcel(self, parcelCandidate):
@@ -128,84 +136,7 @@ class Individual_algo_genetic:
         self.m_totalProd = 0
         self.m_map.restoreDic(initialDoc)
         return 0 
-        
-    ### in process...
-    def objectDistance(self, objectA=(0,0), objectB=(0,0), i=0):
-        print("object = ", self.m_map.m_roads_pos[i])
-        print(f"difference ligne = {abs(objectA[0]-objectB[0])}, difference col = {abs(objectA[1]-objectB[1])}")
-    
-    ### in process...
-    def findNearestObj(self, posActualObj=(0,0),typeTargetObj=' '):
-        found = False
-        distance = 0
-        while not found:
-            if typeTargetObj == 'R':
-                self.m_map.m_roads_pos
-    
-    def returnCompacity(self, listParcel):
-
-        listParcelcopy = copy.copy(listParcel)
-        
-        
-        #print(printList)
-        
-        minLineParcel = min(listParcel, key=Parcel.returnLinePosition)
-        maxLineParcel = max(listParcel, key=Parcel.returnLinePosition)
-
-        lowestLineParcel = [parcel for parcel in listParcel if parcel.returnLinePosition() == minLineParcel.returnLinePosition()]
-        highestLineParcel = [parcel for parcel in listParcel if parcel.returnLinePosition() == maxLineParcel.returnLinePosition()]
-
-        lowParcelA  = min(lowestLineParcel, key = Parcel.returnColPosition); lowParcelB  = max(lowestLineParcel, key = Parcel.returnColPosition)
-        highParcelA  = min(highestLineParcel, key = Parcel.returnColPosition); highParcelB  = max(highestLineParcel, key = Parcel.returnColPosition)
-        
-        listParcelcopy.remove(lowParcelA); listParcelcopy.remove(highParcelA)
-        if len(lowestLineParcel)>1:
-            listParcelcopy.remove(lowParcelB)
-        if len(highestLineParcel)>1:
-            listParcelcopy.remove(highParcelB)
-
-        minColParcel = min(listParcelcopy, key=Parcel.returnColPosition)
-        maxColParcel = max(listParcelcopy, key=Parcel.returnColPosition)
-
-        lowestMidColParcel = [parcel for parcel in listParcelcopy if parcel.returnColPosition() == minColParcel.returnColPosition()]
-                              #and parcel.returnColPosition() < lowParcelA.returnColPosition()]
-        highestMidColParcel = [parcel for parcel in listParcelcopy if parcel.returnColPosition() == maxColParcel.returnColPosition()]
-                              #and parcel.returnColPosition() < highParcelA.returnColPosition()]
-        
-        
-        lowMidParcelA  = min(lowestMidColParcel, key = Parcel.returnLinePosition); lowMidParcelB  = max(lowestMidColParcel, key = Parcel.returnLinePosition)
-        highMidParcelA  = min(highestMidColParcel, key = Parcel.returnLinePosition); highMidParcelB  = max(highestMidColParcel, key = Parcel.returnLinePosition)
-        
-        picliste = [lowParcelA, lowMidParcelA, highParcelA,highMidParcelA]
-        printList=[]
-        for elem in picliste:
-            printList.append(elem.returnPosition())
-        print(printList)
-
-        x = []
-        y = []
-        for elem in printList:
-            x.append(elem[0])
-            y.append(elem[1])
-        # Tracer les points
-        plt.scatter(x, y)
-
-        # Créer la surface à partir des coordonnées
-        plt.fill_between(x, y, color='blue', alpha=0.2)
-
-        # Calculer l'aire de la surface
-        area = np.abs(np.trapz(y, x))
-
-        # Afficher l'aire sur le graphique
-        plt.text(2, 2, f'Aire = {area}', fontsize=12)
-
-        # Afficher le graphique
-        plt.show()
-
-
-        self.draw_matrix()
-
-
+            
     def draw_matrix(self):
 
         # Define the dimensions of the map
@@ -275,25 +206,30 @@ class Individual_algo_genetic:
                     cluster.append(randomCandidate)
                     candidateOk = True
         
-        self.m_CluserList = allCluster
+        for list in allCluster:
+            for elem in list:
+                self.m_CluserList.append(elem)
 
         return 0
 
-    def min_dist_parcel(self,group_taken_parcel):
+    def min_dist_parcel(self, group_taken_parcel):
         min_distances = []
-        habitate_parcel=self.m_map.returnHouses()
+        habitate_parcel = self.m_map.returnHouses()
         for p in group_taken_parcel:
             distances_p = []
             for hLine in habitate_parcel:
                 for h in hLine:
-                    distances_p.append(np.linalg.norm(np.array(p.returnPosition()) - np.array(h)))
+                    distance = math.sqrt((h[0] - p.returnPosition()[0]) ** 2 + (h[1] - p.returnPosition()[1]) ** 2)
+                    distances_p.append(distance)
             min_distances.append(min(distances_p))
-            occur_nb = len(min_distances)
-            return min(min_distances) / occur_nb
+        print(min_distances)
+        occur_nb = len(min_distances)
+        min_dist = min(min_distances) if min_distances else 0
+        return min_dist / occur_nb
 
     def moyenne_min_dist_parcel(self):
         coeff_dist = []
-        for p in self.m_CluserList:
+        for p in self.m_GroupCluserList:
             dist_p = self.min_dist_parcel(p)
             coeff_dist.append(dist_p)
         return sum(coeff_dist) / len(coeff_dist)
