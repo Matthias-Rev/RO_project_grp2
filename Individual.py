@@ -189,7 +189,7 @@ class Individual_algo_genetic:
     #define the compacity
     def compacity(self, listParcels):
         listObjet = compacity.recoveryCoords(listParcels)
-        #Maj de l'emplacement dans le sens anti-horlogique par aprtitionnement
+        #Maj de l'emplacement dans le sens anti-horlogique par partitionnement
         AHSortList = compacity.Partitionning(listObjet)
 
         listObjet = set(listObjet)
@@ -200,8 +200,11 @@ class Individual_algo_genetic:
 
         #Tri des listes par ligne
         listObjet = compacity.returnSortLineList(listObjet)
-        AHSortList.append(listObjet[0])
-        AHSortList.append(listObjet[-1])
+        
+        if len(AHSortList) > 0:
+            recoveryElem = AHSortList[0]
+            AHSortList[0] = listObjet[0]
+            AHSortList.append(recoveryElem)
         AHSortList = compacity.returnSortLineList(AHSortList)
 
         #Tri des partitions de liste par colones
@@ -211,10 +214,15 @@ class Individual_algo_genetic:
         compacity.returnVisitedPoint(listObjet)
         compacity.returnVisitedPoint(AHSortList)
 
-        # print(listObjet)
-        # print(AHSortList)
+        #Ajout de la jonction entre les deux parties
+        junctionList = compacity.returnJunctionSurface(listObjet,AHSortList)
 
-        return (compacity.returnSurface(listObjet,AHSortList)/self.m_totalArea)*100
+        print(listObjet)
+        print(AHSortList)
+        print(junctionList)
+        print(self.m_totalArea)
+
+        return (compacity.returnSurface(listObjet,AHSortList,junctionList)/self.m_totalArea)*100
     
     #create our individual
     def chooseCandidate(self):

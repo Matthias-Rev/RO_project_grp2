@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 
 def recoveryCoords(listParcel):
     listCoords = []
-    #print(listParcel)
     for elem in listParcel:
         listCoords.append(elem.returnPosition())
     return listCoords
@@ -18,8 +17,14 @@ def returnCol(objet):
 
 def Partitionning(listObj):
     AHSortList = []
+
+    minelem = min(listObj, key=returnLine)
     for elem in listObj:
-        if returnCol(elem) > returnCol(min(listObj, key=returnLine)):
+        if returnLine(elem) == returnLine(minelem) and returnCol(elem) < returnCol(minelem):
+            minelem = elem
+
+    for elem in listObj:
+        if returnCol(elem) > returnCol(minelem):
             AHSortList.append(elem)
 
     return AHSortList
@@ -36,7 +41,9 @@ def returnSortLineList(listObj):
     return SortLineList
 
 def returnVisitedPoint(listObj):
-    listPoint=[listObj[0]]
+    listPoint=[]
+    if len(listObj)>1:
+        listPoint.append(listObj[0])
     i=1
     while i < len(listObj)-1:
         slopePti=returnSlope(listObj[i], listObj[0])
@@ -48,7 +55,8 @@ def returnVisitedPoint(listObj):
             listObj.remove(listObj[i])
             i-=1
             listPoint.remove(listObj[i])
-    listPoint.append(listObj[-1])
+    if len(listObj)>1:
+        listPoint.append(listObj[-1])
     return listPoint
 
 def returnSlope(ObjA, ObjB):
@@ -95,9 +103,27 @@ def returnPartialColSort2(listObj, side):
             i+=1
     return sortList
 
-def returnSurface(listObjA, listObjB):
+def returnJunctionSurface(listObjA, listObjB):
+    junctionList = [listObjA[0]]
+    if len(listObjA) > 1 and len(listObjB) > 1:
+        junctionList.append(listObjA[-1])
+        junctionList.append(listObjB[-1])
+    elif len(listObjA) == 1:
+        junctionList.append(listObjB[-2])
+        junctionList.append(listObjB[-1])
+        listObjB.remove(listObjB[-1])
+    elif len(listObjB) == 1:
+        junctionList.append(listObjA[-2])
+        junctionList.append(listObjA[-1])
+        listObjA.remove(listObjA[-1])
+    
+    return junctionList
+
+
+
+def returnSurface(listObjA, listObjB, listObjC):
     i=1
-    #fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     totalSurface = 0
     while i < len(listObjA) -1:
 
@@ -113,7 +139,7 @@ def returnSurface(listObjA, listObjB):
 
         # Création du triangle
         plt.Polygon(coords, color='blue', alpha=0.5)
-        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
     while i < len(listObjB) -1:
@@ -130,11 +156,28 @@ def returnSurface(listObjA, listObjB):
 
         # Création du triangle
         plt.Polygon(coords, color='blue', alpha=0.5)
-        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
-    #plt.close()
+    i=1
+    while i < len(listObjC) -1:
+
+        coords = [listObjC[0], listObjC[i], listObjC[i+1]]
+
+        # Calcul de l'aire du triangle
+        a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
+        b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
+        c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
+        p = (a+b+c)/2
+        surface = np.sqrt(p*(p-a)*(p-b)*(p-c))
+        totalSurface += surface
+
+        # Création du triangle
+        plt.Polygon(coords, color='blue', alpha=0.5)
+        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        i+=1
     # Affichage du triangle
-    # plt.axis('equal')
-    # plt.show()
+    plt.axis('equal')
+    #plt.show()
+    plt.close()
     # print("la surface totale est de :", totalSurface)
     return totalSurface

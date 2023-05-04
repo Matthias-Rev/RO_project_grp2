@@ -15,7 +15,7 @@ Instance_Map=Map(constructMap(), costDic)
 # #print(Instance_Map.returnGrid())
 
 # #algo = Individual.Individual_algo_genetic(Matrix, Instance_Map, 0)
-test = Algo_genetic(5,150,0.80,0.20,Instance_Map)
+test = Algo_genetic(5,300,0.80,0.20,Instance_Map)
 liste_pop =test.genetic_algorithm()
 
 promethe = PrometheeII([1,2])
