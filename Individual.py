@@ -117,12 +117,12 @@ class Individual_algo_genetic:
         first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
         while self.m_totalCost+first_parcel.returnCost() <= 50 and first_parcel.returnType()!="R" and first_parcel not in self.m_CluserList:
-            print("again")
+            #print("again")
             self.m_CluserList.insert(self.m_CluserList.index(random_parcel)+1,first_parcel)
             self.m_totalProd+=first_parcel.returnProd()
             self.m_totalCost+=first_parcel.returnCost()
             random_parcel_position, random_parcel_x,random_parcel_y,random_parcel = self.random_choice()
-            print(random_parcel_position," ", random_parcel_x," ",random_parcel_y," ",random_parcel)
+            #print(random_parcel_position," ", random_parcel_x," ",random_parcel_y," ",random_parcel)
             first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
         
@@ -217,10 +217,10 @@ class Individual_algo_genetic:
         #Ajout de la jonction entre les deux parties
         junctionList = compacity.returnJunctionSurface(listObjet,AHSortList)
 
-        print(listObjet)
-        print(AHSortList)
-        print(junctionList)
-        print(self.m_totalArea)
+        # print(listObjet)
+        # print(AHSortList)
+        # print(junctionList)
+        # print(self.m_totalArea)
 
         return (compacity.returnSurface(listObjet,AHSortList,junctionList)/self.m_totalArea)*100
     
@@ -245,7 +245,7 @@ class Individual_algo_genetic:
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.cleanIndividual(self.m_CluserList, restoreDic)
-        print(f"valeur production = {self.m_totalProd}, compacity = {self.m_totalCompacity}, score = {self.moyenne()}")
+        #print(f"valeur production = {self.m_totalProd}, compacity = {self.m_totalCompacity}, score = {self.moyenne()}")
         return self.m_CluserList
 
     #define if a parcel is checked

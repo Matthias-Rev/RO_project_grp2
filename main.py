@@ -14,15 +14,17 @@ Instance_Map=Map(constructMap(), costDic)
 # #Instance_Map.posInit()
 # #print(Instance_Map.returnGrid())
 
+def build_matrix(instances):
+    matrix = np.array([[p.returnM_totalComp(), p.returnM_totalComp(), p.return_m_minDistHabitation()] for p in instances])
+    return matrix
+
 # #algo = Individual.Individual_algo_genetic(Matrix, Instance_Map, 0)
-test = Algo_genetic(5,300,0.80,0.20,Instance_Map)
+test = Algo_genetic(1,1000,0.80,0.20,Instance_Map)
 liste_pop =test.genetic_algorithm()
 
-promethe = PrometheeII([1,2])
-print(promethe.build_matrix(liste_pop))
-promethe.normalize_matrix()
-promethe.calculate_concordance_and_discordance_matrices()
-promethe.upgrade_id()
+weights = [1, 1, 1]
+matrix = build_matrix(liste_pop)
+promethe = PrometheeII(matrix,weights)
 promethe.find_pareto_border()
 promethe.show_3d_graph()
 

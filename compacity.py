@@ -123,7 +123,7 @@ def returnJunctionSurface(listObjA, listObjB):
 
 def returnSurface(listObjA, listObjB, listObjC):
     i=1
-    fig, ax = plt.subplots()
+    #fig, ax = plt.subplots()
     totalSurface = 0
     while i < len(listObjA) -1:
 
@@ -134,12 +134,12 @@ def returnSurface(listObjA, listObjB, listObjC):
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
         p = (a+b+c)/2
-        surface = np.sqrt(p*(p-a)*(p-b)*(p-c))
+        surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
         totalSurface += surface
 
         # Création du triangle
         plt.Polygon(coords, color='blue', alpha=0.5)
-        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
     while i < len(listObjB) -1:
@@ -151,12 +151,12 @@ def returnSurface(listObjA, listObjB, listObjC):
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
         p = (a+b+c)/2
-        surface = np.sqrt(p*(p-a)*(p-b)*(p-c))
+        surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
         totalSurface += surface
 
         # Création du triangle
         plt.Polygon(coords, color='blue', alpha=0.5)
-        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
     while i < len(listObjC) -1:
@@ -168,16 +168,16 @@ def returnSurface(listObjA, listObjB, listObjC):
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
         p = (a+b+c)/2
-        surface = np.sqrt(p*(p-a)*(p-b)*(p-c))
+        surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
         totalSurface += surface
 
         # Création du triangle
         plt.Polygon(coords, color='blue', alpha=0.5)
-        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     # Affichage du triangle
-    plt.axis('equal')
+    #plt.axis('equal')
     #plt.show()
-    plt.close()
+    #plt.close()
     # print("la surface totale est de :", totalSurface)
     return totalSurface
