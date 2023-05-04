@@ -34,29 +34,36 @@ class Algo_genetic:
         # check if better (e.g. perform a tournament)
             if self.m_scores[ix] < self.m_scores[selection_ix]:
                 selection_ix = ix
-        print(self.moyenne(self.m_pop[selection_ix]))
+        #print(self.moyenne(self.m_pop[selection_ix]))
         return self.m_pop[selection_ix]
     
     def construct_wheel(self):
         index = 0
         for individual_prob in self.m_scores:
-            p=round(individual_prob/self.m_total_score,3)
+            #p=round(individual_prob/self.m_total_score,3)
+            p=(individual_prob/self.m_total_score)*1000
+            #print(p,"p")
             self.m_prob.append(p)
             if index == 1:
-                self.m_cumulative_prob.append(round(self.m_cumulative_prob[-1]+p,3))
+                #self.m_cumulative_prob.append(round(self.m_cumulative_prob[-1]+p,3))
+                self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+p)
             else:
                 self.m_cumulative_prob.append(p)
             index=1
+        #print(self.m_cumulative_prob,"cumulative")
     
     def selection_wheel(self):
-        r = round(random.uniform(0, 1),4)
+        #r = round(random.uniform(0, self.m_cumulative_prob[-1]),3)
+        r = random.uniform(0, self.m_cumulative_prob[-1])
+        #print(r,"random choice")
         if r <= self.m_cumulative_prob[0]:
             return self.m_pop[0]
         else:
             #TODO -1 maybe not useful
-            for i in range(1,len(self.m_cumulative_prob)-1):
+            for i in range(1,len(self.m_cumulative_prob)):
                 if self.m_cumulative_prob[i-1] < r <= self.m_cumulative_prob[i]:
-                    print(self.moyenne(self.m_pop[i]))
+                    #print(self.moyenne(self.m_pop[i]))
+                    #print(self.m_pop[i],"write in function")
                     return self.m_pop[i]
 
     def add_elitism(self,elit_indiv):
@@ -74,18 +81,6 @@ class Algo_genetic:
             parent_tupple2 = p2.return_m_Clusterlist()
             parent_cluster1 = p1.return_m_GroupCluserList()
             parent_cluster2 = p2.return_m_GroupCluserList()
-
-            # print("parent 1")
-            # p1.draw_matrix()
-            # print("end parent 1")
-            # print("parent 2")
-            # p2.draw_matrix()
-            # print("end parent 2")
-
-            # print("parent 1",self.moyenne(p1))
-            # p1.draw_matrix()
-            # print("parent 2",self.moyenne(p2))
-            # p2.draw_matrix()
 
             c1 = Individual.Individual_algo_genetic(self.m_mapfile)
             c2 = Individual.Individual_algo_genetic(self.m_mapfile)
@@ -123,33 +118,6 @@ class Algo_genetic:
                     # print("child score", self.moyenne(child))
                     # child.draw_matrix()
         return return_list
-
-    # def crossover(self,p1, p2, r_cross):
-    #     # here we copy the parent to create 2 children
-    #     # r_cross is the crossover rate (normally equal to 80%)
-    #     # children are copies of parents by default
-    #     parent_tupple1 = p1.returnList_Parcel()
-    #     parent_tupple2 = p2.returnList_Parcel()
-
-    #     #create 2 children every time, but the r_cross indicate that the children is a mix of the parent
-    #     c1 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple1)
-    #     c2 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple2)
-    #     c1.changeParcel(False)
-    #     c2.changeParcel(False)
-    #     # check for recombination
-    #     if random.uniform(0, 1) < r_cross:
-    #     # select crossover point that is not on the end of the string
-    #         #print(len(c1.returnList_Parcel()),"len du candidat")
-    #         cut_gene_pt = random.randint(1, len(c1.returnList_Parcel())-1)
-    #         # perform crossover
-    #         #c1.m_listParcel = parent_tupple1[:pt] + parent_tupple2[pt:]
-    #         #c2.m_listParcel = parent_tupple2[:pt] + parent_tupple1[pt:]
-
-    #         #print(parent_tupple1[:pt] + parent_tupple2[pt:],"new tupple c1")
-    #         #print(parent_tupple2[:pt] + parent_tupple1[pt:],"new tupple c2")
-    #         c1.changeParcel(True,parent_tupple1[:cut_gene_pt] + parent_tupple2[cut_gene_pt:])
-    #         c2.changeParcel(True,parent_tupple2[:cut_gene_pt] + parent_tupple1[cut_gene_pt:])
-    #     return [c1, c2]
     
     def mutation(self,children, r_mut):
         #TODO prendre un cluster au hasard et le déplacer sur la map
@@ -168,7 +136,7 @@ class Algo_genetic:
         return
 
     def moyenne(self, indiv):
-        return (-1*indiv.returnM_totalComp()+-1*indiv.return_m_minDistHabitation()+indiv.returnM_totalProd())        
+        return (1*indiv.returnM_totalComp()+1*indiv.return_m_minDistHabitation()+2*indiv.returnM_totalProd())        
         
     def genetic_algorithm(self):
 
@@ -218,10 +186,12 @@ class Algo_genetic:
             #selected = [self.selection_tournament() for _ in range(self.m_n_pop)]
             #selected = [self.selection_wheel() for _ in range(self.m_n_pop)]
             selected=[]
-            for _ in range(self.m_n_pop):
-                test = self.selection_wheel()
-                print(test)
-                selected.append(test)
+            for ok in range(self.m_n_pop):
+                #test = self.selection_wheel()
+                #print(test,"test")
+                selected.append(self.selection_wheel())
+
+            #print(selected, "liste")
 
             children = list()
             for i in range(0, self.m_n_pop-1, 2):
@@ -239,7 +209,9 @@ class Algo_genetic:
             self.m_pop = children
             #self.next_generation(children)
             self.m_scores = []
+            self.m_cumulative_prob=[]
             self.m_n_pop = len(children)
+            self.m_total_score=0
             #print(len(best.returnList_Parcel()))
             #print(best,"end")
             #best.draw_matrix()
@@ -253,4 +225,6 @@ class Algo_genetic:
 
         # Show the plot
         plt.show()
+        for i in self.m_pop:
+            print(self.moyenne(i))
         return self.m_pop

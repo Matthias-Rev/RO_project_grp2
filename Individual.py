@@ -117,27 +117,37 @@ class Individual_algo_genetic:
         first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
         while self.m_totalCost+first_parcel.returnCost() <= 50 and first_parcel.returnType()!="R" and first_parcel not in self.m_CluserList:
+            print("again")
             self.m_CluserList.insert(self.m_CluserList.index(random_parcel)+1,first_parcel)
             self.m_totalProd+=first_parcel.returnProd()
             self.m_totalCost+=first_parcel.returnCost()
             random_parcel_position, random_parcel_x,random_parcel_y,random_parcel = self.random_choice()
+            print(random_parcel_position," ", random_parcel_x," ",random_parcel_y," ",random_parcel)
             first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
         
         #print(self.m_CluserList,"next cluster")
 
         self.Cluster_group_change(p1,p2,new_parcel1,new_parcel2,True)
+        #print(self.m_GroupCluserList,"before min")
 
         #print(self.return_m_GroupCluserList(),"grp")
 
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
 
+    def moyenne(self):
+        return (1*self.returnM_totalComp()+1*self.return_m_minDistHabitation()+2*self.returnM_totalProd())  
+
     def random_choice(self):
-        random_parcel = random.choice(self.m_CluserList)
-        random_parcel_position = random_parcel.returnPosition()
-        random_parcel_y = random.choice([-1,1])
-        random_parcel_x = random.choice([1,-1])
+        out_of_range = True
+        while out_of_range == True:
+            random_parcel = random.choice(self.m_CluserList)
+            random_parcel_position = random_parcel.returnPosition()
+            random_parcel_y = random.choice([-1,1])
+            random_parcel_x = random.choice([1,-1])
+            if random_parcel_position[0]+random_parcel_x < 170 and random_parcel_position[1]+random_parcel_y < 70:
+                out_of_range = False
         return random_parcel_position,random_parcel_x,random_parcel_y,random_parcel
 
     def changeParcel(self ,p1,p2,cut_gene,new_parcel1=[],new_parcel2=[]):
@@ -227,7 +237,7 @@ class Individual_algo_genetic:
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.cleanIndividual(self.m_CluserList, restoreDic)
-        print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}, compacity = {self.m_totalCompacity}")
+        print(f"valeur production = {self.m_totalProd}, compacity = {self.m_totalCompacity}, score = {self.moyenne()}")
         return self.m_CluserList
 
     #define if a parcel is checked
@@ -345,7 +355,7 @@ class Individual_algo_genetic:
     def min_dist_parcel(self,group_taken_parcel):
         min_distances = []
         habitate_parcel=self.m_map.returnHouses()
-        print(habitate_parcel,"habitate parcel")
+        #TODO sometimes grouplist = [[OO], [OO],[]]
         for p in group_taken_parcel:
             distances_p = []
             for hLine in habitate_parcel:
@@ -361,8 +371,14 @@ class Individual_algo_genetic:
 
     def moyenne_min_dist_parcel(self):
         coeff_dist = []
-        print(self.m_GroupCluserList, "min problem")
+        self.Cluster_verif()
+        #print(self.m_GroupCluserList, "min problem")
         for p in self.m_GroupCluserList:
             dist_p = self.min_dist_parcel(p)
             coeff_dist.append(dist_p)
         return sum(coeff_dist) / len(coeff_dist)
+
+    def Cluster_verif(self):
+        for cluster_list in self.m_GroupCluserList:
+            if len(cluster_list)==0:
+                self.m_GroupCluserList.remove(cluster_list)
