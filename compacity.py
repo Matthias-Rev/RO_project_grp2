@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 def recoveryCoords(listParcel):
     listCoords = []
+    #print(listParcel)
     for elem in listParcel:
         listCoords.append(elem.returnPosition())
     return listCoords
