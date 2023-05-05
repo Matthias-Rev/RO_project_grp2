@@ -36,3 +36,12 @@ class Parcel:
     
     def returnPosition(self):
         return self.m_pos
+    
+    def returnColPosition(self):
+        return self.m_pos[0]
+    
+    def returnLinePosition(self):
+        return self.m_pos[1]
+    
+    def returnColPosition(self):
+        return self.m_pos[0]

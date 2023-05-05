@@ -5,6 +5,8 @@ class Map:
         self.m_roads_Colpos = {}
         self.m_houses_pos = []
         self.m_houses_Colpos = {}
+        self.m_heigth = len(grid)
+        self.m_width = len(grid[0])
 
         self.m_cost = 0
         self.m_prod  = 0
@@ -12,8 +14,18 @@ class Map:
 
         self.m_costDic = dictionnary
 
+        self.m_total_area = self.m_heigth*self.m_width
+
         self.posInit()
 
+    def returnWidth(self):
+        return self.m_width
+    
+    def returnHeigth(self):
+        return self.m_heigth
+    
+    def returnTotalArea(self):
+        return self.m_total_area
     
     def returnDic(self):
         return self.m_costDic
@@ -35,16 +47,17 @@ class Map:
             lineRoads = []
             lineHouses = []
             for element in line:
-                if element == "R":
+                if element.returnType() == "R":
                     lineRoads.append((j,i))
-                    #if is not in dico_
-                elif element == "C":
+                elif element.returnType() == "C":
                     lineHouses.append((j,i))
                 i += 1
             j +=1
 
-            self.m_roads_pos.append(lineRoads)
-            self.m_houses_pos.append(lineHouses)
+            if len(lineRoads) > 0:
+                self.m_roads_pos.append(lineRoads)
+            if len(lineHouses) > 0:
+                self.m_houses_pos.append(lineHouses)
 
     def printRoads(self, i=0, j=0):
         print(self.m_roads_pos[i])
@@ -68,4 +81,3 @@ class Map:
         j = tuple[1]
         self.m_grid[i][j] = char
         return 0
-
