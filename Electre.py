@@ -50,8 +50,8 @@ class Electre:
         """Calcule la matrice d'outrangement."""
         num_alternatives = len(self.data)
         outranking_matrix = np.zeros((num_alternatives, num_alternatives))
-        for i in range(num_alternatives):
-            for j in range(i + 1, num_alternatives):
+        for i in range(num_alternatives-1):
+            for j in range(i + 1, num_alternatives-1):
                 concordance_diff = self.concordance_matrix[i, j] - self.concordance_matrix[j, i]
                 discordance_diff = self.discordance_matrix[i, j] - self.discordance_matrix[j, i]
                 if concordance_diff >= self.thresholds[1] and discordance_diff <= self.thresholds[2]:

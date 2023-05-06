@@ -6,6 +6,7 @@ import map
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
+from Electre import *
 
 class Algo_genetic:
     def __init__(self, nbr_iter,n_pop,r_cross,r_mut,mapfile) -> None:
@@ -72,8 +73,13 @@ class Algo_genetic:
     def next_generation(self,list_input):
         for elite in self.m_listElitism:
             list_input.append(elite)
+            
     
     def crossover(self,p1,p2,r_cross):
+
+        #TODO attention des enfants peuvent avoir un double de parcelle, vérifier les indices de parcelles
+        #lorsqu'un enfant va chercher une parcelle chez un parent !!!!
+
         return_list=[]
         if random.uniform(0, 1) < r_cross:
 
@@ -124,11 +130,13 @@ class Algo_genetic:
         # take the tupple of parcelle
         # check if a random number is less than r_mut (nearly 20%)
         # if yes then we flip the gene (but in our case we take the line and take another parcelle)
-        list_propriety = children.returnList_Parcel()
-        for i in range(len(list_propriety)):
-            # check for a mutation
-            if random.uniform(0, 1) < r_mut:
-                list_propriety[i] = self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[1]][random.randint(0,len(self.m_mapfile.returnGrid())-1)]
+        if random.uniform(0, 1) < r_mut:
+            print("draw mut")
+            print(children.return_m_GroupCluserList(),"before")
+            children.draw_matrix()
+            children.shift_positions()
+            children.draw_matrix()
+            print(children.return_m_GroupCluserList(),"after")
 
     def print_pop(self):
         for indiv in self.m_pop:
@@ -136,7 +144,12 @@ class Algo_genetic:
         return
 
     def moyenne(self, indiv):
-        return (1*indiv.returnM_totalComp()+1*indiv.return_m_minDistHabitation()+2*indiv.returnM_totalProd())        
+        moyenne = (-1*indiv.returnM_totalComp()-1*indiv.return_m_minDistHabitation()+2*indiv.returnM_totalProd())
+        if moyenne < 0:
+            moyenne=abs(moyenne)
+        else:
+            moyenne*=2
+        return moyenne    
         
     def genetic_algorithm(self):
 
@@ -153,7 +166,6 @@ class Algo_genetic:
         
         best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
         print(best_eval,"init")
-        print(best)
 
         for gen in range(self.m_iter_max):
             print(f"=========== {gen} generation ===========")
@@ -172,7 +184,13 @@ class Algo_genetic:
                 self.m_total_score += score
                 self.register_list.append(score)
             
-            #self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]
+            ranking = self.moyenne_Electre()
+            print(f"valeur production = {self.m_pop[ranking[-1]].returnM_totalProd()}, compacity = {self.m_pop[ranking[-1]].returnM_totalComp()}, distance = {self.m_pop[ranking[-1]].return_m_minDistHabitation()}")
+            self.m_pop[ranking[-1]].draw_matrix()
+            print(f"valeur production = {self.m_pop[ranking[0]].returnM_totalProd()}, compacity = {self.m_pop[ranking[0]].returnM_totalComp()}, distance = {self.m_pop[ranking[0]].return_m_minDistHabitation()}")
+            self.m_pop[ranking[0]].draw_matrix()
+            
+            #self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]           
             self.construct_wheel()
 
             for i in range(self.m_n_pop):
@@ -181,6 +199,8 @@ class Algo_genetic:
                     best, best_eval = self.m_pop[i], self.m_scores[i]
                     #self.add_elitism(self.m_pop[i])
                     print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
+                    print(f"valeur production = {best.returnM_totalProd()}, compacity = {best.returnM_totalComp()}, distance = {best.return_m_minDistHabitation()}")
+                    best.draw_matrix()
 
             #TODO strange bc there are 13 individuals that are very good and they are not taken !!!
             #selected = [self.selection_tournament() for _ in range(self.m_n_pop)]
@@ -228,3 +248,24 @@ class Algo_genetic:
         for i in self.m_pop:
             print(self.moyenne(i))
         return self.m_pop
+
+    def compute_selection_probs(rankings):
+        n = len(rankings)
+        weights = [n - i + 1 for i in range(1, n + 1)]
+        total_weight = sum(weights)
+        probs = [w / total_weight for w in weights]
+        return probs
+
+    def build_matrix(self,instances):
+        matrix = np.array([[p.returnM_totalComp(), p.returnM_totalProd(), p.return_m_minDistHabitation()] for p in instances])
+        print(matrix)
+        return matrix
+    
+    def moyenne_Electre(self):
+                
+        weights = np.array([5, -10, 1])
+        concordance_thresholds = np.array([0.6, 0.6, 0.6,0.6])
+        discordance_threshold = 0.3
+        self.electre = Electre(self.build_matrix(self.m_pop),weights, concordance_thresholds, discordance_threshold)
+        ranking = self.electre.get_ranked_indices()
+        return ranking
