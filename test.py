@@ -1,44 +1,28 @@
-import matplotlib.pyplot as plt
-from matplotlib import colors
+from Electre import *
 import numpy as np
+criteria_matrix = np.array([
+    [3, 5, 2, 5],
+    [2, 3, 5, 4],
+    [10, 10, 10, 10],
+    [5, 4, 4, 3],
+    [4, 5, 4, 2]
+])
 
-# Define the matrix
-matrix = [['', 'C', 'P'], ['R', '', ''], ['', '', 'R']]
+# Matrice des poids des critères Production, compacité, 
+weights = np.array([0.5, 0.5, -0.5, 0.5])
 
-# Define the color map for the matrix values
-color_dict = {'C': 'red', 'R': 'grey', 'P': 'green'}  # Rename the dictionary to "color_dict"
-cmap = colors.ListedColormap([color_dict.get(val, 'white') for val in set(np.ravel(matrix))])
+# Seuils de concordance et de discordance
+concordance_thresholds = np.array([0.6, 0.6, 0.6, 0.6])
+discordance_threshold = 0.3
 
-# Convert the matrix to a numerical array
-data = np.zeros((3, 3), dtype=int)
-for i in range(3):
-    for j in range(3):
-        if matrix[i][j] == 'C':
-            data[i, j] = 3
-        elif matrix[i][j] == 'R':
-            data[i, j] = 2
-        elif matrix[i][j] == 'P':
-            data[i, j] = 1
+# Noms des alternatives
+names = ["A1", "A2", "A3", "A4", "A5"]
 
-# Plot the matrix
-fig, ax = plt.subplots()
-im = ax.imshow(data, cmap=cmap)
+# Création de l'objet ELECTRE
+electre = Electre(criteria_matrix, weights, concordance_thresholds, discordance_threshold)
+pareto_border = electre.pareto_frontier(criteria_matrix)
+print(electre.get_ranked_indices())
+print(pareto_border)
 
-# Add color bar
-cbar = ax.figure.colorbar(im, ax=ax, ticks=[0, 1, 2])
-cbar.ax.set_yticklabels(['R', 'C', 'P'])
-
-# Add grid lines
-ax.grid(which='major', axis='both', linestyle='-', color='k', linewidth=2)
-ax.set_xticks(np.arange(-0.5, 3.5, 1))
-ax.set_yticks(np.arange(-0.5, 3.5, 1))
-ax.set_xticklabels([])
-ax.set_yticklabels([])
-
-# Add labels
-for i in range(3):
-    for j in range(3):
-        ax.text(j, i, matrix[i][j], ha='center', va='center', color='w')
-
-# Show the plot
-plt.show()
+# Calcul du classement final
+electre.compute_ranking()
