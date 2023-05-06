@@ -401,6 +401,7 @@ class Individual_algo_genetic:
         list_cluster = self.return_m_GroupCluserList()
         list_of_parcels = random.choice(self.m_GroupCluserList)
         index_list = self.m_GroupCluserList.index(list_of_parcels)
+        print(len(self.return_m_Clusterlist()),"longueur avant")
         print(list_of_parcels,"want to modify (actual) parcel")
         # Décalage de 1 ou 2 unités en x et/ou y pour chaque parcelle
         parcel_moved_safely = False
@@ -429,7 +430,7 @@ class Individual_algo_genetic:
                 self.m_totalProd -= parcel.returnProd()
                 
                 # Vérification que la nouvelle position est valide (pas déjà occupée...)
-                if ((parcelCandidate.returnType() == ' ' or parcelCandidate.returnType() == 'x' and parcelCandidate in list_of_parcels) and str(parcelCandidate.returnCost()) in self.m_map.returnDic().keys() 
+                if ((parcelCandidate.returnType() == ' ' or (parcelCandidate.returnType() == 'x' and parcelCandidate in list_of_parcels)) and str(parcelCandidate.returnCost()) in self.m_map.returnDic().keys() 
                     and self.putParcel(parcelCandidate)):
                     parcel = parcelCandidate
                     liste_new_parcel.append(parcelCandidate)
@@ -455,4 +456,10 @@ class Individual_algo_genetic:
         list_cluster[index_list]=liste_new_parcel
         self.change_Groupcluster(list_cluster)
         self.change_cluster_list()
+        print(len(self.return_m_Clusterlist()),"longueur avant")
+        matrix = self.m_map.returnGrid()
+        for ok in list_cluster:
+            for row in ok:
+                position = row.returnPosition()
+                print(matrix[position[1]][position[0]].returnType(),"parcel type")
         return 0
