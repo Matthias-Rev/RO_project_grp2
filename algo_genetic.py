@@ -79,7 +79,7 @@ class Algo_genetic:
 
         #TODO attention des enfants peuvent avoir un double de parcelle, vérifier les indices de parcelles
         #lorsqu'un enfant va chercher une parcelle chez un parent !!!!
-        
+
         return_list=[]
         if random.uniform(0, 1) < r_cross:
 
@@ -132,11 +132,11 @@ class Algo_genetic:
         # if yes then we flip the gene (but in our case we take the line and take another parcelle)
         if random.uniform(0, 1) < r_mut:
             print("draw mut")
-            print(children.return_m_GroupCluserList())
+            print(children.return_m_GroupCluserList(),"before")
             children.draw_matrix()
             children.shift_positions()
             children.draw_matrix()
-            print(children.return_m_GroupCluserList())
+            print(children.return_m_GroupCluserList(),"after")
 
     def print_pop(self):
         for indiv in self.m_pop:

@@ -419,7 +419,7 @@ class Individual_algo_genetic:
                 parcelCandidate = self.m_map.returnObject(row,col)
                 
                 #Réinititalisation de la parcelle initiale
-                parcel.changeTypeElem(' ') 
+                #parcel.changeTypeElem(' ') 
                 parcel.parcelPlaced(False)
                 if str(parcel.returnCost()) in self.m_map.returnDic():
                     self.m_map.returnDic()[str(parcel.returnCost())] += 1
@@ -436,7 +436,7 @@ class Individual_algo_genetic:
 
                 # On garde la parcelle initiale en cas d'echec du candidat
                 else :
-                    parcel.changeTypeElem('x') 
+                    #parcel.changeTypeElem('x') 
                     parcel.parcelPlaced(True)
                     self.m_map.returnDic()[str(parcel.returnCost())] -= 1
                     if self.m_map.returnDic()[str(parcel.returnCost())] == 0:
@@ -448,8 +448,10 @@ class Individual_algo_genetic:
                 parcel_moved_safely=True
                 for parcel_element in liste_new_parcel:
                     parcel_element.changeTypeElem('x')
+                for parcel_old_element in list_of_parcels:
+                    parcel_old_element.changeTypeElem(' ')
 
-        print(liste_new_parcel, "new parcel after")
+        #print(liste_new_parcel, "new parcel after")
         list_cluster[index_list]=liste_new_parcel
         self.change_Groupcluster(list_cluster)
         self.change_cluster_list()
