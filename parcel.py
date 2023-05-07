@@ -43,5 +43,7 @@ class Parcel:
     def returnColPosition(self):
         return self.m_pos[0]
     
+    def returnPutState(self):
+        return self.m_Put
     def returnLinePosition(self):
         return self.m_pos[1]

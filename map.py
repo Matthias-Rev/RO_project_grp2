@@ -75,6 +75,7 @@ class Map:
     def returnCostDic(self):
         return self.costDic
     
+    #return objet wich have the coord i,j (y,x => l,col)
     def returnObject(self, i,j):
         return self.m_grid[i][j]
 

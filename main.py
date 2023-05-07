@@ -8,7 +8,6 @@ from mpl_toolkits.mplot3d import Axes3D
 
 Instance_Map=Map(constructMap(), costDic)
 
-
 def build_matrix(instances):
     matrix = np.array([[p.return_totalComp(),p.return_minDistHabitation(), p.return_totalProd()] for p in instances])
     return matrix

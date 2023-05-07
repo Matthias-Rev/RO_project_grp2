@@ -1,5 +1,5 @@
 import random
-from copy import copy
+import copy
 import Individual
 import utils
 import map
@@ -32,7 +32,6 @@ class Algo_genetic:
     
     def build_matrix(self,instances):
         matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation()] for p in instances])
-        print(matrix)
         return matrix        
 
     def compute_selection_probs(rankings):
@@ -55,9 +54,6 @@ class Algo_genetic:
     
     def crossover(self,p1,p2,r_cross):
 
-        #TODO attention des enfants peuvent avoir un double de parcelle, vérifier les indices de parcelles
-        #lorsqu'un enfant va chercher une parcelle chez un parent !!!!
-
         return_list=[]
         if random.uniform(0, 1) < r_cross:
 
@@ -66,17 +62,17 @@ class Algo_genetic:
             parent_cluster1 = p1.return_cluserListGroup()
             parent_cluster2 = p2.return_cluserListGroup()
 
-            c1 = Individual.Individual_algo_genetic(self.m_mapfile)
-            c2 = Individual.Individual_algo_genetic(self.m_mapfile)
+            mapfile1 = copy.deepcopy(self.m_mapfile)
+            mapfile2 = copy.deepcopy(self.m_mapfile)
+            c1 = Individual.Individual_algo_genetic(mapfile1)
+            c2 = Individual.Individual_algo_genetic(mapfile2)
 
             min_cluster = min(len(parent_cluster1), len(parent_cluster2))
             if min_cluster == 1:
-                #TODO problem if parent 1 == 1 cluster and parent 2 == 3 but smaller
                 min_parcel = min(len(parent_tupple1),len(parent_tupple2))
                 cut_gene_pt = random.randint(1, min_parcel-1)
                 c1.changeParcel(p1,p2,cut_gene_pt,parent_tupple1[:cut_gene_pt],parent_tupple2[cut_gene_pt:])
                 c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
-                #input("ok")
             else:
                 cut_gene_cluster = random.randint(1,min_cluster-1)
                 c1.change_clusterParcel(p1,p2,parent_cluster1[:cut_gene_cluster],parent_cluster2[cut_gene_cluster:])
@@ -96,7 +92,10 @@ class Algo_genetic:
         self.m_pop = list()
 
         for i in range(self.m_n_pop):
-            indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
+
+            mapfile = copy.deepcopy(self.m_mapfile)
+
+            indiv_map = Individual.Individual_algo_genetic(mapfile)
             indiv_map.chooseCandidate()
             self.m_pop.append(indiv_map)
         
@@ -120,9 +119,7 @@ class Algo_genetic:
                     best, best_eval = self.m_pop[i], self.m_scores[i]
                     print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
                     print(f"valeur production = {best.return_totalProd()}, compacity = {best.return_totalComp()}, distance = {best.return_minDistHabitation()}")
-                    best.draw_matrix()
 
-            #TODO strange bc there are 13 individuals that are very good and they are not taken !!!
             selected=[]
             for ok in range(self.m_n_pop):
                 selected.append(self.selection_wheel())
@@ -130,16 +127,13 @@ class Algo_genetic:
             children = list()
             for i in range(0, self.m_n_pop-1, 2):
                 p1, p2 = selected[i], selected[i+1]
-            
-                for c in self.crossover(p1, p2, self.m_r_cross):
+                crossoverList = self.crossover(p1, p2, self.m_r_cross)
+
+                for c in crossoverList:
                     if len(c.return_clusterList()) == 0:
                         continue
                     self.mutation(c, self.m_r_mut)
                     children.append(c)
-            
-            # TODO attention parent mort, changer dictionnaire
-            # de préference dans la mutation
-            # attention de pas libérer des parcels attaché aux enfants
             
             self.m_pop = children
             self.m_scores = []
@@ -171,18 +165,13 @@ class Algo_genetic:
         return ranking    
 
     def mutation(self,children, r_mut):
-        #TODO prendre un cluster au hasard et le déplacer sur la map
         # take the tupple of parcelle
         # check if a random number is less than r_mut (nearly 20%)
         # if yes then we flip the gene (but in our case we take the line and take another parcelle)
         if random.uniform(0, 1) < r_mut:
-            print("draw mut")
             children.draw_matrix()
-            print("\n")
             children.shift_positions()
-            print("\n")
             children.draw_matrix()
-            input("ok")
 
     def moyenne(self, indiv):
         moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd())
@@ -212,7 +201,6 @@ class Algo_genetic:
         if r <= self.m_cumulative_prob[0]:
             return self.m_pop[0]
         else:
-            #TODO -1 maybe not useful
             for i in range(1,len(self.m_cumulative_prob)):
                 if self.m_cumulative_prob[i-1] < r <= self.m_cumulative_prob[i]:
                     return self.m_pop[i]
