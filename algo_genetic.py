@@ -93,13 +93,16 @@ class Algo_genetic:
 
             min_cluster = min(len(parent_cluster1), len(parent_cluster2))
             if min_cluster == 1:
+                #TODO problem if parent 1 == 1 cluster and parent 2 == 3 but smaller
                 min_parcel = min(len(parent_tupple1),len(parent_tupple2))
                 #print(min_parcel,len(parent_tupple1),len(parent_tupple2),"min p1 et p2")
                 cut_gene_pt = random.randint(1, min_parcel-1)
                 #print(cut_gene_pt,"cut gene")
                 c1.changeParcel(p1,p2,cut_gene_pt,parent_tupple1[:cut_gene_pt],parent_tupple2[cut_gene_pt:])
                 c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
+                #input("ok")
             else:
+                #print(min_cluster,"passer là")
                 cut_gene_cluster = random.randint(1,min_cluster-1)
                 # print(cut_gene_cluster)
                 # print(parent_cluster1,"p1 before")
@@ -132,11 +135,14 @@ class Algo_genetic:
         # if yes then we flip the gene (but in our case we take the line and take another parcelle)
         if random.uniform(0, 1) < r_mut:
             print("draw mut")
-            print(children.return_m_GroupCluserList(),"before")
+            #print(children.return_m_GroupCluserList(),"before")
             children.draw_matrix()
+            print("\n")
             children.shift_positions()
+            print("\n")
             children.draw_matrix()
-            print(children.return_m_GroupCluserList(),"after")
+            #print(children.return_m_GroupCluserList(),"after")
+            input("ok")
 
     def print_pop(self):
         for indiv in self.m_pop:
@@ -184,11 +190,11 @@ class Algo_genetic:
                 self.m_total_score += score
                 self.register_list.append(score)
             
-            ranking = self.moyenne_Electre()
-            print(f"valeur production = {self.m_pop[ranking[-1]].returnM_totalProd()}, compacity = {self.m_pop[ranking[-1]].returnM_totalComp()}, distance = {self.m_pop[ranking[-1]].return_m_minDistHabitation()}")
-            self.m_pop[ranking[-1]].draw_matrix()
-            print(f"valeur production = {self.m_pop[ranking[0]].returnM_totalProd()}, compacity = {self.m_pop[ranking[0]].returnM_totalComp()}, distance = {self.m_pop[ranking[0]].return_m_minDistHabitation()}")
-            self.m_pop[ranking[0]].draw_matrix()
+            # ranking = self.moyenne_Electre()
+            # print(f"valeur production = {self.m_pop[ranking[-1]].returnM_totalProd()}, compacity = {self.m_pop[ranking[-1]].returnM_totalComp()}, distance = {self.m_pop[ranking[-1]].return_m_minDistHabitation()}")
+            # self.m_pop[ranking[-1]].draw_matrix()
+            # print(f"valeur production = {self.m_pop[ranking[0]].returnM_totalProd()}, compacity = {self.m_pop[ranking[0]].returnM_totalComp()}, distance = {self.m_pop[ranking[0]].return_m_minDistHabitation()}")
+            # self.m_pop[ranking[0]].draw_matrix()
             
             #self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]           
             self.construct_wheel()
@@ -226,6 +232,10 @@ class Algo_genetic:
             
             # replace population
             #self.print_pop()
+            # TODO attention parent mort, changer dictionnaire
+            # de préference dans la mutation
+            # attention de pas libérer des parcels attaché aux enfants
+            
             self.m_pop = children
             #self.next_generation(children)
             self.m_scores = []
