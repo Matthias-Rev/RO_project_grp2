@@ -100,6 +100,7 @@ class Algo_genetic:
                 c1.changeParcel(p1,p2,cut_gene_pt,parent_tupple1[:cut_gene_pt],parent_tupple2[cut_gene_pt:])
                 c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
             else:
+                #print(min_cluster,"passer là")
                 cut_gene_cluster = random.randint(1,min_cluster-1)
                 # print(cut_gene_cluster)
                 # print(parent_cluster1,"p1 before")
@@ -132,11 +133,12 @@ class Algo_genetic:
         # if yes then we flip the gene (but in our case we take the line and take another parcelle)
         if random.uniform(0, 1) < r_mut:
             print("draw mut")
-            print(children.return_m_GroupCluserList(),"before")
-            children.draw_matrix()
+            #print(children.return_m_GroupCluserList(),"before")
+            #children.draw_matrix()
             children.shift_positions()
-            children.draw_matrix()
-            print(children.return_m_GroupCluserList(),"after")
+            #children.draw_matrix()
+            input("ok")
+            #print(children.return_m_GroupCluserList(),"after")
 
     def print_pop(self):
         for indiv in self.m_pop:
@@ -184,11 +186,11 @@ class Algo_genetic:
                 self.m_total_score += score
                 self.register_list.append(score)
             
-            ranking = self.moyenne_Electre()
-            print(f"valeur production = {self.m_pop[ranking[-1]].returnM_totalProd()}, compacity = {self.m_pop[ranking[-1]].returnM_totalComp()}, distance = {self.m_pop[ranking[-1]].return_m_minDistHabitation()}")
-            self.m_pop[ranking[-1]].draw_matrix()
-            print(f"valeur production = {self.m_pop[ranking[0]].returnM_totalProd()}, compacity = {self.m_pop[ranking[0]].returnM_totalComp()}, distance = {self.m_pop[ranking[0]].return_m_minDistHabitation()}")
-            self.m_pop[ranking[0]].draw_matrix()
+            # ranking = self.moyenne_Electre()
+            # print(f"valeur production = {self.m_pop[ranking[-1]].returnM_totalProd()}, compacity = {self.m_pop[ranking[-1]].returnM_totalComp()}, distance = {self.m_pop[ranking[-1]].return_m_minDistHabitation()}")
+            # self.m_pop[ranking[-1]].draw_matrix()
+            # print(f"valeur production = {self.m_pop[ranking[0]].returnM_totalProd()}, compacity = {self.m_pop[ranking[0]].returnM_totalComp()}, distance = {self.m_pop[ranking[0]].return_m_minDistHabitation()}")
+            # self.m_pop[ranking[0]].draw_matrix()
             
             #self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]           
             self.construct_wheel()

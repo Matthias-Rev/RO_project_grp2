@@ -66,7 +66,6 @@ ax.scatter(liste_pop[:, 0], liste_pop[:, 1], liste_pop[:, 2], c=obj_1_values, cm
 ax.scatter(liste_pop[pareto_mask, 0], liste_pop[pareto_mask, 1], liste_pop[pareto_mask, 2], c=obj_1_values[pareto_mask], cmap='viridis', edgecolors='r', linewidths=2)
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
-ax.set_zlabel('Z')
 plt.show()
 
 # mapObject = Map(constructMap(), costDic)
