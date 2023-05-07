@@ -258,7 +258,6 @@ class Algo_genetic:
 
     def build_matrix(self,instances):
         matrix = np.array([[p.returnM_totalComp(), p.returnM_totalProd(), p.return_m_minDistHabitation()] for p in instances])
-        print(matrix)
         return matrix
     
     def moyenne_Electre(self):
