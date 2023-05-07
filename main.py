@@ -9,16 +9,10 @@ from mpl_toolkits.mplot3d import Axes3D
 Instance_Map=Map(constructMap(), costDic)
 
 
-# # Print the resulting matrix
-# #Instance_Map = Map(readMapFile(mapfile))
-# #Instance_Map.posInit()
-# #print(Instance_Map.returnGrid())
-
 def build_matrix(instances):
-    matrix = np.array([[p.returnM_totalComp(),p.return_m_minDistHabitation(), p.returnM_totalProd()] for p in instances])
+    matrix = np.array([[p.return_totalComp(),p.return_minDistHabitation(), p.return_totalProd()] for p in instances])
     return matrix
 
-# #algo = Individual.Individual_algo_genetic(Matrix, Instance_Map, 0)
 test = Algo_genetic(1,10,0.80,0.99,Instance_Map)
 liste_pop =test.genetic_algorithm()
 
@@ -26,11 +20,10 @@ weights = [1, 1, 1]
 matrix = build_matrix(liste_pop)
 promethe = PrometheeII(matrix,weights)
 promethe.find_pareto_border()
-#promethe.show_3d_graph()
 points = []
 for i in range(0,len(liste_pop)-1):
     points.append(tuple(matrix[i]))
-#print(points)
+
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
@@ -67,8 +60,3 @@ ax.scatter(liste_pop[pareto_mask, 0], liste_pop[pareto_mask, 1], liste_pop[paret
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 plt.show()
-
-# mapObject = Map(constructMap(), costDic)
-# i = 0
-# algo = Individual.Individual_algo_genetic(copy.copy(mapObject))
-# a = algo.chooseCandidate()
