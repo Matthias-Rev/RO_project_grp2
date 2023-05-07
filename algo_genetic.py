@@ -93,12 +93,14 @@ class Algo_genetic:
 
             min_cluster = min(len(parent_cluster1), len(parent_cluster2))
             if min_cluster == 1:
+                #TODO problem if parent 1 == 1 cluster and parent 2 == 3 but smaller
                 min_parcel = min(len(parent_tupple1),len(parent_tupple2))
                 #print(min_parcel,len(parent_tupple1),len(parent_tupple2),"min p1 et p2")
                 cut_gene_pt = random.randint(1, min_parcel-1)
                 #print(cut_gene_pt,"cut gene")
                 c1.changeParcel(p1,p2,cut_gene_pt,parent_tupple1[:cut_gene_pt],parent_tupple2[cut_gene_pt:])
                 c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
+                #input("ok")
             else:
                 #print(min_cluster,"passer là")
                 cut_gene_cluster = random.randint(1,min_cluster-1)
@@ -134,11 +136,13 @@ class Algo_genetic:
         if random.uniform(0, 1) < r_mut:
             print("draw mut")
             #print(children.return_m_GroupCluserList(),"before")
-            #children.draw_matrix()
+            children.draw_matrix()
+            print("\n")
             children.shift_positions()
-            #children.draw_matrix()
-            input("ok")
+            print("\n")
+            children.draw_matrix()
             #print(children.return_m_GroupCluserList(),"after")
+            input("ok")
 
     def print_pop(self):
         for indiv in self.m_pop:

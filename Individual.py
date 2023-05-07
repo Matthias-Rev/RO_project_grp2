@@ -63,8 +63,7 @@ class Individual_algo_genetic:
     def return_m_GroupCluserList(self):
         return self.m_GroupCluserList
     
-    def Cluster_group_change(self, p1,p2,new_parcel1,new_parcel2,cluster_state,cut_gene=0):
-
+    def Cluster_group_change(self,new_parcel1,new_parcel2,cluster_state):
         if cluster_state == True:
             for element_1 in new_parcel1:
                 self.m_GroupCluserList.append(element_1)
@@ -72,29 +71,8 @@ class Individual_algo_genetic:
                 self.m_GroupCluserList.append(element_2)
         
         else:
-            #print(self.m_GroupCluserList,"mgroup cluster")
             self.m_GroupCluserList.append(new_parcel1)
             self.m_GroupCluserList.append(new_parcel2)
-            #print(self.m_GroupCluserList,"mgroup cluster after")
-            # print(new_parcel1,"1")
-            # print(new_parcel2,"2")
-            # p1_cluster = p1.return_m_GroupCluserList()
-            # for parcel_to_cluster in new_parcel1:
-            #     print(parcel_to_cluster,"cluster")
-            #     #presence  = [element for element in parcel_to_cluster if element in new_parcel1]
-            #     if parcel_to_cluster in p1_cluster:
-            #         self.m_GroupCluserList.append(parcel_to_cluster)
-            #     else:
-            #         list_for_cluster  = [element for element in new_parcel1]
-            #         self.m_GroupCluserList.append(list_for_cluster)
-
-    
-            # for parcel_to_cluster in p2.return_m_GroupCluserList():
-            #     if parcel_to_cluster in new_parcel2:
-            #         self.m_GroupCluserList.append(parcel_to_cluster)
-            #     else:
-            #         list_for_cluster  = [element for element in new_parcel1]
-            #         self.m_GroupCluserList.append(list_for_cluster)
 
     def changeParcel_cluster(self,p1,p2,new_parcel1=[],new_parcel2=[]):
         self.m_totalCost=0
@@ -111,7 +89,7 @@ class Individual_algo_genetic:
         #print(parcel1)
         #print(parcel2)
         self.change_cluster(parcel1+parcel2)
-        self.Cluster_group_change(p1,p2,new_parcel1,new_parcel2,True)
+        self.Cluster_group_change(new_parcel1,new_parcel2,True)
         #print(self.m_CluserList,"cluster list")
 
         for parcel in self.m_CluserList:
@@ -127,10 +105,10 @@ class Individual_algo_genetic:
         #TODO gros problème ou on peut aller ou of range
         first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
-        while self.m_totalCost+first_parcel.returnCost() <= 50 and first_parcel.returnType()!="R" and first_parcel not in self.m_CluserList:
+        while self.m_totalCost+first_parcel.returnCost() <= 50 and first_parcel.returnType() not in ["R","C"] and first_parcel not in self.m_CluserList:
             #print("again")
             #self.m_CluserList.insert(self.m_CluserList.index(random_parcel)+1,first_parcel)
-            self.m_GroupCluserList.insert(index,first_parcel)
+            self.m_GroupCluserList[index].append(first_parcel)
             self.m_totalProd+=first_parcel.returnProd()
             self.m_totalCost+=first_parcel.returnCost()
             first_parcel.m_Put = True
@@ -138,7 +116,7 @@ class Individual_algo_genetic:
             #print(random_parcel_position," ", random_parcel_x," ",random_parcel_y," ",random_parcel)
             first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
-        
+        self.change_cluster_list()
         #print(self.m_CluserList,"next cluster")
 
         #self.Cluster_group_change(p1,p2,new_parcel1,new_parcel2,True)
@@ -146,7 +124,7 @@ class Individual_algo_genetic:
 
         #print(self.return_m_GroupCluserList(),"grp")
 
-        print("Cluster parcel")
+        #print("Cluster parcel")
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
 
@@ -157,6 +135,7 @@ class Individual_algo_genetic:
         out_of_range = True
         while out_of_range == True:
             random_list = random.choice(self.m_GroupCluserList)
+            #print(len(random_list),"longueur")
             random_parcel = random.choice(random_list)
             index_random_parcel = self.m_GroupCluserList.index(random_list)
             random_parcel_position = random_parcel.returnPosition()
@@ -177,6 +156,7 @@ class Individual_algo_genetic:
         # print(p2.return_m_GroupCluserList(),"p2")
 
         self.change_cluster(new_parcel1+new_parcel2)
+        self.Cluster_group_change(new_parcel1,new_parcel2,False)
 
         for parcel in self.m_CluserList:
             self.m_totalCost+=parcel.returnCost()
@@ -186,19 +166,21 @@ class Individual_algo_genetic:
         #pq pas faire parent aléatoire
         while cut_gene+1 < len(p1.return_m_Clusterlist()) and self.m_totalCost+p1.return_m_Clusterlist()[cut_gene+1].returnCost() <= 50:
             parcel_add = p1.return_m_Clusterlist()[cut_gene+1]
-            new_parcel1.append(parcel_add)
+            #new_parcel1.append(parcel_add)
+            self.m_GroupCluserList[0].insert(0,parcel_add)
             self.m_totalProd+=parcel_add.returnProd()
             self.m_totalCost+=parcel_add.returnCost()
             parcel_add.m_Put=True
             cut_gene+=1
 
-        self.change_cluster(new_parcel1+new_parcel2)
+        #self.change_cluster(new_parcel1+new_parcel2)
+        self.change_cluster_list()
 
-        self.Cluster_group_change(p1,p2,new_parcel1,new_parcel2,False,cut_gene)
+        #self.Cluster_group_change(new_parcel1,new_parcel2,False)
 
         #print(self.return_m_GroupCluserList(),"grp")
 
-        print("change parcel")
+        #print("change parcel")
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
     
@@ -305,10 +287,11 @@ class Individual_algo_genetic:
     def draw_matrix(self):
 
         # Define the dimensions of the map
+        list_parcel_linear =  [element for row in self.m_GroupCluserList for element in row]
         matrix = self.m_map.returnGrid()
         y =len(matrix)
         x = len(matrix[0])
-        print("draw list",len(self.m_CluserList))
+        print("draw list longueur",len(self.m_CluserList))
 
         # Define the colors for each letter
         colors = {
@@ -327,15 +310,15 @@ class Individual_algo_genetic:
             for j in range(x):
                 char = matrix[i][j].returnType()
                 parcel=matrix[i][j]
-                if parcel in self.m_CluserList:
-                    data[i, j] = "4"
+                # if parcel in list_parcel_linear:
+                #     data[i, j] = "4"
                 if char != 'x':
                     color = list(colors.keys()).index(char) + 1
                     data[i, j] = color
                 # else:
                 #     data[i, j] = "4"
         
-        for instane_parcel in self.return_m_Clusterlist():
+        for instane_parcel in list_parcel_linear:
             data[instane_parcel.returnPosition()[1],instane_parcel.returnPosition()[0]] = 3
 
         # Display the image
@@ -386,8 +369,7 @@ class Individual_algo_genetic:
     def min_dist_parcel(self,group_taken_parcel):
         min_distances = []
         habitate_parcel=self.m_map.returnHouses()
-        #TODO sometimes grouplist = [[OO], [OO],[]]
-        print(group_taken_parcel,"group taken")
+        #print(group_taken_parcel,"group taken")
         for p in group_taken_parcel:
             distances_p = []
             for hLine in habitate_parcel:
@@ -404,7 +386,7 @@ class Individual_algo_genetic:
     def moyenne_min_dist_parcel(self):
         coeff_dist = []
         #self.Cluster_verif()
-        print(self.m_GroupCluserList, "min problem")
+        #print(self.m_GroupCluserList, "min problem")
         for p in self.m_GroupCluserList:
             dist_p = self.min_dist_parcel(p)
             coeff_dist.append(dist_p)
@@ -421,15 +403,15 @@ class Individual_algo_genetic:
         index_list = self.m_GroupCluserList.index(list_of_parcels)
         #print(self.return_m_Clusterlist(),"avant")
         #print(list_cluster,"list cluster avant")
-        print(len(self.return_m_Clusterlist()),"longueur avant")
+        #print(len(self.return_m_Clusterlist()),"longueur avant")
         #print(len(list_of_parcels),"longueur selectionner")
         #print(list_of_parcels,"sélectionner")
         #print(list_of_parcels," want to modify (actual) parcel")
         # Décalage de 1 ou 2 unités en x et/ou y pour chaque parcelle
         parcel_moved_safely = False
         while parcel_moved_safely==False:
-            i = random.randint(-2, 2)
-            j = random.randint(-2, 2)
+            i = random.randint(-10, 10)
+            j = random.randint(-10, 10)
             liste_new_parcel = []
             for parcel in list_of_parcels:
                 col, row = parcel.returnPosition()
@@ -452,6 +434,7 @@ class Individual_algo_genetic:
                 self.m_totalProd -= parcel.returnProd()
                 
                 # Vérification que la nouvelle position est valide (pas déjà occupée...)
+                #TODO peut tourner en boucle !!!!!!!
                 if ((parcelCandidate.returnType() == ' ' and parcelCandidate not in list_of_parcels) and str(parcelCandidate.returnCost()) in self.m_map.returnDic().keys() 
                     and self.putParcel(parcelCandidate)):
                     #parcel = parcelCandidate
@@ -469,7 +452,7 @@ class Individual_algo_genetic:
                     self.m_totalProd += parcel.returnProd()
 
             if len(list_of_parcels) == len(liste_new_parcel):
-                print("même longueur")
+                #print("même longueur")
                 parcel_moved_safely=True
 
         #print(liste_new_parcel, "remplacer")
