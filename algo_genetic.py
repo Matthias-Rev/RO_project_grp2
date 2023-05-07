@@ -232,6 +232,10 @@ class Algo_genetic:
             
             # replace population
             #self.print_pop()
+            # TODO attention parent mort, changer dictionnaire
+            # de préference dans la mutation
+            # attention de pas libérer des parcels attaché aux enfants
+            
             self.m_pop = children
             #self.next_generation(children)
             self.m_scores = []

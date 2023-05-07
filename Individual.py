@@ -102,18 +102,14 @@ class Individual_algo_genetic:
         #print(random_parcel_position, random_parcel_x, random_parcel_y,random_parcel)
         #print(random_parcel_position[0]+random_parcel_x,random_parcel_position[1]+random_parcel_y)
 
-        #TODO gros problème ou on peut aller ou of range
         first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
         while self.m_totalCost+first_parcel.returnCost() <= 50 and first_parcel.returnType() not in ["R","C"] and first_parcel not in self.m_CluserList:
-            #print("again")
-            #self.m_CluserList.insert(self.m_CluserList.index(random_parcel)+1,first_parcel)
             self.m_GroupCluserList[index].append(first_parcel)
             self.m_totalProd+=first_parcel.returnProd()
             self.m_totalCost+=first_parcel.returnCost()
             first_parcel.m_Put = True
             random_parcel_position, random_parcel_x,random_parcel_y,index = self.random_choice()
-            #print(random_parcel_position," ", random_parcel_x," ",random_parcel_y," ",random_parcel)
             first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
         self.change_cluster_list()
@@ -391,17 +387,12 @@ class Individual_algo_genetic:
             dist_p = self.min_dist_parcel(p)
             coeff_dist.append(dist_p)
         return sum(coeff_dist) / len(coeff_dist)
-
-    def Cluster_verif(self):
-        for cluster_list in self.m_GroupCluserList:
-            if len(cluster_list)==0:
-                self.m_GroupCluserList.remove(cluster_list)
     
     def shift_positions(self):
         list_cluster = self.return_m_GroupCluserList()
         list_of_parcels = random.choice(self.m_GroupCluserList)
         index_list = self.m_GroupCluserList.index(list_of_parcels)
-        #print(self.return_m_Clusterlist(),"avant")
+        print(self.return_m_Clusterlist(),"avant")
         #print(list_cluster,"list cluster avant")
         #print(len(self.return_m_Clusterlist()),"longueur avant")
         #print(len(list_of_parcels),"longueur selectionner")
