@@ -1,6 +1,6 @@
 import random
 import compacity 
-from parcel import Parcel
+import parcel
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -15,55 +15,32 @@ class Individual_algo_genetic:
 
     def __init__(self, map,listParcel=[]):
         self.m_map = map
-        self.m_listParcel = listParcel
+        self.m_totalArea = map.returnTotalArea()
         self.m_totalCost = 0                        #must be <500.000
         self.m_totalProd = 0
         self.m_totalCompacity = 0
-        self.m_totalArea = map.returnTotalArea()
+        
+        self.m_listParcel = listParcel
         self.m_CluserList = []
-        self.m_minDistHabitation = 0
         self.m_GroupCluserList = []
-
+        self.m_minDistHabitation = 0
+        
         #distance entre les zones habitées
         #compacité ???? -> surface d'une "nasse"
-
-        self.m_parcels_placed = []
     
-    def returnList_Parcel(self):
-        return self.m_listParcel
-        
-    #define the compacity
-    def coefCompact(self, highestNasse, allParcel):
-        return highestNasse/allParcel
-    
-    def returnM_totalCost(self):
-        return self.m_totalCost
-    
-    def returnM_totalProd(self):
-        return self.m_totalProd
-    
-    def returnM_totalComp(self):
-        return self.m_totalCompacity
-
-    def return_m_minDistHabitation(self):
-        return self.m_minDistHabitation
-    
-    def return_m_Clusterlist(self):
-        return self.m_CluserList
-
     def change_cluster(self,parcel):
         self.m_CluserList = parcel
-
-    def change_cluster_list(self):
+        return 0
+    
+    def change_clusterList(self):
         self.m_CluserList = [element for row in self.m_GroupCluserList for element in row]
-
-    def change_Groupcluster(self,cluster_list):
+        return 0
+    
+    def change_clusterSingleGroup(self,cluster_list):
         self.m_GroupCluserList = cluster_list
+        return 0
     
-    def return_m_GroupCluserList(self):
-        return self.m_GroupCluserList
-    
-    def Cluster_group_change(self,new_parcel1,new_parcel2,cluster_state):
+    def change_clusterGroup(self,new_parcel1,new_parcel2,cluster_state):
         if cluster_state == True:
             for element_1 in new_parcel1:
                 self.m_GroupCluserList.append(element_1)
@@ -73,116 +50,84 @@ class Individual_algo_genetic:
         else:
             self.m_GroupCluserList.append(new_parcel1)
             self.m_GroupCluserList.append(new_parcel2)
+        return 0
+    
+    def change_clusterParcel(self,p1,p2,new_parcel1=[],new_parcel2=[]):
 
-    def changeParcel_cluster(self,p1,p2,new_parcel1=[],new_parcel2=[]):
         self.m_totalCost=0
         self.m_totalProd=0
-
-        #print(new_parcel1,"1")
-        #print(new_parcel2,"2")
-        # print(p1.return_m_GroupCluserList(),"p1")
-        # print(p2.return_m_GroupCluserList(),"p2")
 
         parcel1 = [element for row in new_parcel1 for element in row]
         parcel2 = [element for row in new_parcel2 for element in row]
 
-        #print(parcel1)
-        #print(parcel2)
         self.change_cluster(parcel1+parcel2)
-        self.Cluster_group_change(new_parcel1,new_parcel2,True)
-        #print(self.m_CluserList,"cluster list")
+        self.change_clusterGroup(new_parcel1,new_parcel2,True)
 
-        for parcel in self.m_CluserList:
+        for p_parcel in self.m_CluserList:
+            x,y = p_parcel.returnPosition()
+            parcel = self.m_map.returnObject(y,x)
+            parcel.parcelPlaced(True)
+            parcel.changeTypeElem('x')
             self.m_totalCost+=parcel.returnCost()
             self.m_totalProd+=parcel.returnProd()
-            parcel.m_Put = True
 
 
         random_parcel_position, random_parcel_x,random_parcel_y,index = self.random_choice()
-        #print(random_parcel_position, random_parcel_x, random_parcel_y,random_parcel)
-        #print(random_parcel_position[0]+random_parcel_x,random_parcel_position[1]+random_parcel_y)
-
         first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
         while self.m_totalCost+first_parcel.returnCost() <= 50 and first_parcel.returnType() not in ["R","C"] and first_parcel not in self.m_CluserList:
             self.m_GroupCluserList[index].append(first_parcel)
             self.m_totalProd+=first_parcel.returnProd()
             self.m_totalCost+=first_parcel.returnCost()
-            first_parcel.m_Put = True
+            first_parcel.parcelPlaced(True)
+            first_parcel.changeTypeElem('x')
             random_parcel_position, random_parcel_x,random_parcel_y,index = self.random_choice()
             first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
 
-        self.change_cluster_list()
-        #print(self.m_CluserList,"next cluster")
-
-        #self.Cluster_group_change(p1,p2,new_parcel1,new_parcel2,True)
-        #print(self.m_GroupCluserList,"before min")
-
-        #print(self.return_m_GroupCluserList(),"grp")
-
-        #print("Cluster parcel")
+        self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
 
-    def moyenne(self):
-        return (1*self.returnM_totalComp()+1*self.return_m_minDistHabitation()+2*self.returnM_totalProd())  
-
-    def random_choice(self):
-        out_of_range = True
-        while out_of_range == True:
-            random_list = random.choice(self.m_GroupCluserList)
-            #print(len(random_list),"longueur")
-            random_parcel = random.choice(random_list)
-            index_random_parcel = self.m_GroupCluserList.index(random_list)
-            random_parcel_position = random_parcel.returnPosition()
-            random_parcel_y = random.choice([-1,1])
-            random_parcel_x = random.choice([1,-1])
-            if random_parcel_position[0]+random_parcel_x < 170 and random_parcel_position[1]+random_parcel_y < 70:
-                out_of_range = False
-        return random_parcel_position,random_parcel_x,random_parcel_y,index_random_parcel
+        return 0
 
     def changeParcel(self ,p1,p2,cut_gene,new_parcel1=[],new_parcel2=[]):
 
         self.m_totalCost=0
         self.m_totalProd=0
 
-        # print(new_parcel1,"1")
-        # print(new_parcel2,"2")
-        # print(p1.return_m_GroupCluserList(),"p1")
-        # print(p2.return_m_GroupCluserList(),"p2")
-
         self.change_cluster(new_parcel1+new_parcel2)
-        self.Cluster_group_change(new_parcel1,new_parcel2,False)
+        self.change_clusterGroup(new_parcel1,new_parcel2,False)
 
-        for parcel in self.m_CluserList:
+        for p_parcel in self.m_CluserList:
+            x,y = p_parcel.returnPosition()
+            parcel = self.m_map.returnObject(y,x)
+            parcel.parcelPlaced(True)
+            #parcel.changeTypeElem('x')
             self.m_totalCost+=parcel.returnCost()
             self.m_totalProd+=parcel.returnProd()
-            parcel.m_Put = True
-    
-        #pq pas faire parent aléatoire
-        while cut_gene+1 < len(p1.return_m_Clusterlist()) and self.m_totalCost+p1.return_m_Clusterlist()[cut_gene+1].returnCost() <= 50:
-            parcel_add = p1.return_m_Clusterlist()[cut_gene+1]
-            #new_parcel1.append(parcel_add)
+
+        #pq pas faire parent aléatoire ?
+        while cut_gene+1 < len(p1.return_clusterList()) and self.m_totalCost+p1.return_clusterList()[cut_gene+1].returnCost() <= 50:
+            parcel_add = p1.return_clusterList()[cut_gene+1]
             self.m_GroupCluserList[0].insert(0,parcel_add)
             self.m_totalProd+=parcel_add.returnProd()
             self.m_totalCost+=parcel_add.returnCost()
-            parcel_add.m_Put=True
+
+            parcel_add.parcelPlaced(True)
+            #parcel_add.changeTypeElem('x')
+
             cut_gene+=1
-
-        #self.change_cluster(new_parcel1+new_parcel2)
-        self.change_cluster_list()
-
-        #self.Cluster_group_change(new_parcel1,new_parcel2,False)
-
-        #print(self.return_m_GroupCluserList(),"grp")
-
-        #print("change parcel")
+        self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
     
-    def showMatrix(self):
-        return self.m_map.returnGrid()
-    
+    def cleanIndividual(self, listeParcelObj, initialDoc):
+        for elem in listeParcelObj:
+            elem.changeTypeElem(' ')
+            elem.parcelPlaced(False)
+        self.m_map.restoreDic(initialDoc)
+        return 0 
+     
     #define the compacity
     def compacity(self, listParcels):
         listObjet = compacity.recoveryCoords(listParcels)
@@ -214,18 +159,14 @@ class Individual_algo_genetic:
         #Ajout de la jonction entre les deux parties
         junctionList = compacity.returnJunctionSurface(listObjet,AHSortList)
 
-        # print(listObjet)
-        # print(AHSortList)
-        # print(junctionList)
-        # print(self.m_totalArea)
-
         return (compacity.returnSurface(listObjet,AHSortList,junctionList)/self.m_totalArea)*100
     
     #create our individual
     def chooseCandidate(self):
+
         if len(self.m_listParcel) == 0:
             self.m_listParcel = []
-        restoreDic = copy.copy(self.m_map.returnDic())
+        #restoreDic = copy.copy(self.m_map.returnDic())
         randomNumber = random.randint(1,5)
         while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50 and len(self.m_listParcel) < randomNumber:
             candidateOk = False
@@ -235,59 +176,60 @@ class Individual_algo_genetic:
                 randomCandidate = self.m_map.returnObject(i,j)
                 if randomCandidate.returnType() == ' ' and str(randomCandidate.returnCost()) in self.m_map.returnDic().keys() and self.putParcel(randomCandidate):
                     candidateOk = True
-                    #randomCandidate.changeTypeElem('x')
+                    randomCandidate.changeTypeElem('x')
                     self.m_listParcel.append(randomCandidate)
-
+    
         self.choosePosition()
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
-        self.cleanIndividual(self.m_CluserList, restoreDic)
-        #print(f"valeur production = {self.m_totalProd}, compacity = {self.m_totalCompacity}, score = {self.moyenne()}")
         return self.m_CluserList
 
-    #define if a parcel is checked
-    def putParcel(self, parcelCandidate):
-        if not parcelCandidate.parcelPlaced() and ((parcelCandidate.returnCost()+self.m_totalCost)<=50):
-            parcelCandidate.parcelPlaced(True)
-            self.m_map.returnDic()[str(parcelCandidate.returnCost())] -=1
-            if self.m_map.returnDic()[str(parcelCandidate.returnCost())] == 0:
-                #print("mort de la clé:", parcelCandidate.returnCost())
-                self.m_map.returnDic().pop(str(parcelCandidate.returnCost()))
-            self.m_totalCost += parcelCandidate.returnCost()
-            self.m_totalProd += parcelCandidate.returnProd()
-            #parcel checked
-            return True 
-        #if constraints are not met
-        return False
-    
-    def cleanIndividual(self, listeParcelObj, initialDoc):
-        for elem in listeParcelObj:
-            elem.changeTypeElem(' ')
-            elem.parcelPlaced(False)
-        self.m_map.restoreDic(initialDoc)
-        return 0 
+    def choosePosition(self):
+
+        allCluster = []
+        i = 0
+
+        while i<len(self.m_listParcel):
+            allCluster.append([self.m_listParcel[i]])
+            i +=1
+
+        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:
+            candidateOk = False
+            # Choix aléatoire d'un cluster dans la liste
+            cluster = random.choice(allCluster)
+            parcelChoice = random.choice(cluster)
+            col, row = parcelChoice.returnPosition()
+            i,j = col,row
+            while not candidateOk:
+                randomCol = random.randint(-1,1)
+                randomRow = random.randint(-1,1)
+                if (i + randomCol) < self.m_map.returnWidth()-1 and (i + randomCol) >= 0: 
+                    i += randomCol
+                if (j + randomRow) < self.m_map.returnHeigth()-1 and (j + randomRow) >= 0: 
+                    j += randomRow
+                randomCandidate = self.m_map.returnObject(j,i)
+                if randomCandidate.returnType() == ' ' and str(randomCandidate.returnCost()) in self.m_map.returnDic().keys() and self.putParcel(randomCandidate):
+                    randomCandidate.changeTypeElem('x')
+                    self.m_listParcel.append(randomCandidate)
+                    cluster.append(randomCandidate)
+                    candidateOk = True
         
-    ### in process...
-    def objectDistance(self, objectA=(0,0), objectB=(0,0), i=0):
-        print("object = ", self.m_map.m_roads_pos[i])
-        print(f"difference ligne = {abs(objectA[0]-objectB[0])}, difference col = {abs(objectA[1]-objectB[1])}")
-    
-    ### in process...
-    def findNearestObj(self, posActualObj=(0,0),typeTargetObj=' '):
-        found = False
-        distance = 0
-        while not found:
-            if typeTargetObj == 'R':
-                self.m_map.m_roads_pos
+        for list in allCluster:
+            for elem in list:
+                self.m_CluserList.append(elem)
+        self.m_GroupCluserList = allCluster
+
+        return 0
 
     def draw_matrix(self):
 
         # Define the dimensions of the map
-        list_parcel_linear =  [element for row in self.m_GroupCluserList for element in row]
+        list_parcel_linear =  [element for row in self.m_GroupCluserList 
+                               for element in row]
         matrix = self.m_map.returnGrid()
+
         y =len(matrix)
         x = len(matrix[0])
-        print("draw list longueur",len(self.m_CluserList))
 
         # Define the colors for each letter
         colors = {
@@ -306,13 +248,11 @@ class Individual_algo_genetic:
             for j in range(x):
                 char = matrix[i][j].returnType()
                 parcel=matrix[i][j]
-                # if parcel in list_parcel_linear:
-                #     data[i, j] = "4"
                 if char != 'x':
                     color = list(colors.keys()).index(char) + 1
                     data[i, j] = color
-                # else:
-                #     data[i, j] = "4"
+                else:
+                    data[i, j] = "4"
         
         for instane_parcel in list_parcel_linear:
             data[instane_parcel.returnPosition()[1],instane_parcel.returnPosition()[0]] = 3
@@ -323,81 +263,63 @@ class Individual_algo_genetic:
         plt.axis("off")
         plt.show()
 
-
-    def choosePosition(self):
-
-        allCluster = []
-        i = 0
-
-        while i<len(self.m_listParcel):
-            allCluster.append([self.m_listParcel[i]])
-            i +=1
-
-        while self.m_totalCost+int(next(iter(self.m_map.returnDic()))) <= 50:
-            # print("lowest key = ",int(next(iter(self.m_map.returnDic()))))
-            candidateOk = False
-            # Choix aléatoire d'un cluster dans la liste
-            cluster = random.choice(allCluster)
-            parcelChoice = random.choice(cluster)
-            col, row = parcelChoice.returnPosition()
-            i,j = col,row
-            while not candidateOk:
-                randomCol = random.randint(-1,1)
-                randomRow = random.randint(-1,1)
-                if (i + randomCol) < self.m_map.returnWidth()-1 and (i + randomCol) >= 0: 
-                    i += randomCol
-                if (j + randomRow) < self.m_map.returnHeigth()-1 and (j + randomRow) >= 0: 
-                    j += randomRow
-                randomCandidate = self.m_map.returnObject(j,i)
-                if randomCandidate.returnType() == ' ' and str(randomCandidate.returnCost()) in self.m_map.returnDic().keys() and self.putParcel(randomCandidate):
-                    #randomCandidate.changeTypeElem('x')
-                    self.m_listParcel.append(randomCandidate)
-                    cluster.append(randomCandidate)
-                    candidateOk = True
-        
-        for list in allCluster:
-            for elem in list:
-                self.m_CluserList.append(elem)
-        self.m_GroupCluserList = allCluster
-
-        return 0
-
     def min_dist_parcel(self,group_taken_parcel):
         min_distances = []
         habitate_parcel=self.m_map.returnHouses()
-        #print(group_taken_parcel,"group taken")
         for p in group_taken_parcel:
             distances_p = []
             for hLine in habitate_parcel:
                 for h in hLine:
-                    # print(h)
-                    # print(p.returnPosition())
                     distance = math.sqrt((h[0] - p.returnPosition()[1])**2 + (h[1] -p.returnPosition()[0])**2)
                     distances_p.append(distance)
             min_distances.append(min(distances_p))
             occur_nb = len(min_distances)
-        #print(min(min_distances))
         return min(min_distances)# / occur_nb
+
+    #Calculate the average score of an individual
+    def moyenne(self):
+        moy = (1*self.return_totalComp()+1*self.return_minDistHabitation()+2*self.return_totalProd())
+        return moy
 
     def moyenne_min_dist_parcel(self):
         coeff_dist = []
-        #self.Cluster_verif()
-        #print(self.m_GroupCluserList, "min problem")
         for p in self.m_GroupCluserList:
             dist_p = self.min_dist_parcel(p)
             coeff_dist.append(dist_p)
         return sum(coeff_dist) / len(coeff_dist)
     
-    def shift_positions(self):
-        list_cluster = self.return_m_GroupCluserList()
+    #define if a parcel is checked
+    def putParcel(self, parcelCandidate):
+        if not parcelCandidate.parcelPlaced() and ((parcelCandidate.returnCost()+self.m_totalCost)<=50):
+            parcelCandidate.parcelPlaced(True)
+            self.m_map.returnDic()[str(parcelCandidate.returnCost())] -=1
+            if self.m_map.returnDic()[str(parcelCandidate.returnCost())] == 0:
+                self.m_map.returnDic().pop(str(parcelCandidate.returnCost()))
+            self.m_totalCost += parcelCandidate.returnCost()
+            self.m_totalProd += parcelCandidate.returnProd()
+            #parcel checked
+            return True 
+        #if constraints are not met
+        return False
+   
+    def random_choice(self):
+        out_of_range = True
+        while out_of_range == True:
+            random_list = random.choice(self.m_GroupCluserList)
+            random_parcel = random.choice(random_list)
+            index_random_parcel = self.m_GroupCluserList.index(random_list)
+            random_parcel_position = random_parcel.returnPosition()
+            random_parcel_y = random.choice([-1,1])
+            random_parcel_x = random.choice([1,-1])
+            if random_parcel_position[0]+random_parcel_x < 170 and random_parcel_position[1]+random_parcel_y < 70:
+                out_of_range = False
+        return random_parcel_position,random_parcel_x,random_parcel_y,index_random_parcel
+    
+    def shift_positions(self):    
+
+        list_cluster = self.return_cluserListGroup()
         list_of_parcels = random.choice(self.m_GroupCluserList)
         index_list = self.m_GroupCluserList.index(list_of_parcels)
-        print(self.return_m_Clusterlist(),"avant")
-        #print(list_cluster,"list cluster avant")
-        #print(len(self.return_m_Clusterlist()),"longueur avant")
-        #print(len(list_of_parcels),"longueur selectionner")
-        #print(list_of_parcels,"sélectionner")
-        #print(list_of_parcels," want to modify (actual) parcel")
         # Décalage de 1 ou 2 unités en x et/ou y pour chaque parcelle
         parcel_moved_safely = False
         while parcel_moved_safely==False:
@@ -428,9 +350,7 @@ class Individual_algo_genetic:
                 #TODO peut tourner en boucle !!!!!!!
                 if ((parcelCandidate.returnType() == ' ' and parcelCandidate not in list_of_parcels) and str(parcelCandidate.returnCost()) in self.m_map.returnDic().keys() 
                     and self.putParcel(parcelCandidate)):
-                    #parcel = parcelCandidate
                     liste_new_parcel.append(parcelCandidate)
-                    print("ajouter")
 
                 # On garde la parcelle initiale en cas d'echec du candidat
                 else :
@@ -443,15 +363,35 @@ class Individual_algo_genetic:
                     self.m_totalProd += parcel.returnProd()
 
             if len(list_of_parcels) == len(liste_new_parcel):
-                #print("même longueur")
                 parcel_moved_safely=True
 
-        #print(liste_new_parcel, "remplacer")
         list_cluster[index_list]=liste_new_parcel
-        #print(list_cluster,"cluser intermédiaire")
-        #print(len(list_cluster),"longueur intermédiaire")
-        self.change_Groupcluster(list_cluster)
-        self.change_cluster_list()
-        #print(self.return_m_Clusterlist(),"après")
-        print(len(self.return_m_Clusterlist()),"longueur après")
+        self.change_clusterSingleGroup(list_cluster)
+        self.change_clusterList()
         return 0
+
+    #ALL RETURN_FUNCTION
+    def return_clusterList(self):
+        return self.m_CluserList
+    
+    def return_cluserListGroup(self):
+        return self.m_GroupCluserList
+    
+    def return_grid(self):
+        return self.m_map.returnGrid()
+    
+    def return_listParcel(self):
+        return self.m_listParcel
+            
+    def return_minDistHabitation(self):
+        return self.m_minDistHabitation
+        
+    def return_totalCost(self):
+        return self.m_totalCost
+
+    def return_totalComp(self):
+        return self.m_totalCompacity
+    
+    def return_totalProd(self):
+        return self.m_totalProd    
+        

@@ -18,28 +18,13 @@ class Map:
 
         self.posInit()
 
-    def returnWidth(self):
-        return self.m_width
-    
-    def returnHeigth(self):
-        return self.m_heigth
-    
-    def returnTotalArea(self):
-        return self.m_total_area
-    
-    def returnDic(self):
-        return self.m_costDic
-    
-    def restoreDic(self, initialDic):
-        self.m_costDic = initialDic
+    #Change the map's position with the choose character
+    def changeGrid(self, coord, char):
+        i = coord[0]
+        j = coord[1]
+        self.m_grid[i][j] = char
         return 0
-
-    def returnCostDic(self):
-        return self.costDic
-    
-    def returnObject(self, i,j):
-        return self.m_grid[i][j]
-    
+    #List the position of roads & habitation   
     def posInit(self):
         j = 0
         for line in self.m_grid:
@@ -66,6 +51,33 @@ class Map:
     def printHouses(self, i=0, j=0):
         print(self.m_houses_pos[i])
         return 0
+    
+    #return Map's width 
+    def returnWidth(self):
+        return self.m_width
+    
+    #return Map's heigth
+    def returnHeigth(self):
+        return self.m_heigth
+    
+    #return Map'sArea
+    def returnTotalArea(self):
+        return self.m_total_area
+    
+    #return Dictionary in wich are all maps'parcels not used
+    def returnDic(self):
+        return self.m_costDic
+    
+    def restoreDic(self, initialDic):
+        self.m_costDic = initialDic
+        return 0
+
+    def returnCostDic(self):
+        return self.costDic
+    
+    #return objet wich have the coord i,j (y,x => l,col)
+    def returnObject(self, i,j):
+        return self.m_grid[i][j]
 
     def returnGrid(self):
         return self.m_grid
@@ -76,8 +88,3 @@ class Map:
     def returnHouses(self):
         return self.m_houses_pos
     
-    def changeGrid(self, tuple, char):
-        i = tuple[0]
-        j = tuple[1]
-        self.m_grid[i][j] = char
-        return 0
