@@ -323,6 +323,11 @@ class Individual_algo_genetic:
         # Décalage de 1 ou 2 unités en x et/ou y pour chaque parcelle
         parcel_moved_safely = False
         while parcel_moved_safely==False:
+            n = 0
+            n +=1
+            if n ==1000:
+                break
+
             i = random.randint(-10, 10)
             j = random.randint(-10, 10)
             liste_new_parcel = []
