@@ -3,35 +3,59 @@ from algo_genetic import *
 import Individual
 from utils import *
 from PrometheeII import *
-import numpy as np
+import numpy as nps
+from mpl_toolkits.mplot3d import Axes3D
 
 Instance_Map=Map(constructMap(), costDic)
 
+def build_matrix(instances):
+    matrix = np.array([[p.return_totalComp(),p.return_minDistHabitation(), p.return_totalProd()] for p in instances])
+    return matrix
 
-# Print the resulting matrix
-#Instance_Map = Map(readMapFile(mapfile))
-#Instance_Map.posInit()
-#print(Instance_Map.returnGrid())
-
-#algo = Individual.Individual_algo_genetic(Matrix, Instance_Map, 0)
-test = Algo_genetic(100,500,0.90,0.50,Instance_Map)
+test = Algo_genetic(2,1000,0.80,0.2,Instance_Map)
 liste_pop =test.genetic_algorithm()
 
-print(len(liste_pop))
-promethe = PrometheeII([1,2])
-promethe.build_matrix(liste_pop)
-promethe.normalize_matrix()
-promethe.calculate_concordance_and_discordance_matrices()
-promethe.upgrade_id()
+weights = [1, 1, 1]
+matrix = build_matrix(liste_pop)
+promethe = PrometheeII(matrix,weights)
 promethe.find_pareto_border()
-promethe.show_3d_graph()
+points = []
+for i in range(0,len(liste_pop)-1):
+    points.append(tuple(matrix[i]))
 
-# algo.returnNbParcel()
-#a = algo.chooseCandidate()
-#print(a)
-#matrix[0][90]
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
+ax.set_xlabel("Compacity")
+ax.set_ylabel("Distance")
+plt.show()
 
-#print(a)
-# print(len(a))
-#algo.putParcel()
-#algo.objectDistance((-10,10))
+# def obj_func_1(x, y, z):
+#     return x + y + z
+
+# def obj_func_2(x, y, z):
+#     return 1 / (1 + x**2 + y**2 + z**2)
+
+# # Calculating the objective function values for the sample data
+# print(liste_pop[:, 0])
+# obj_1_values = obj_func_1(liste_pop[:, 0], liste_pop[:, 1], liste_pop[:, 2])
+# obj_2_values = obj_func_2(liste_pop[:, 0], liste_pop[:, 1], liste_pop[:, 2])
+
+# # Finding the Pareto frontier using numpy
+# pareto_mask = np.ones_like(obj_1_values, dtype=bool)
+# for i, (obj_1, obj_2) in enumerate(zip(obj_1_values, obj_2_values)):
+#     if pareto_mask[i]:
+#         pareto_mask[pareto_mask] = np.logical_or(
+#             obj_1_values[pareto_mask] > obj_1,
+#             obj_2_values[pareto_mask] > obj_2
+#         )
+#         pareto_mask[i] = True
+
+# # Plotting the Pareto frontier using Matplotlib
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.scatter(liste_pop[:, 0], liste_pop[:, 1], liste_pop[:, 2], c=obj_1_values, cmap='viridis')
+# ax.scatter(liste_pop[pareto_mask, 0], liste_pop[pareto_mask, 1], liste_pop[pareto_mask, 2], c=obj_1_values[pareto_mask], cmap='viridis', edgecolors='r', linewidths=2)
+# ax.set_xlabel('X')
+# ax.set_ylabel('Y')
+# plt.show()

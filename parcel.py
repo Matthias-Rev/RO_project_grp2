@@ -18,15 +18,7 @@ class Parcel:
         self.m_typeElement = typeElem
         return 0
 
-    def returnCost(self):
-        return int(self.m_cost)
-    
-    def returnProd(self):
-        return int(self.m_prod)
-    
-    def returnType(self):
-        return self.m_typeElement
-    
+    #Define if a parcel is used
     def parcelPlaced(self, placed=False):
         if placed == True:
             self.m_Put = True
@@ -34,5 +26,24 @@ class Parcel:
             self.m_Put = False
         return self.m_Put
     
+    def returnCost(self):
+        return int(self.m_cost)
+    
+    def returnProd(self):
+        return int(self.m_prod)
+
+    #Say what kind of element the object is 
+    def returnType(self):
+        return self.m_typeElement
+
+    #Return coord's object (x,y => c,l)
     def returnPosition(self):
         return self.m_pos
+    
+    def returnColPosition(self):
+        return self.m_pos[0]
+    
+    def returnPutState(self):
+        return self.m_Put
+    def returnLinePosition(self):
+        return self.m_pos[1]

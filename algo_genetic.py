@@ -1,11 +1,13 @@
 import random
-from copy import copy
+import copy
 import Individual
 import utils
 import map
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
+from Electre import *
+import time
 
 class Algo_genetic:
     def __init__(self, nbr_iter,n_pop,r_cross,r_mut,mapfile) -> None:
@@ -13,10 +15,187 @@ class Algo_genetic:
         self.m_n_pop = n_pop
         self.m_r_cross = r_cross
         self.m_r_mut = r_mut
-        self.m_score = []
+        self.m_scores = []
         self.m_pop = []
         self.m_mapfile = mapfile
+        self.m_register_list = []
+        self.m_initial_doc=self.m_mapfile.returnDic()
+
+        #wheel selection
+        self.m_total_score = 0
+        self.m_prob = []
+        self.m_cumulative_prob = []
+
+        #elitism
+        self.m_listElitism = []
     
+    def add_elitism(self,elit_indiv):
+        self.m_listElitism.append(elit_indiv)
+    
+    def build_matrix(self,instances):
+        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation()] for p in instances])
+        return matrix        
+
+    def compute_selection_probs(rankings):
+        n = len(rankings)
+        weights = [n - i + 1 for i in range(1, n + 1)]
+        total_weight = sum(weights)
+        probs = [w / total_weight for w in weights]
+        return probs
+        
+    def construct_wheel(self):
+        index = 0
+        for individual_prob in self.m_scores:
+            p=(individual_prob/self.m_total_score)*1000
+            self.m_prob.append(p)
+            if index == 1:
+                self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+p)
+            else:
+                self.m_cumulative_prob.append(p)
+            index=1
+    
+    def crossover(self,p1,p2,r_cross):
+
+        return_list=[]
+        if random.uniform(0, 1) < r_cross:
+
+            parent_tupple1 = p1.return_clusterList()
+            parent_tupple2 = p2.return_clusterList()
+            parent_cluster1 = p1.return_cluserListGroup()
+            parent_cluster2 = p2.return_cluserListGroup()
+
+            #mapfile1 = copy.deepcopy(self.m_mapfile)
+            #mapfile2 = copy.deepcopy(self.m_mapfile)
+            m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
+            c1 = Individual.Individual_algo_genetic(self.m_mapfile)
+            c2 = Individual.Individual_algo_genetic(self.m_mapfile)
+            c1.initiate_Cost_Dic(m_initial_doc_init)
+            c2.initiate_Cost_Dic(m_initial_doc_init)
+
+            min_cluster = min(len(parent_cluster1), len(parent_cluster2))
+            if min_cluster == 1:
+                min_parcel = min(len(parent_tupple1),len(parent_tupple2))
+                cut_gene_pt = random.randint(1, min_parcel-1)
+                c1.changeParcel(p1,p2,cut_gene_pt,parent_tupple1[:cut_gene_pt],parent_tupple2[cut_gene_pt:])
+                c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
+            else:
+                cut_gene_cluster = random.randint(1,min_cluster-1)
+                c1.change_clusterParcel(p1,p2,parent_cluster1[:cut_gene_cluster],parent_cluster2[cut_gene_cluster:])
+                c2.change_clusterParcel(p1,p2,parent_cluster2[:cut_gene_cluster],parent_cluster1[cut_gene_cluster:])
+
+            return_list = [c1,c2]
+
+            for child in return_list:
+                cost = child.return_totalCost()
+                if cost > 50:
+                    del return_list[return_list.index(child)]
+        return return_list
+
+    def genetic_algorithm(self):
+
+
+        self.m_pop = list()
+        #Initial doc
+        #peut être le crée pour les enfants à chaque fois ce serai pas mal
+   
+        begin = time.time()
+        for i in range(self.m_n_pop):
+            #mapfile = copy.deepcopy(self.m_mapfile)
+            m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
+            indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
+            indiv_map.chooseCandidate(m_initial_doc_init)
+            self.m_pop.append(indiv_map)
+        end = time.time()
+        print(f"it takes {end-begin}")
+        
+        best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
+        print(best_eval,"init")
+
+        for gen in range(self.m_iter_max):
+            print(f"=========== {gen} generation ===========")
+            print(f"population: {self.m_n_pop}")
+
+            for individual in self.m_pop:
+                score = self.moyenne(individual)
+                self.m_scores.append(score)
+                self.m_total_score += score
+                self.m_register_list.append(score)            
+          
+            self.construct_wheel()
+
+            for i in range(self.m_n_pop):
+                if self.m_scores[i] > best_eval:
+                    best, best_eval = self.m_pop[i], self.m_scores[i]
+                    print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
+                    print(f"valeur production = {best.return_totalProd()}, compacity = {best.return_totalComp()}, distance = {best.return_minDistHabitation()}")
+
+            selected=[]
+            for _ in range(self.m_n_pop):
+                selected.append(self.selection_wheel())
+
+            children = list()
+            for i in range(0, self.m_n_pop-1, 2):
+                p1, p2 = selected[i], selected[i+1]
+                crossoverList = self.crossover(p1, p2, self.m_r_cross)
+
+                for c in crossoverList:
+                    if len(c.return_clusterList()) == 0:
+                        continue
+                    self.mutation(c, self.m_r_mut)
+                    children.append(c)
+            
+            self.m_pop = children
+            self.m_scores = []
+            self.m_cumulative_prob=[]
+            self.m_n_pop = len(children)
+            self.m_total_score=0
+
+        fig, ax = plt.subplots()
+
+        # Plot the data as a line graph
+        ax.plot(self.m_register_list)
+
+        # Show the plot
+        plt.show()
+        for i in self.m_pop:
+            print(self.moyenne(i))
+        return self.m_pop
+ 
+    def next_generation(self,list_input):
+        for elite in self.m_listElitism:
+            list_input.append(elite)
+            
+    def moyenne_Electre(self):
+        weights = np.array([5, -10, 1])
+        concordance_thresholds = np.array([0.6, 0.6, 0.6,0.6])
+        discordance_threshold = 0.3
+        self.electre = Electre(self.build_matrix(self.m_pop),weights, concordance_thresholds, discordance_threshold)
+        ranking = self.electre.get_ranked_indices()
+        return ranking    
+
+    def mutation(self,children, r_mut):
+        # take the tupple of parcelle
+        # check if a random number is less than r_mut (nearly 20%)
+        # if yes then we flip the gene (but in our case we take the line and take another parcelle)
+        if random.uniform(0, 1) < r_mut:
+            #children.draw_matrix()
+            children.shift_positions()
+            #children.draw_matrix()
+
+
+    def moyenne(self, indiv):
+        moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd())
+        if moyenne < 0:
+            moyenne=abs(moyenne)
+        else:
+            moyenne*=2
+        return moyenne    
+        
+    def print_pop(self):
+        for indiv in self.m_pop:
+            print(f"Le score de l'individu {indiv.returnM_totalCost()+indiv.return_totalProd()}")
+        return
+ 
     def selection_tournament(self, k=3):
         # select a parent from the population
         # first random selection
@@ -27,90 +206,12 @@ class Algo_genetic:
                 selection_ix = ix
         return self.m_pop[selection_ix]
 
-    def crossover(self,p1, p2, r_cross):
-        # here we copy the parent to create 2 children
-        # r_cross is the crossover rate (normally equal to 80%)
-        # children are copies of parents by default
-        parent_tupple1 = p1.returnList_Parcel()
-        parent_tupple2 = p2.returnList_Parcel()
-        # check for recombination
-        if random.uniform(0, 1) < r_cross:
-            c1 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple1)
-            c2 = Individual.Individual_algo_genetic(self.m_mapfile,parent_tupple2)
-        # select crossover point that is not on the end of the string
-            #print(len(c1.returnList_Parcel()),"len du candidat")
-            cut_gene_pt = random.randint(1, len(c1.returnList_Parcel())-1)
-            # perform crossover
-            #c1.m_listParcel = parent_tupple1[:pt] + parent_tupple2[pt:]
-            #c2.m_listParcel = parent_tupple2[:pt] + parent_tupple1[pt:]
-
-            #print(parent_tupple1[:pt] + parent_tupple2[pt:],"new tupple c1")
-            #print(parent_tupple2[:pt] + parent_tupple1[pt:],"new tupple c2")
-            c1.changeParcel(parent_tupple1[:cut_gene_pt] + parent_tupple2[cut_gene_pt:])
-            c2.changeParcel( parent_tupple2[:cut_gene_pt] + parent_tupple1[cut_gene_pt:])
-            return [c1, c2]
-        return []
-    
-    def mutation(self,children, r_mut):
-        # take the tupple of parcelle
-        # check if a random number is less than r_mut (nearly 20%)
-        # if yes then we flip the gene (but in our case we take the line and take another parcelle)
-        list_propriety = children.returnList_Parcel()
-        for i in range(len(list_propriety)):
-            # check for a mutation
-            if random.uniform(0, 1) < r_mut:
-                #flip tupple
-                #list_propriety[i] = (random.randint(0,len(utils.matrix[1])),list_propriety[i][1])
-                # print(self.m_mapfile.returnGrid()[31][159])
-                # print(len(self.m_mapfile.returnGrid()[1]),"length")
-                # print(random.randint(0,len(self.m_mapfile.returnGrid()[1])),"random number for x")
-                # print(list_propriety[i].returnPosition()[1],"return Position")
-                #print()
-                #self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[0]][len(self.m_mapfile.returnGrid()[1])]
-                list_propriety[i] = self.m_mapfile.returnGrid()[list_propriety[i].returnPosition()[1]][random.randint(0,len(self.m_mapfile.returnGrid())-1)]
-                
-    
-    def genetic_algorithm(self):
-
-
-        self.m_pop = list()
-
-        for i in range(self.m_n_pop):
-            #print("Candidate",i)
-            indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
-            indiv_map.chooseCandidate()
-            #print(indiv_map.returnList_Parcel(),"candidate début")
-            self.m_pop.append(indiv_map)
-        
-        best, best_eval = self.m_pop[0], self.m_pop[0].returnM_totalCost()+self.m_pop[0].returnM_totalProd()
-        #print(best,"init")
-
-        for gen in range(self.m_iter_max):
-            print(f"=========== {gen} generation ===========")
-            print(f"population: {self.m_n_pop}")
-
-            self.m_scores = [individual.m_totalCost+individual.m_totalProd for individual in self.m_pop]
-            for i in range(self.m_n_pop):
-                #print(f"{i} individu {self.m_scores[i]} score")
-                if self.m_scores[i] > best_eval:
-                    best, best_eval = self.m_pop[i], self.m_scores[i]
-                    print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
-
-                selected = [self.selection_tournament() for _ in range(self.m_n_pop)]
-
-            children = list()
-            for i in range(0, self.m_n_pop-1, 2):
-                p1, p2 = selected[i], selected[i+1]
-                #print(p1,p2)
-            
-                for c in self.crossover(p1, p2, self.m_r_cross):
-                    self.mutation(c, self.m_r_mut)
-                    children.append(c)
-            # replace population
-            self.m_pop = children
-            self.m_scores = []
-            self.m_n_pop = len(children)
-            #print(len(best.returnList_Parcel()))
-            #print(best,"end")
-            #best.draw_matrix()
-        return self.m_pop
+    def selection_wheel(self):
+        r = random.uniform(0, self.m_cumulative_prob[-1])
+        if r <= self.m_cumulative_prob[0]:
+            return self.m_pop[0]
+        else:
+            for i in range(1,len(self.m_cumulative_prob)):
+                if self.m_cumulative_prob[i-1] < r <= self.m_cumulative_prob[i]:
+                    return self.m_pop[i]
+              
