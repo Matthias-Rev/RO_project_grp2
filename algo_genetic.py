@@ -49,16 +49,28 @@ class Algo_genetic:
         probs = [w / total_weight for w in weights]
         return probs
 
-    def construct_wheel(self, rankings):
-        rank_sum = sum(range(1, len(rankings) + 1))
-        for i, rank in enumerate(rankings):
-            rank_distance = len(rankings) - i
-            rank_prob = rank_distance / rank_sum
-            self.m_prob.append(rank_prob)
-            if i == 0:
-                self.m_cumulative_prob.append(rank_prob)
+    # def construct_wheel(self, rankings):
+    #     rank_sum = sum(range(1, len(rankings) + 1))
+    #     for i, rank in enumerate(rankings):
+    #         rank_distance = len(rankings) - i
+    #         rank_prob = rank_distance / rank_sum
+    #         self.m_prob.append(rank_prob)
+    #         if i == 0:
+    #             self.m_cumulative_prob.append(rank_prob)
+    #         else:
+    #             self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
+    #     return 0
+    
+    def construct_wheel(self):
+        index = 0
+        for individual_score in self.m_scores:
+            prob=(individual_score/self.m_total_score)*1000
+            self.m_prob.append(prob)
+            if index == 1:
+                self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+prob)
             else:
-                self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
+                self.m_cumulative_prob.append(prob)
+            index=1
         return 0
     
     def create_population(self,_):
@@ -144,18 +156,27 @@ class Algo_genetic:
         for gen in range(self.m_iter_max):
             score_matrix = self.build_matrix(self.m_pop)
             #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
-            electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
-            ranking = electre.rank_solutions()
+            #electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
+            # ranking = electre.rank_solutions()
 
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
 
-            self.construct_wheel(ranking)
+            for individual in self.m_pop:
+                score = self.moyenne(individual)
+                self.m_scores.append(score)
+                self.m_total_score += score
+                self.m_register_list.append(score)
+
+            # self.construct_wheel(ranking)
+            self.construct_wheel()
 
 
             selected=[]
             begin = time.time()
             selected = self.run_parallel()
+            # for _ in range(self.m_n_pop):
+            #     selected.append(self.selection_wheel())
             end = time.time()
             print(f"it takes {end-begin} to make selection_wheel")
 
@@ -176,13 +197,13 @@ class Algo_genetic:
             end = time.time()
             print(f"it takes {end-begin} to create childs")
 
-            if gen == self.m_iter_max-1:
-                pareto = electre.pareto_frontier(score_matrix)
-                print(f"il y a {len(pareto)} solutions trouvées")
-                print(pareto)
-                #for index in pareto:
-                    #self.m_pop[index].draw_matrix()
-                self.Plot3D(pareto)
+            # if gen == self.m_iter_max-1:
+            #     pareto = electre.pareto_frontier(score_matrix)
+            #     print(f"il y a {len(pareto)} solutions trouvées")
+            #     print(pareto)
+            #     #for index in pareto:
+            #         #self.m_pop[index].draw_matrix()
+            #     self.Plot3D(pareto)
             
             self.m_pop = children
             self.m_scores = []
