@@ -21,9 +21,17 @@ elapsed_time = time.time() - start_time
 # afficher le temps d'exécution
 print(f"Le temps d'exécution est de {elapsed_time:.2f} secondes")
 
+weights = [1, 1, 1]
+matrix = build_matrix(liste_pop)
+promethe = PrometheeII(matrix,weights)
+promethe.find_pareto_border()
+points = []
+for i in range(0,len(liste_pop)-1):
+    points.append(tuple(matrix[i]))
 
-
-
-
-
-
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
+ax.set_xlabel("Compacity")
+ax.set_ylabel("Distance")
+plt.show()

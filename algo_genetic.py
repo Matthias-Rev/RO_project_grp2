@@ -9,6 +9,7 @@ from matplotlib import colors
 
 from ElcetreII import *
 from Electre import *
+import time
 
 class Algo_genetic:
     def __init__(self, nbr_iter,n_pop,r_cross,r_mut,mapfile) -> None:
@@ -19,7 +20,8 @@ class Algo_genetic:
         self.m_scores = []
         self.m_pop = []
         self.m_mapfile = mapfile
-        self.register_list = []
+        self.m_register_list = []
+        self.m_initial_doc=self.m_mapfile.returnDic()
 
         #wheel selection
         self.m_total_score = 0
@@ -63,10 +65,13 @@ class Algo_genetic:
             parent_cluster1 = p1.return_cluserListGroup()
             parent_cluster2 = p2.return_cluserListGroup()
 
-            mapfile1 = copy.deepcopy(self.m_mapfile)
-            mapfile2 = copy.deepcopy(self.m_mapfile)
-            c1 = Individual.Individual_algo_genetic(mapfile1)
-            c2 = Individual.Individual_algo_genetic(mapfile2)
+            #mapfile1 = copy.deepcopy(self.m_mapfile)
+            #mapfile2 = copy.deepcopy(self.m_mapfile)
+            m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
+            c1 = Individual.Individual_algo_genetic(self.m_mapfile)
+            c2 = Individual.Individual_algo_genetic(self.m_mapfile)
+            c1.initiate_Cost_Dic(m_initial_doc_init)
+            c2.initiate_Cost_Dic(m_initial_doc_init)
 
             min_cluster = min(len(parent_cluster1), len(parent_cluster2))
             if min_cluster == 1:
@@ -92,15 +97,17 @@ class Algo_genetic:
         weights = [-0.5, 0.5, -0.5]
         concordance_index = 0.6
         discordance_index = 0.4
-
-
+        #Initial doc
+        #peut être le crée pour les enfants à chaque fois ce serai pas mal
+   
+        begin = time.time()
         for i in range(self.m_n_pop):
-
-            mapfile = copy.deepcopy(self.m_mapfile)
-
-            indiv_map = Individual.Individual_algo_genetic(mapfile)
-            indiv_map.chooseCandidate()
+            m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
+            indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
+            indiv_map.chooseCandidate(m_initial_doc_init)
             self.m_pop.append(indiv_map)
+        end = time.time()
+        print(f"it takes {end-begin}")
         
         best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
         print(best_eval,"init")
@@ -109,9 +116,6 @@ class Algo_genetic:
             score_matrix = self.build_matrix(self.m_pop)
             electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
             ranking = electre.rank_solutions()
-            #for index in ranking:
-                #self.m_pop[index].draw_matrix()
-                #print(score_matrix[index])
 
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
@@ -125,7 +129,7 @@ class Algo_genetic:
                     #print(f"valeur production = {best.return_totalProd()}, compacity = {best.return_totalComp()}, distance = {best.return_minDistHabitation()}")
 
             selected=[]
-            for ok in range(self.m_n_pop):
+            for _ in range(self.m_n_pop):
                 selected.append(self.selection_wheel())
 
             children = list()
@@ -153,6 +157,15 @@ class Algo_genetic:
             self.m_n_pop = len(children)
             self.m_total_score=0
 
+        fig, ax = plt.subplots()
+
+        # Plot the data as a line graph
+        ax.plot(self.m_register_list)
+
+        # Show the plot
+        plt.show()
+        for i in self.m_pop:
+            print(self.moyenne(i))
         return self.m_pop
  
     def next_generation(self,list_input):
@@ -165,9 +178,8 @@ class Algo_genetic:
         # check if a random number is less than r_mut (nearly 20%)
         # if yes then we flip the gene (but in our case we take the line and take another parcelle)
         if random.uniform(0, 1) < r_mut:
-            None
             #children.draw_matrix()
-            #children.shift_positions()
+            children.shift_positions()
             #children.draw_matrix()
 
     def moyenne(self, indiv):
