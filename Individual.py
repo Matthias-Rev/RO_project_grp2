@@ -77,9 +77,7 @@ class Individual_algo_genetic:
             self.m_totalProd+=parcel.returnProd()
 
         if self.m_totalCost < 50:
-            self.draw_matrix()
             self.list_choice()
-            self.draw_matrix()
 
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
