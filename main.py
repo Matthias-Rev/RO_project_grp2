@@ -7,31 +7,32 @@ import time
 import numpy as nps
 from mpl_toolkits.mplot3d import Axes3D
 
-Instance_Map=Map(constructMap(), costDic)
+if __name__ == "__main__":
+    Instance_Map=Map(constructMap(), costDic)
 
-def build_matrix(instances):
-    matrix = np.array([[p.return_totalComp(),p.return_minDistHabitation(), p.return_totalProd()] for p in instances])
-    return matrix
+    def build_matrix(instances):
+        matrix = np.array([[p.return_totalComp(),p.return_minDistHabitation(), p.return_totalProd()] for p in instances])
+        return matrix
 
-start_time = time.time()
-test = Algo_genetic(1,1000,0.80,0.99,Instance_Map)
-liste_pop =test.genetic_algorithm()
-elapsed_time = time.time() - start_time
+    start_time = time.time()
+    test = Algo_genetic(1,10000,0.80,0.99,Instance_Map)
+    liste_pop =test.genetic_algorithm()
+    elapsed_time = time.time() - start_time
 
-# afficher le temps d'exécution
-print(f"Le temps d'exécution est de {elapsed_time:.2f} secondes")
+    # afficher le temps d'exécution
+    print(f"Le temps d'exécution est de {elapsed_time:.2f} secondes")
 
-weights = [1, 1, 1]
-matrix = build_matrix(liste_pop)
-promethe = PrometheeII(matrix,weights)
-promethe.find_pareto_border()
-points = []
-for i in range(0,len(liste_pop)-1):
-    points.append(tuple(matrix[i]))
+    weights = [1, 1, 1]
+    matrix = build_matrix(liste_pop)
+    promethe = PrometheeII(matrix,weights)
+    promethe.find_pareto_border()
+    points = []
+    for i in range(0,len(liste_pop)-1):
+        points.append(tuple(matrix[i]))
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
-ax.set_xlabel("Compacity")
-ax.set_ylabel("Distance")
-plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
+    ax.set_xlabel("Compacity")
+    ax.set_ylabel("Distance")
+    plt.show()
