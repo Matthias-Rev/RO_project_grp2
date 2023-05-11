@@ -300,20 +300,20 @@ class Individual_algo_genetic:
             for parcel in cluster_list:
                 liste_possible = []
                 position_init= parcel.returnPosition()
-                if position_init[1] > 1:
-                    down = (position_init[1]-1,position_init[0])
-                    liste_possible.append(down)
-                if position_init[1] < 169:
-                    up = (position_init[1]+1,position_init[0])
-                    liste_possible.append(up)
                 if position_init[0] > 1:
-                    left = (position_init[1],position_init[0]-1)
+                    down = (position_init[0]-1,position_init[1])
+                    liste_possible.append(down)
+                if position_init[0] < 168:
+                    up = (position_init[0]+1,position_init[1])
+                    liste_possible.append(up)
+                if position_init[1] > 1:
+                    left = (position_init[0],position_init[1]-1)
                     liste_possible.append(left)
-                if position_init[0] < 69:
-                    right = (position_init[1],position_init[0]+1)
+                if position_init[1] < 68:
+                    right = (position_init[0],position_init[1]+1)
                     liste_possible.append(right)
                 for try_position in liste_possible:
-                    parcel_candidate = self.m_map.returnObject(try_position[0],try_position[1])
+                    parcel_candidate = self.m_map.returnObject(try_position[1],try_position[0])
                     if self.m_totalCost+parcel_candidate.returnCost() <= 50 and parcel_candidate not in self.m_CluserList and parcel_candidate.returnType() not in ["R","C"]:
                         self.m_dic_pos[str(parcel_candidate.returnCost())]-=1
                         self.m_totalCost+=parcel_candidate.returnCost()
