@@ -13,8 +13,6 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 BREAK = 0
 VALID = 1
-#self.m_map.returnDic() replaced by self.m_dic_pos
-#TODO changer les limites numérique par des limites -> m_map.return_height, m_map.return_weight
 
 class Individual_algo_genetic:
 
@@ -346,16 +344,11 @@ class Individual_algo_genetic:
         index_list = self.m_GroupCluserList.index(list_of_parcels)
         # Décalage de 1 ou 2 unités en x et/ou y pour chaque parcelle
 
-        #TODO l'état des parcels n'est pas un problème, elles restent constante le long du processus
-        #block and doesn't go in ajouter branch ??
         parcel_moved_safely = False
         while parcel_moved_safely==False:
             debug=debug+1
             if debug == 20:
                 state = BREAK
-                #TODO retire une ou deux parcels pour permettre à son enfant de prendre plus du deuxième parent
-                #self.draw_matrix()
-                #("break")
                 break
             i = random.randint(-2, 2)
             j = random.randint(-2, 2)
@@ -371,8 +364,6 @@ class Individual_algo_genetic:
                 parcelCandidate = self.m_map.returnObject(row,col)
                 
                 #Réinititalisation de la parcelle initiale
-                #parcel.changeTypeElem(' ') 
-                #parcel.parcelPlaced(False)
                 if str(parcel.returnCost()) in self.m_dic_pos:
                    self.m_dic_pos[str(parcel.returnCost())] += 1
                 elif str(parcel.returnCost()) not in self.m_dic_pos:
@@ -381,15 +372,12 @@ class Individual_algo_genetic:
                 self.m_totalProd -= parcel.returnProd()
                 
                 # Vérification que la nouvelle position est valide (pas déjà occupée...)
-                #TODO peut tourner en boucle !!!!!!!
                 if ((parcelCandidate.returnType() == ' ' and parcelCandidate not in list_of_parcels) and str(parcelCandidate.returnCost()) in self.m_dic_pos.keys() 
                     and self.putParcel(parcelCandidate)):
                     liste_new_parcel.append(parcelCandidate)
 
                 # On garde la parcelle initiale en cas d'echec du candidat
                 else :
-                    #parcel.changeTypeElem('x') 
-                    #parcel.parcelPlaced(True)
                     self.m_dic_pos[str(parcel.returnCost())] -= 1
                     if self.m_dic_pos[str(parcel.returnCost())] == 0:
                         self.m_dic_pos.pop(str(parcel.returnCost()))

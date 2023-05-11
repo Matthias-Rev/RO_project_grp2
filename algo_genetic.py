@@ -6,6 +6,8 @@ import map
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
+
+from ElcetreII import *
 from Electre import *
 import time
 
@@ -42,20 +44,19 @@ class Algo_genetic:
         total_weight = sum(weights)
         probs = [w / total_weight for w in weights]
         return probs
-        
-    def construct_wheel(self):
-        index = 0
-        for individual_prob in self.m_scores:
-            p=(individual_prob/self.m_total_score)*1000
-            self.m_prob.append(p)
-            if index == 1:
-                self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+p)
+
+    def construct_wheel(self, rankings):
+        rank_sum = sum(range(1, len(rankings) + 1))
+        for i, rank in enumerate(rankings):
+            rank_distance = len(rankings) - i
+            rank_prob = rank_distance / rank_sum
+            self.m_prob.append(rank_prob)
+            if i == 0:
+                self.m_cumulative_prob.append(rank_prob)
             else:
-                self.m_cumulative_prob.append(p)
-            index=1
+                self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
     
     def crossover(self,p1,p2,r_cross):
-
         return_list=[]
         if random.uniform(0, 1) < r_cross:
 
@@ -92,15 +93,15 @@ class Algo_genetic:
         return return_list
 
     def genetic_algorithm(self):
-
-
         self.m_pop = list()
+        weights = [-0.5, 0.5, -0.5]
+        concordance_index = 0.6
+        discordance_index = 0.4
         #Initial doc
         #peut être le crée pour les enfants à chaque fois ce serai pas mal
    
         begin = time.time()
         for i in range(self.m_n_pop):
-            #mapfile = copy.deepcopy(self.m_mapfile)
             m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
             indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
             indiv_map.chooseCandidate(m_initial_doc_init)
@@ -112,22 +113,20 @@ class Algo_genetic:
         print(best_eval,"init")
 
         for gen in range(self.m_iter_max):
+            score_matrix = self.build_matrix(self.m_pop)
+            electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
+            ranking = electre.rank_solutions()
+
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
 
-            for individual in self.m_pop:
-                score = self.moyenne(individual)
-                self.m_scores.append(score)
-                self.m_total_score += score
-                self.m_register_list.append(score)            
-          
-            self.construct_wheel()
+            self.construct_wheel(ranking)
 
-            for i in range(self.m_n_pop):
-                if self.m_scores[i] > best_eval:
-                    best, best_eval = self.m_pop[i], self.m_scores[i]
-                    print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
-                    print(f"valeur production = {best.return_totalProd()}, compacity = {best.return_totalComp()}, distance = {best.return_minDistHabitation()}")
+            #for i in range(self.m_n_pop):
+                #if self.m_scores[i] > best_eval:
+                    #best, best_eval = self.m_pop[i], self.m_scores[i]
+                    #print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
+                    #print(f"valeur production = {best.return_totalProd()}, compacity = {best.return_totalComp()}, distance = {best.return_minDistHabitation()}")
 
             selected=[]
             for _ in range(self.m_n_pop):
@@ -143,6 +142,14 @@ class Algo_genetic:
                         continue
                     self.mutation(c, self.m_r_mut)
                     children.append(c)
+
+            if gen == self.m_iter_max-1:
+                pareto = electre.pareto_frontier(score_matrix)
+                print(f"il y a {len(pareto)} solutions trouvées")
+                print(pareto)
+                #for index in pareto:
+                    #self.m_pop[index].draw_matrix()
+                self.Plot3D(pareto)
             
             self.m_pop = children
             self.m_scores = []
@@ -164,14 +171,7 @@ class Algo_genetic:
     def next_generation(self,list_input):
         for elite in self.m_listElitism:
             list_input.append(elite)
-            
-    def moyenne_Electre(self):
-        weights = np.array([5, -10, 1])
-        concordance_thresholds = np.array([0.6, 0.6, 0.6,0.6])
-        discordance_threshold = 0.3
-        self.electre = Electre(self.build_matrix(self.m_pop),weights, concordance_thresholds, discordance_threshold)
-        ranking = self.electre.get_ranked_indices()
-        return ranking    
+
 
     def mutation(self,children, r_mut):
         # take the tupple of parcelle
@@ -181,7 +181,6 @@ class Algo_genetic:
             #children.draw_matrix()
             children.shift_positions()
             #children.draw_matrix()
-
 
     def moyenne(self, indiv):
         moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd())
@@ -195,7 +194,7 @@ class Algo_genetic:
         for indiv in self.m_pop:
             print(f"Le score de l'individu {indiv.returnM_totalCost()+indiv.return_totalProd()}")
         return
- 
+
     def selection_tournament(self, k=3):
         # select a parent from the population
         # first random selection
@@ -214,4 +213,21 @@ class Algo_genetic:
             for i in range(1,len(self.m_cumulative_prob)):
                 if self.m_cumulative_prob[i-1] < r <= self.m_cumulative_prob[i]:
                     return self.m_pop[i]
-              
+
+    def Plot3D(self, points):
+
+        # créer un graph 3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        # ajouter les points à l'axe du graphique
+        ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='r', marker='o')
+
+        # ajouter des étiquettes d'axe
+        ax.set_xlabel('X Label')
+        ax.set_ylabel('Y Label')
+        ax.set_zlabel('Z Label')
+
+        # afficher le graphique
+        plt.show()
+
