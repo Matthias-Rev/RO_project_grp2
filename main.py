@@ -12,7 +12,7 @@ def build_matrix(instances):
     matrix = np.array([[p.return_totalComp(),p.return_minDistHabitation(), p.return_totalProd()] for p in instances])
     return matrix
 
-test = Algo_genetic(2,2000,0.80,0.2,Instance_Map)
+test = Algo_genetic(2,1000,0.80,0.2,Instance_Map)
 liste_pop =test.genetic_algorithm()
 
 weights = [1, 1, 1]
@@ -23,12 +23,12 @@ points = []
 for i in range(0,len(liste_pop)-1):
     points.append(tuple(matrix[i]))
 
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
-# ax.set_xlabel("Compacity")
-# ax.set_ylabel("Distance")
-# plt.show()
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter([p[0] for p in points], [p[1] for p in points], [p[2] for p in points])
+ax.set_xlabel("Compacity")
+ax.set_ylabel("Distance")
+plt.show()
 
 # def obj_func_1(x, y, z):
 #     return x + y + z

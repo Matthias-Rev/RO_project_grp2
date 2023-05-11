@@ -141,7 +141,7 @@ class Algo_genetic:
                 for c in crossoverList:
                     if len(c.return_clusterList()) == 0:
                         continue
-                    #self.mutation(c, self.m_r_mut)
+                    self.mutation(c, self.m_r_mut)
                     children.append(c)
             
             self.m_pop = children

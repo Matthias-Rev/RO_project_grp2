@@ -14,7 +14,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 BREAK = 0
 VALID = 1
 #self.m_map.returnDic() replaced by self.m_dic_pos
-
+#TODO changer les limites numérique par des limites -> m_map.return_height, m_map.return_weight
 
 class Individual_algo_genetic:
 
@@ -72,23 +72,14 @@ class Individual_algo_genetic:
         for p_parcel in self.m_CluserList:
             x,y = p_parcel.returnPosition()
             parcel = self.m_map.returnObject(y,x)
-            #parcel.parcelPlaced(True)
-            #parcel.changeTypeElem('x')
+            self.m_dic_pos[str(parcel.returnCost())]-=1
             self.m_totalCost+=parcel.returnCost()
             self.m_totalProd+=parcel.returnProd()
 
-
-        random_parcel_position, random_parcel_x,random_parcel_y,index = self.random_choice()
-        first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
-
-        while self.m_totalCost+first_parcel.returnCost() <= 50 and first_parcel.returnType() not in ["R","C"] and first_parcel not in self.m_CluserList:
-            self.m_GroupCluserList[index].append(first_parcel)
-            self.m_totalProd+=first_parcel.returnProd()
-            self.m_totalCost+=first_parcel.returnCost()
-            #first_parcel.parcelPlaced(True)
-            #first_parcel.changeTypeElem('x')
-            random_parcel_position, random_parcel_x,random_parcel_y,index = self.random_choice()
-            first_parcel = self.m_map.returnGrid()[random_parcel_position[1]+random_parcel_y][random_parcel_position[0]+random_parcel_x]
+        if self.m_totalCost < 50:
+            self.draw_matrix()
+            self.list_choice()
+            self.draw_matrix()
 
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
@@ -107,7 +98,7 @@ class Individual_algo_genetic:
         for p_parcel in self.m_CluserList:
             x,y = p_parcel.returnPosition()
             parcel = self.m_map.returnObject(y,x)
-            #parcel.parcelPlaced(True)
+            self.m_dic_pos[str(parcel.returnCost())]-=1
             self.m_totalCost+=parcel.returnCost()
             self.m_totalProd+=parcel.returnProd()
 
@@ -117,20 +108,11 @@ class Individual_algo_genetic:
             self.m_GroupCluserList[0].insert(0,parcel_add)
             self.m_totalProd+=parcel_add.returnProd()
             self.m_totalCost+=parcel_add.returnCost()
-
-            parcel_add.parcelPlaced(True)
-
+            self.m_dic_pos[str(parcel_add.returnCost())]-=1
             cut_gene+=1
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
-    
-    def cleanIndividual(self, initialDoc):
-        # for elem in listeParcelObj:
-        #     elem.changeTypeElem(' ')
-        #     elem.parcelPlaced(False)
-        #self.m_map.restoreDic(initialDoc)
-        return 0 
      
     #define the compacity
     def compacity(self, listParcels):
@@ -172,24 +154,21 @@ class Individual_algo_genetic:
 
         if len(self.m_listParcel) == 0:
             self.m_listParcel = []
-        #restoreDic = copy.copy(self.m_map.returnDic())
+
         randomNumber = random.randint(1,5)
         while self.m_totalCost+int(next(iter(self.m_dic_pos))) <= 50 and len(self.m_listParcel) < randomNumber:
             candidateOk = False
             while not candidateOk:
-                #print("debug")
                 i = random.randint(0, len(self.m_map.returnGrid())-1)
                 j = random.randint(0, len(self.m_map.returnGrid()[i])-1)
                 randomCandidate = self.m_map.returnObject(i,j)
                 if randomCandidate.returnType() == ' ' and str(randomCandidate.returnCost()) in self.m_dic_pos.keys() and self.putParcel(randomCandidate):
                     candidateOk = True
-                    #randomCandidate.changeTypeElem('x')
                     self.m_listParcel.append(randomCandidate)
         self.choosePosition()
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
-        print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
-        #self.cleanIndividual(init_doc)
+        #print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
         return self.m_CluserList
 
     def choosePosition(self):
@@ -209,7 +188,6 @@ class Individual_algo_genetic:
             col, row = parcelChoice.returnPosition()
             i,j = col,row
             while not candidateOk:
-                #print("debug here")
                 randomCol = random.randint(-1,1)
                 randomRow = random.randint(-1,1)
                 if (i + randomCol) < self.m_map.returnWidth()-1 and (i + randomCol) >= 0: 
@@ -218,11 +196,9 @@ class Individual_algo_genetic:
                     j += randomRow
                 randomCandidate = self.m_map.returnObject(j,i)
                 if randomCandidate.returnType() == ' ' and str(randomCandidate.returnCost()) in self.m_dic_pos.keys() and self.putParcel(randomCandidate):
-                    #randomCandidate.changeTypeElem('x')
                     self.m_listParcel.append(randomCandidate)
                     cluster.append(randomCandidate)
                     candidateOk = True
-        #print("end debug")
         
         for list in allCluster:
             for elem in list:
@@ -300,15 +276,12 @@ class Individual_algo_genetic:
     
     #define if a parcel is checked
     def putParcel(self, parcelCandidate):
-        #TODO change here not parcelCandidate.parcelPlaced() by parcelCandidate not in self.m_listParcel
         if parcelCandidate not in self.m_listParcel and ((parcelCandidate.returnCost()+self.m_totalCost)<=50):
-            parcelCandidate.parcelPlaced(True)
             self.m_dic_pos[str(parcelCandidate.returnCost())] -=1
             if self.m_dic_pos[str(parcelCandidate.returnCost())] == 0:
                 self.m_dic_pos.pop(str(parcelCandidate.returnCost()))
             self.m_totalCost += parcelCandidate.returnCost()
             self.m_totalProd += parcelCandidate.returnProd()
-            #parcel checked
             return True 
         #if constraints are not met
         return False
@@ -323,6 +296,35 @@ class Individual_algo_genetic:
                 if i.returnPutState()==False:
                     count_S+=1
         return count, count_S
+
+    def list_choice(self):
+        for cluster_list in self.m_GroupCluserList:
+            for parcel in cluster_list:
+                liste_possible = []
+                position_init= parcel.returnPosition()
+                if position_init[1] > 1:
+                    down = (position_init[1]-1,position_init[0])
+                    liste_possible.append(down)
+                if position_init[1] < 169:
+                    up = (position_init[1]+1,position_init[0])
+                    liste_possible.append(up)
+                if position_init[0] > 1:
+                    left = (position_init[1],position_init[0]-1)
+                    liste_possible.append(left)
+                if position_init[0] < 69:
+                    right = (position_init[1],position_init[0]+1)
+                    liste_possible.append(right)
+                for try_position in liste_possible:
+                    parcel_candidate = self.m_map.returnObject(try_position[0],try_position[1])
+                    if self.m_totalCost+parcel_candidate.returnCost() <= 50 and parcel_candidate not in self.m_CluserList and parcel_candidate.returnType() not in ["R","C"]:
+                        self.m_dic_pos[str(parcel_candidate.returnCost())]-=1
+                        self.m_totalCost+=parcel_candidate.returnCost()
+                        self.m_totalProd+=parcel_candidate.returnProd()
+                        self.m_GroupCluserList[self.m_GroupCluserList.index(cluster_list)].append(parcel_candidate)
+                        return 0
+        return 0
+
+        return 0
    
     def random_choice(self):
         out_of_range = True
@@ -428,5 +430,8 @@ class Individual_algo_genetic:
         return self.m_totalCompacity
     
     def return_totalProd(self):
-        return self.m_totalProd    
+        return self.m_totalProd   
+    
+    def return_dic(self):
+        return self.m_dic_pos
         
