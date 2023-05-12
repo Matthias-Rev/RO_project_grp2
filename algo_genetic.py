@@ -9,6 +9,8 @@ from matplotlib import colors
 
 from ElcetreII import *
 from Electre import *
+import time
+import multiprocessing
 
 class Algo_genetic:
     def __init__(self, nbr_iter,n_pop,r_cross,r_mut,mapfile) -> None:
@@ -19,7 +21,8 @@ class Algo_genetic:
         self.m_scores = []
         self.m_pop = []
         self.m_mapfile = mapfile
-        self.register_list = []
+        self.m_register_list = []
+        self.m_initial_doc=self.m_mapfile.returnDic()
 
         #wheel selection
         self.m_total_score = 0
@@ -28,6 +31,9 @@ class Algo_genetic:
 
         #elitism
         self.m_listElitism = []
+
+        #multiprocessing
+        self.num_processes = multiprocessing.cpu_count()
     
     def add_elitism(self,elit_indiv):
         self.m_listElitism.append(elit_indiv)
@@ -43,16 +49,56 @@ class Algo_genetic:
         probs = [w / total_weight for w in weights]
         return probs
 
-    def construct_wheel(self, rankings):
-        rank_sum = sum(range(1, len(rankings) + 1))
-        for i, rank in enumerate(rankings):
-            rank_distance = len(rankings) - i
-            rank_prob = rank_distance / rank_sum
-            self.m_prob.append(rank_prob)
-            if i == 0:
-                self.m_cumulative_prob.append(rank_prob)
+    # def construct_wheel(self, rankings):
+    #     rank_sum = sum(range(1, len(rankings) + 1))
+    #     for i, rank in enumerate(rankings):
+    #         rank_distance = len(rankings) - i
+    #         rank_prob = rank_distance / rank_sum
+    #         self.m_prob.append(rank_prob)
+    #         if i == 0:
+    #             self.m_cumulative_prob.append(rank_prob)
+    #         else:
+    #             self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
+    #     return 0
+    
+    def construct_wheel(self):
+        index = 0
+        for individual_score in self.m_scores:
+            prob=(individual_score/self.m_total_score)*1000
+            self.m_prob.append(prob)
+            if index == 1:
+                self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+prob)
             else:
-                self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
+                self.m_cumulative_prob.append(prob)
+            index=1
+        return 0
+    
+    def create_population(self,_):
+        m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
+        indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
+        indiv_map.chooseCandidate(m_initial_doc_init)
+        return indiv_map
+    
+    def process_chunk(self, chunk_size):
+        chunk_results = []
+        for _ in range(chunk_size):
+            chunk_results.append(self.selection_wheel())
+
+        return chunk_results
+    
+    def run_parallel(self):
+        chunk_size = self.m_n_pop // self.num_processes
+        with multiprocessing.Pool(self.num_processes) as pool:
+            chunks = [chunk_size] * (self.num_processes - 1)
+            chunks.append(self.m_n_pop - chunk_size * (self.num_processes - 1))
+
+            results = pool.map(self.process_chunk, chunks)
+
+        selected = []
+        for chunk_result in results:
+            selected.extend(chunk_result)
+
+        return selected
     
     def crossover(self,p1,p2,r_cross):
         return_list=[]
@@ -63,10 +109,13 @@ class Algo_genetic:
             parent_cluster1 = p1.return_cluserListGroup()
             parent_cluster2 = p2.return_cluserListGroup()
 
-            mapfile1 = copy.deepcopy(self.m_mapfile)
-            mapfile2 = copy.deepcopy(self.m_mapfile)
-            c1 = Individual.Individual_algo_genetic(mapfile1)
-            c2 = Individual.Individual_algo_genetic(mapfile2)
+            #mapfile1 = copy.deepcopy(self.m_mapfile)
+            #mapfile2 = copy.deepcopy(self.m_mapfile)
+            m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
+            c1 = Individual.Individual_algo_genetic(self.m_mapfile)
+            c2 = Individual.Individual_algo_genetic(self.m_mapfile)
+            c1.initiate_Cost_Dic(m_initial_doc_init)
+            c2.initiate_Cost_Dic(m_initial_doc_init)
 
             min_cluster = min(len(parent_cluster1), len(parent_cluster2))
             if min_cluster == 1:
@@ -92,42 +141,49 @@ class Algo_genetic:
         weights = [-0.5, 0.5, -0.5]
         concordance_index = 0.6
         discordance_index = 0.4
-
-
-        for i in range(self.m_n_pop):
-
-            mapfile = copy.deepcopy(self.m_mapfile)
-
-            indiv_map = Individual.Individual_algo_genetic(mapfile)
-            indiv_map.chooseCandidate()
-            self.m_pop.append(indiv_map)
+        #Initial doc
+        #peut être le crée pour les enfants à chaque fois ce serai pas mal
+   
+        begin = time.time()
+        pool = multiprocessing.Pool(self.num_processes)
+        self.m_pop = pool.map(self.create_population, range(self.m_n_pop))
+        end = time.time()
+        print(f"it takes {end-begin} to create population")
         
         best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
         print(best_eval,"init")
 
         for gen in range(self.m_iter_max):
             score_matrix = self.build_matrix(self.m_pop)
-            electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
-            ranking = electre.rank_solutions()
-            #for index in ranking:
-                #self.m_pop[index].draw_matrix()
-                #print(score_matrix[index])
+            #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
+            #electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
+            # ranking = electre.rank_solutions()
 
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
 
-            self.construct_wheel(ranking)
+            for individual in self.m_pop:
+                score = self.moyenne(individual)
+                self.m_scores.append(score)
+                self.m_total_score += score
+                self.m_register_list.append(score)
 
-            #for i in range(self.m_n_pop):
-                #if self.m_scores[i] > best_eval:
-                    #best, best_eval = self.m_pop[i], self.m_scores[i]
-                    #print(">%d, new best = %.3f" % (gen, self.m_scores[i]))
-                    #print(f"valeur production = {best.return_totalProd()}, compacity = {best.return_totalComp()}, distance = {best.return_minDistHabitation()}")
+            # self.construct_wheel(ranking)
+            self.construct_wheel()
+
 
             selected=[]
-            for ok in range(self.m_n_pop):
-                selected.append(self.selection_wheel())
+            begin = time.time()
+            selected = self.run_parallel()
+            # for _ in range(self.m_n_pop):
+            #     selected.append(self.selection_wheel())
+            end = time.time()
+            print(f"it takes {end-begin} to make selection_wheel")
 
+
+            begin = time.time()
+
+            
             children = list()
             for i in range(0, self.m_n_pop-1, 2):
                 p1, p2 = selected[i], selected[i+1]
@@ -138,14 +194,16 @@ class Algo_genetic:
                         continue
                     self.mutation(c, self.m_r_mut)
                     children.append(c)
+            end = time.time()
+            print(f"it takes {end-begin} to create childs")
 
-            if gen == self.m_iter_max-1:
-                pareto = electre.pareto_frontier(score_matrix)
-                print(f"il y a {len(pareto)} solutions trouvées")
-                print(pareto)
-                #for index in pareto:
-                    #self.m_pop[index].draw_matrix()
-                self.Plot3D(pareto)
+            # if gen == self.m_iter_max-1:
+            #     pareto = electre.pareto_frontier(score_matrix)
+            #     print(f"il y a {len(pareto)} solutions trouvées")
+            #     print(pareto)
+            #     #for index in pareto:
+            #         #self.m_pop[index].draw_matrix()
+            #     self.Plot3D(pareto)
             
             self.m_pop = children
             self.m_scores = []
@@ -153,11 +211,21 @@ class Algo_genetic:
             self.m_n_pop = len(children)
             self.m_total_score=0
 
+        fig, ax = plt.subplots()
+
+        # Plot the data as a line graph
+        ax.plot(self.m_register_list)
+
+        # Show the plot
+        plt.show()
+        for i in self.m_pop:
+            print(self.moyenne(i))
         return self.m_pop
  
     def next_generation(self,list_input):
         for elite in self.m_listElitism:
             list_input.append(elite)
+        return 0
 
 
     def mutation(self,children, r_mut):
@@ -165,10 +233,10 @@ class Algo_genetic:
         # check if a random number is less than r_mut (nearly 20%)
         # if yes then we flip the gene (but in our case we take the line and take another parcelle)
         if random.uniform(0, 1) < r_mut:
-            None
             #children.draw_matrix()
-            #children.shift_positions()
+            children.shift_positions()
             #children.draw_matrix()
+        return 0
 
     def moyenne(self, indiv):
         moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd())
@@ -181,7 +249,7 @@ class Algo_genetic:
     def print_pop(self):
         for indiv in self.m_pop:
             print(f"Le score de l'individu {indiv.returnM_totalCost()+indiv.return_totalProd()}")
-        return
+        return 0
 
     def selection_tournament(self, k=3):
         # select a parent from the population
@@ -201,6 +269,8 @@ class Algo_genetic:
             for i in range(1,len(self.m_cumulative_prob)):
                 if self.m_cumulative_prob[i-1] < r <= self.m_cumulative_prob[i]:
                     return self.m_pop[i]
+        
+        return -1
 
     def Plot3D(self, points):
 
@@ -218,4 +288,6 @@ class Algo_genetic:
 
         # afficher le graphique
         plt.show()
+
+        return 0
 
