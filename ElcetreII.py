@@ -1,8 +1,7 @@
 import numpy as np
 
 class ELECTRE:
-    def __init__(self, score_matrix, weights, concordance_index, discordance_index):
-        self.score_matrix = score_matrix
+    def __init__(self, weights, concordance_index, discordance_index):
         self.weights = weights
         self.concordance_index = concordance_index
         self.discordance_index = discordance_index
@@ -36,9 +35,9 @@ class ELECTRE:
         normal_matrix = self.normalization(score_matrix)
         concordance_matrix = self.calculate_concordance(score_matrix,normal_matrix)
         discordance_matrix = self.calculate_discordance(score_matrix,normal_matrix)
-        net_flow = np.zeros((self.score_matrix.shape[0],))
-        for i in range(self.score_matrix.shape[0]):
-            net_flow[i] = sum([self.concordance_index * concordance_matrix[i][j] - self.discordance_index * discordance_matrix[i][j] for j in range(self.score_matrix.shape[0])])
+        net_flow = np.zeros((score_matrix.shape[0],))
+        for i in range(score_matrix.shape[0]):
+            net_flow[i] = sum([self.concordance_index * concordance_matrix[i][j] - self.discordance_index * discordance_matrix[i][j] for j in range(score_matrix.shape[0])])
         return net_flow
 
     def rank_solutions(self,score_matrix):
