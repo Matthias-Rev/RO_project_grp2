@@ -47,42 +47,6 @@ class ELECTRE:
         matrix = np.array([[p.returnM_totalComp(), p.returnM_totalProd(), p.return_m_minDistHabitation()] for p in instances])
         return matrix
 
-    def pareto_frontier_ND(self,matrix):
-        """
-        Returns the indices of the Pareto frontier for a matrix of fitness values
-        with multiple objectives (dimensions).
-        """
-        # Trier la matrice en ordre croissant sur les deux premières colonnes (scores à minimiser)
-        sorted_matrix = matrix[np.lexsort((matrix[:, 1], matrix[:, 0]))]
-
-        # Initialiser une liste vide pour stocker les indices des individus dans la frontière de Pareto
-        pareto_front = []
-
-        # Initialiser les valeurs à comparer pour la frontière de Pareto
-        max_third_score = -np.inf
-        min_second_score = sorted_matrix[0, 1]
-
-        # Parcourir la matrice triée
-        for i in range(sorted_matrix.shape[0]):
-            # Si le score du troisième critère est supérieur à la valeur maximale trouvée jusqu'à présent,
-            # le point est ajouté à la frontière de Pareto
-            if sorted_matrix[i, 2] >= max_third_score:
-                max_third_score = sorted_matrix[i, 2]
-                pareto_front.append(i)
-
-            # Si le score du deuxième critère est inférieur à la valeur minimale trouvée jusqu'à présent,
-            # le point est ajouté à la frontière de Pareto
-            if sorted_matrix[i, 1] <= min_second_score:
-                min_second_score = sorted_matrix[i, 1]
-                pareto_front.append(i)
-
-        # Retourner la liste des indices des individus dans la frontière de Pareto
-        return list(set(pareto_front))
-
-    import numpy as np
-
-    import numpy as np
-
     def pareto_frontier(self,matrix):
         # Triez la matrice par ordre décroissant de la deuxième colonne
         matrix = np.multiply(matrix,np.array([-1,1,-1]))
@@ -101,9 +65,3 @@ class ELECTRE:
         pareto_frontier = np.multiply(pareto_frontier,np.array([-1,1,-1]))
 
         return pareto_frontier
-
-
-
-
-
-
