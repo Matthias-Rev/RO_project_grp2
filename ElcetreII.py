@@ -6,41 +6,44 @@ class ELECTRE:
         self.weights = weights
         self.concordance_index = concordance_index
         self.discordance_index = discordance_index
-        # normalization
-        self.normalized_scores = np.zeros_like(self.score_matrix)
-        for i in range(self.score_matrix.shape[1]):
-            self.normalized_scores[:,i] = (self.score_matrix[:,i] - np.min(self.score_matrix[:,i])) / (np.max(self.score_matrix[:,i]) - np.min(self.score_matrix[:,i]))
 
-    def calculate_concordance(self):
-        concordance_matrix = np.zeros((self.score_matrix.shape[0], self.score_matrix.shape[0]))
-        for i in range(self.score_matrix.shape[0]):
-            for j in range(self.score_matrix.shape[0]):
+
+    def normalization(self,score_matrix):
+        normalized_scores = np.zeros_like(score_matrix)
+        for i in range(score_matrix.shape[1]):
+            normalized_scores[:,i] = (score_matrix[:,i] - np.min(score_matrix[:,i])) / (np.max(score_matrix[:,i]) - np.min(score_matrix[:,i]))
+        return  normalized_scores
+
+    def calculate_concordance(self,score_matrix,normalized_scores):
+        concordance_matrix = np.zeros((score_matrix.shape[0], score_matrix.shape[0]))
+        for i in range(score_matrix.shape[0]):
+            for j in range(score_matrix.shape[0]):
                 if i == j:
                     continue
-                concordance_matrix[i][j] = sum([self.weights[k] * (self.normalized_scores[i][k] >= self.normalized_scores[j][k]) for k in range(self.score_matrix.shape[1])])
+                concordance_matrix[i][j] = sum([self.weights[k] * (normalized_scores[i][k] >= normalized_scores[j][k]) for k in range(score_matrix.shape[1])])
         return concordance_matrix
 
-    def calculate_discordance(self):
-        discordance_matrix = np.zeros((self.score_matrix.shape[0], self.score_matrix.shape[0]))
-        for i in range(self.score_matrix.shape[0]):
-            for j in range(self.score_matrix.shape[0]):
+    def calculate_discordance(self,score_matrix,normalized_scores):
+        discordance_matrix = np.zeros((score_matrix.shape[0], score_matrix.shape[0]))
+        for i in range(score_matrix.shape[0]):
+            for j in range(score_matrix.shape[0]):
                 if i == j:
                     continue
-                discordance_matrix[i][j] = sum([self.weights[k] * (self.normalized_scores[j][k] - self.normalized_scores[i][k]) for k in range(self.score_matrix.shape[1])])
+                discordance_matrix[i][j] = sum([self.weights[k] * (normalized_scores[j][k] - normalized_scores[i][k]) for k in range(score_matrix.shape[1])])
         return discordance_matrix
 
-    def calculate_net_flow(self):
-        concordance_matrix = self.calculate_concordance()
-        discordance_matrix = self.calculate_discordance()
+    def calculate_net_flow(self,score_matrix):
+        normal_matrix = self.normalization(score_matrix)
+        concordance_matrix = self.calculate_concordance(score_matrix,normal_matrix)
+        discordance_matrix = self.calculate_discordance(score_matrix,normal_matrix)
         net_flow = np.zeros((self.score_matrix.shape[0],))
         for i in range(self.score_matrix.shape[0]):
             net_flow[i] = sum([self.concordance_index * concordance_matrix[i][j] - self.discordance_index * discordance_matrix[i][j] for j in range(self.score_matrix.shape[0])])
         return net_flow
 
-    def rank_solutions(self):
-        net_flow = self.calculate_net_flow()
+    def rank_solutions(self,score_matrix):
+        net_flow = self.calculate_net_flow(score_matrix)
         ranking = np.argsort(-net_flow)
-        print("end ELECTREE")
         return ranking
 
     def build_matrix(self,instances):
