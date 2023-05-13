@@ -6,6 +6,7 @@ import map
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
+import bisect
 
 from ElcetreII import *
 from Electre import *
@@ -82,7 +83,7 @@ class Algo_genetic:
     def process_chunk(self, chunk_size):
         chunk_results = []
         for _ in range(chunk_size):
-            chunk_results.append(self.selection_wheel())
+            chunk_results.append(self.selection_wheel_dic())
 
         return chunk_results
     
@@ -157,6 +158,9 @@ class Algo_genetic:
         for gen in range(self.m_iter_max):
             score_matrix = self.build_matrix(self.m_pop)
             ranking = electre.rank_solutions()
+            #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
+            #electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
+            #ranking = electre.rank_solutions()
 
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
@@ -174,8 +178,8 @@ class Algo_genetic:
             selected=[]
             begin = time.time()
             selected = self.run_parallel()
-            # for _ in range(self.m_n_pop):
-            #     selected.append(self.selection_wheel())
+            #for _ in range(self.m_n_pop):
+                #selected.append(self.selection_wheel())
             end = time.time()
             print(f"it takes {end-begin} to make selection_wheel")
 
@@ -259,6 +263,25 @@ class Algo_genetic:
             if self.m_scores[ix] < self.m_scores[selection_ix]:
                 selection_ix = ix
         return self.m_pop[selection_ix]
+
+    def selection_wheel_dic(self):
+        # select =random.uniform(0, self.m_cumulative_prob[-1])
+        # low = 0
+        # high = len(self.m_cumulative_prob) - 1
+        # while low <= high:
+        #     mid = (low + high) // 2
+
+        #     if self.m_cumulative_prob[mid-1] < select <= self.m_cumulative_prob[mid] :
+        #         return self.pop[mid]
+        #     elif self.m_cumulative_prob[mid] < select:
+        #         low = mid + 1
+        #     else:
+        #         high = mid - 1
+
+
+        select =random.uniform(0, self.m_cumulative_prob[-1])
+        index = bisect.bisect_right(self.m_cumulative_prob, select)
+        return self.m_pop[index]
 
     def selection_wheel(self):
         r = random.uniform(0, self.m_cumulative_prob[-1])
