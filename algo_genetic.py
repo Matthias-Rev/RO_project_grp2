@@ -50,17 +50,28 @@ class Algo_genetic:
         probs = [w / total_weight for w in weights]
         return probs
 
-    def construct_wheel(self, rankings):
-         rank_sum = sum(range(1, len(rankings) + 1))
-         for i, rank in enumerate(rankings):
-             rank_distance = len(rankings) - i
-             rank_prob = rank_distance / rank_sum
-             self.m_prob.append(rank_prob)
-             if i == 0:
-                 self.m_cumulative_prob.append(rank_prob)
-             else:
-                 self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
-         return 0
+    def construct_wheel(self):
+        index = 0
+        for individual_prob in self.m_scores:
+            p=round(individual_prob/self.m_total_score,3)
+            self.m_prob.append(p)
+            if index == 1:
+                self.m_cumulative_prob.append(round(self.m_cumulative_prob[-1]+p,3))
+            else:
+                self.m_cumulative_prob.append(p)
+            index=1
+
+    def construct_wheel_electre(self, rankings):
+        rank_sum = sum(range(1, len(rankings) + 1))
+        for i in enumerate(rankings):
+            rank_distance = len(rankings) - i
+            rank_prob = rank_distance / rank_sum
+            self.m_prob.append(rank_prob)
+            if i == 0:
+                self.m_cumulative_prob.append(rank_prob)
+            else:
+                self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
+        return 0
 
      #def construct_wheel(self):
      #   index = 0
@@ -157,7 +168,7 @@ class Algo_genetic:
 
         for gen in range(self.m_iter_max):
             score_matrix = self.build_matrix(self.m_pop)
-            ranking = electre.rank_solutions()
+            #ranking = electre.rank_solutions()
             #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
             #electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
             #ranking = electre.rank_solutions()
@@ -171,8 +182,8 @@ class Algo_genetic:
                 self.m_total_score += score
                 self.m_register_list.append(score)
 
-            self.construct_wheel(ranking)
-            #self.construct_wheel()
+            #self.construct_wheel(ranking)
+            self.construct_wheel()
 
 
             selected=[]
@@ -221,9 +232,9 @@ class Algo_genetic:
 
         # Show the plot
         plt.show()
-        for i in self.m_pop:
-            print(self.moyenne(i))
-        return self.m_pop
+        # for i in self.m_pop:
+        #     print(self.moyenne(i))
+        # return self.m_pop
  
     def next_generation(self,list_input):
         for elite in self.m_listElitism:
