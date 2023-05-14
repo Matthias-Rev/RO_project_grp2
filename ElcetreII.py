@@ -1,4 +1,5 @@
 import numpy as np
+from multiprocessing import Pool
 
 class ELECTRE:
     def __init__(self, weights, concordance_index, discordance_index):
@@ -13,22 +14,18 @@ class ELECTRE:
             normalized_scores[:,i] = (score_matrix[:,i] - np.min(score_matrix[:,i])) / (np.max(score_matrix[:,i]) - np.min(score_matrix[:,i]))
         return  normalized_scores
 
-    def calculate_concordance(self,score_matrix,normalized_scores):
+    def calculate_concordance(self, score_matrix, normalized_scores):
         concordance_matrix = np.zeros((score_matrix.shape[0], score_matrix.shape[0]))
         for i in range(score_matrix.shape[0]):
-            for j in range(score_matrix.shape[0]):
-                if i == j:
-                    continue
-                concordance_matrix[i][j] = sum([self.weights[k] * (normalized_scores[i][k] >= normalized_scores[j][k]) for k in range(score_matrix.shape[1])])
+            diff_matrix = normalized_scores[i, :] - normalized_scores
+            concordance_matrix[i, :] = np.sum((diff_matrix >= 0) * self.weights, axis=1)
         return concordance_matrix
 
-    def calculate_discordance(self,score_matrix,normalized_scores):
+    def calculate_discordance(self, score_matrix, normalized_scores):
         discordance_matrix = np.zeros((score_matrix.shape[0], score_matrix.shape[0]))
         for i in range(score_matrix.shape[0]):
-            for j in range(score_matrix.shape[0]):
-                if i == j:
-                    continue
-                discordance_matrix[i][j] = sum([self.weights[k] * (normalized_scores[j][k] - normalized_scores[i][k]) for k in range(score_matrix.shape[1])])
+            diff_matrix = normalized_scores - normalized_scores[i, :]
+            discordance_matrix[i, :] = np.max((diff_matrix * self.weights), axis=1)
         return discordance_matrix
 
     def calculate_net_flow(self,score_matrix):
@@ -41,8 +38,10 @@ class ELECTRE:
         return net_flow
 
     def rank_solutions(self,score_matrix):
+        print("begin electree")
         net_flow = self.calculate_net_flow(score_matrix)
         ranking = np.argsort(-net_flow)
+        print("end electree")
         return ranking
 
     def build_matrix(self,instances):
@@ -50,6 +49,7 @@ class ELECTRE:
         return matrix
 
     def pareto_frontier(self,matrix):
+        print("begin pareto")
         # Triez la matrice par ordre décroissant de la deuxième colonne
         matrix = np.multiply(matrix,np.array([-1,1,-1]))
         matrix = matrix[np.argsort(-matrix[:, 1])]

@@ -9,7 +9,6 @@ from matplotlib import colors
 import bisect
 
 from ElcetreII import *
-from Electre import *
 import time
 import multiprocessing
 
@@ -62,8 +61,9 @@ class Algo_genetic:
             index=1
 
     def construct_wheel_electre(self, rankings):
+        print("begin contruct wheel")
         rank_sum = sum(range(1, len(rankings) + 1))
-        for i in enumerate(rankings):
+        for i in range(0,len(rankings)-1):
             rank_distance = len(rankings) - i
             rank_prob = rank_distance / rank_sum
             self.m_prob.append(rank_prob)
@@ -71,6 +71,7 @@ class Algo_genetic:
                 self.m_cumulative_prob.append(rank_prob)
             else:
                 self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
+        print("end construct wheel")
         return 0
 
      #def construct_wheel(self):
@@ -168,10 +169,7 @@ class Algo_genetic:
 
         for gen in range(self.m_iter_max):
             score_matrix = self.build_matrix(self.m_pop)
-            #ranking = electre.rank_solutions()
-            #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
-            #electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
-            #ranking = electre.rank_solutions()
+            ranking = electre.rank_solutions(score_matrix)
 
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
@@ -182,8 +180,8 @@ class Algo_genetic:
                 self.m_total_score += score
                 self.m_register_list.append(score)
 
-            #self.construct_wheel(ranking)
-            self.construct_wheel()
+            print(ranking)
+            self.construct_wheel_electre(ranking)
 
 
             selected=[]
