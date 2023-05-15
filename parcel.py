@@ -5,6 +5,12 @@ class Parcel:
         self.m_pos = (x,y)
         self.m_typeElement = None
         self.m_Put = False
+    
+    def __eq__(self, other):
+        return self.m_pos == other.m_pos
+    
+    def __hash__(self):
+        return hash(self.m_pos)
 
     def changeCost(self, cost):
         self.m_cost = cost

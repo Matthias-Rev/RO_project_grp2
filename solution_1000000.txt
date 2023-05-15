@@ -25,8 +25,8 @@
                                          R                               RRR          R                                                                      R            
                                          R                                  RR         R                                                                    R             
                                          R                                   RRR       R                                                  CCCC             R              
-                                     xx   R                                    RRR    R                                         RRRRRRRRRRRRRRRRRRRRRRRRRRR               
-                                      xx  R                                      RRR R                                          R                                         
+                                          R                                    RRR    R                                         RRRRRRRRRRRRRRRRRRRRRRRRRRR               
+                                          R                                      RRR R                                          R                                         
                                           R                                        RR                                           R                                         
                                           R                                          RR                                         R                                         
                                           R                                            RR                                       R                                         
@@ -58,13 +58,13 @@ RRRRRRRRRRRRRRRRRRRRRRRRRRRRC                                                   
                                          R                      CCC  RR                                                                                             R     
                                           RRRRRRRRRRRRRRRRRRRRRRCCCRRR                                                                                             R      
                                                                   RR                                                                                              R       
-                                                                   R                                            xx                                             RRR        
+                                                                   R                                                                                           RRR        
                                                                    R                                                                                          R           
                                                                    R                                                                                        RR            
                                                                    R                                                                                       R              
-                                                                  RR                                                                                      R               
-                                                                  R                                                                                      R                
-                                                                  R                                                                                     R                 
+                                                                  RR                                  x                                                   R               
+                                                                  R                                 x xxx                                                R                
+                                                                  R                                 x x x                                               R                 
                                                                   R                                                                                    R                  
                                                                  R                                                                                    R                   
                                                                 R                                                                                    R                    

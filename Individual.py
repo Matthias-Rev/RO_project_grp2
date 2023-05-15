@@ -427,37 +427,36 @@ class Individual_algo_genetic:
     def check_unicity(self, parcel1, parcel2):
         seen= set()
         counter = 0
-        liste_c = [parcel1,parcel2]
-        for new_parcel in liste_c:
-            for item in new_parcel:
-                check = item.returnPosition()
-                if check in seen:
-                    del parcel1[counter]
-                    print("def")
+        liste_canditate = [parcel1,parcel2]
+        for new_parcel in liste_canditate:
+            while counter < len(new_parcel):
+                if new_parcel[counter] in seen:
+                    del new_parcel[counter]
                     counter=counter-1
-                seen.add(check)
+                seen.add(new_parcel[counter])
                 counter+=1
             counter=0
-        return liste_c[0],liste_c[1]
+        return liste_canditate[0],liste_canditate[1]
         
         
     def check_unicity_Group(self,new_parcel1, new_parcel2):
-        seen = set()
-        i_counter = 0
-        j_counter = 0
-        liste_c = [new_parcel1,new_parcel2]
-        for new_parcel in liste_c:
-            for i_item in new_parcel:
-                for j_item in i_item:
-                    check = j_item.returnPosition()
-                    if check in seen:
-                        del new_parcel[i_counter][j_counter]
-                        j_counter=j_counter-1
-                        print("def")
-                    seen.add(check)
-                    j_counter+=1
-                i_counter+=1
-            i_counter=0
-            j_counter=0
-        return liste_c[0],liste_c[1]
+        seen= set()
+        liste_counter = 0
+        liste_canditate = [new_parcel1,new_parcel2]
+        for new_parcel in liste_canditate:
+            while liste_counter < len(new_parcel):
+                i_counter = 0   
+                while 0 <= i_counter < len(new_parcel[liste_counter]):
+                    if new_parcel[liste_counter][i_counter] in seen:
+                        del new_parcel[liste_counter][i_counter]
+                        i_counter-=1
+                    if len(new_parcel[liste_counter]) != 0:
+                        seen.add(new_parcel[liste_counter][i_counter])
+                    else:
+                        del new_parcel[liste_counter]
+                        liste_counter-=1
+                        i_counter=len(new_parcel[liste_counter])
+                    i_counter+=1
+                liste_counter+=1
+        return liste_canditate[0],liste_canditate[1]
         
