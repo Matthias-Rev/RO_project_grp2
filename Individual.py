@@ -61,11 +61,13 @@ class Individual_algo_genetic:
         self.m_totalCost=0
         self.m_totalProd=0
 
-        parcel1 = [element for row in new_parcel1 for element in row]
-        parcel2 = [element for row in new_parcel2 for element in row]
+        parcel_u, parcel2_u = self.check_unicity_Group(new_parcel1,new_parcel2)
+
+        parcel1 = [element for row in parcel_u for element in row]
+        parcel2 = [element for row in parcel2_u for element in row]
 
         self.change_cluster(parcel1+parcel2)
-        self.change_clusterGroup(new_parcel1,new_parcel2,True)
+        self.change_clusterGroup(parcel_u,parcel2_u,True)
 
         for p_parcel in self.m_CluserList:
             x,y = p_parcel.returnPosition()
@@ -87,9 +89,10 @@ class Individual_algo_genetic:
 
         self.m_totalCost=0
         self.m_totalProd=0
-
-        self.change_cluster(new_parcel1+new_parcel2)
-        self.change_clusterGroup(new_parcel1,new_parcel2,False)
+        
+        parcel1, parcel2 = self.check_unicity(new_parcel1,new_parcel2)
+        self.change_cluster(parcel1+parcel2)
+        self.change_clusterGroup(parcel1,parcel2,False)
 
         for p_parcel in self.m_CluserList:
             x,y = p_parcel.returnPosition()
@@ -241,9 +244,11 @@ class Individual_algo_genetic:
 
         # Display the image
         plt.figure(figsize=(10, 5))
+        plt.figtext(0,0,f"C={self.return_totalComp()},P={self.return_totalProd()},D={self.return_minDistHabitation()}",fontsize=10,color='black')
         plt.imshow(data, cmap=cmap, interpolation="nearest")
         plt.axis("off")
-        plt.show()
+        #plt.show()
+        plt.savefig("Individual_1000000.png")
 
     def min_dist_parcel(self,group_taken_parcel):
         min_distances = []
@@ -318,8 +323,6 @@ class Individual_algo_genetic:
                         self.m_totalProd+=parcel_candidate.returnProd()
                         self.m_GroupCluserList[self.m_GroupCluserList.index(cluster_list)].append(parcel_candidate)
                         return 0
-        return 0
-
         return 0
    
     def random_choice(self):
@@ -420,4 +423,41 @@ class Individual_algo_genetic:
     
     def return_dic(self):
         return self.m_dic_pos
+    
+    def check_unicity(self, parcel1, parcel2):
+        seen= set()
+        counter = 0
+        liste_c = [parcel1,parcel2]
+        for new_parcel in liste_c:
+            for item in new_parcel:
+                check = item.returnPosition()
+                if check in seen:
+                    del parcel1[counter]
+                    print("def")
+                    counter=counter-1
+                seen.add(check)
+                counter+=1
+            counter=0
+        return liste_c[0],liste_c[1]
+        
+        
+    def check_unicity_Group(self,new_parcel1, new_parcel2):
+        seen = set()
+        i_counter = 0
+        j_counter = 0
+        liste_c = [new_parcel1,new_parcel2]
+        for new_parcel in liste_c:
+            for i_item in new_parcel:
+                for j_item in i_item:
+                    check = j_item.returnPosition()
+                    if check in seen:
+                        del new_parcel[i_counter][j_counter]
+                        j_counter=j_counter-1
+                        print("def")
+                    seen.add(check)
+                    j_counter+=1
+                i_counter+=1
+            i_counter=0
+            j_counter=0
+        return liste_c[0],liste_c[1]
         

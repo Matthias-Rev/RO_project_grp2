@@ -1,3 +1,4 @@
+import numpy as np
 class Map:
     def __init__(self, grid, dictionnary):
         self.m_grid = grid
@@ -24,6 +25,17 @@ class Map:
         j = coord[1]
         self.m_grid[i][j] = char
         return 0
+
+    def write_solution(self,list_pos):
+        for i in list_pos:
+            pos=i.returnPosition()
+            self.m_grid[pos[1]][pos[0]].changeTypeElem("x")
+        with open("solution_1000000.txt", "w") as file:
+            for element in self.m_grid:
+                for parcel in element:
+                    file.write(parcel.returnType())
+                file.write("\n")
+
     #List the position of roads & habitation   
     def posInit(self):
         j = 0

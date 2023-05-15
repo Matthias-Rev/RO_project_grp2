@@ -53,17 +53,18 @@ class Algo_genetic:
     def construct_wheel(self):
         index = 0
         for individual_prob in self.m_scores:
-            p=round(individual_prob/self.m_total_score,3)
+            p=(individual_prob/self.m_total_score)*100
             self.m_prob.append(p)
             if index == 1:
-                self.m_cumulative_prob.append(round(self.m_cumulative_prob[-1]+p,3))
+                self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+p)
             else:
                 self.m_cumulative_prob.append(p)
             index=1
 
     def construct_wheel_electre(self, rankings):
+        print("begin contruct wheel")
         rank_sum = sum(range(1, len(rankings) + 1))
-        for i in enumerate(rankings):
+        for i in range(0,len(rankings)-1):
             rank_distance = len(rankings) - i
             rank_prob = rank_distance / rank_sum
             self.m_prob.append(rank_prob)
@@ -71,6 +72,7 @@ class Algo_genetic:
                 self.m_cumulative_prob.append(rank_prob)
             else:
                 self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
+        print("end construct wheel")
         return 0
 
      #def construct_wheel(self):
@@ -164,14 +166,16 @@ class Algo_genetic:
         print(f"it takes {end-begin} to create population")
         
         best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
-        print(best_eval,"init")
 
         for gen in range(self.m_iter_max):
             score_matrix = self.build_matrix(self.m_pop)
             #ranking = electre.rank_solutions()
             #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
+            #begin = time.time()
             #electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
-            #ranking = electre.rank_solutions()
+            #ranking = electre.rank_solutions(score_matrix)
+            #end = time.time()
+            #print(f"it takes {end-begin} to do Electre")
 
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
@@ -181,8 +185,12 @@ class Algo_genetic:
                 self.m_scores.append(score)
                 self.m_total_score += score
                 self.m_register_list.append(score)
+                if self.m_scores[-1] > best_eval:
+                    best, best_eval = self.m_pop[-1], self.m_scores[-1]
+                    self.add_elitism(best)
+                    print(">%d, new best = %.3f" % (gen, best_eval))
 
-            #self.construct_wheel(ranking)
+            #self.construct_wheel_electre(ranking)
             self.construct_wheel()
 
 
@@ -212,29 +220,31 @@ class Algo_genetic:
             print(f"it takes {end-begin} to create childs")
 
             if gen == self.m_iter_max-1:
-                 pareto = electre.pareto_frontier(score_matrix)
-                 print(f"il y a {len(pareto)} solutions trouvées")
-                 print(pareto)
-                 #for index in pareto:
-                     #self.m_pop[index].draw_matrix()
-                 self.Plot3D(pareto)
+                pareto = electre.pareto_frontier(self.build_matrix(self.m_pop))
+                print(f"il y a {len(pareto)} solutions trouvées")
+                print(pareto)
+                #for index in pareto:
+                    #self.m_pop[index].draw_matrix()
+                self.Plot3D(pareto)
+
             
             self.m_pop = children
             self.m_scores = []
             self.m_cumulative_prob=[]
             self.m_n_pop = len(children)
             self.m_total_score=0
+            self.next_generation(children)
 
         fig, ax = plt.subplots()
 
         # Plot the data as a line graph
-        ax.plot(self.m_register_list)
+        #ax.plot(self.m_register_list)
 
         # Show the plot
-        plt.show()
+        #plt.show()
         # for i in self.m_pop:
         #     print(self.moyenne(i))
-        # return self.m_pop
+        return self.m_pop
  
     def next_generation(self,list_input):
         for elite in self.m_listElitism:
@@ -276,19 +286,6 @@ class Algo_genetic:
         return self.m_pop[selection_ix]
 
     def selection_wheel_dic(self):
-        # select =random.uniform(0, self.m_cumulative_prob[-1])
-        # low = 0
-        # high = len(self.m_cumulative_prob) - 1
-        # while low <= high:
-        #     mid = (low + high) // 2
-
-        #     if self.m_cumulative_prob[mid-1] < select <= self.m_cumulative_prob[mid] :
-        #         return self.pop[mid]
-        #     elif self.m_cumulative_prob[mid] < select:
-        #         low = mid + 1
-        #     else:
-        #         high = mid - 1
-
 
         select =random.uniform(0, self.m_cumulative_prob[-1])
         index = bisect.bisect_right(self.m_cumulative_prob, select)
@@ -320,7 +317,8 @@ class Algo_genetic:
         ax.set_zlabel('Z Label')
 
         # afficher le graphique
-        plt.show()
+        #plt.show()
+        plt.savefig("Pareto_1000000.png")
 
         return 0
 
