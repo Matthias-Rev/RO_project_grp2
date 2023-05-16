@@ -28,11 +28,11 @@ if __name__ == "__main__":
     weights = [-0.5, 0.5, -0.5]
     concordance_index = 0.6
     discordance_index = 0.4
-    electre = ELECTRE(weights, concordance_index, discordance_index)
+    #electre = ELECTRE(weights, concordance_index, discordance_index)
     score_matrix = build_matrix(liste_pop)
-    ranking = electre.rank_solutions(score_matrix)
+    #ranking = electre.rank_solutions(score_matrix)
 
-    liste_pop[ranking[0]].draw_matrix("with Electre")
+    #liste_pop[ranking[0]].draw_matrix("with Electre")
     for parcel in best.return_clusterList():
         print(parcel.returnPosition())
     Instance_Map.write_solution(best.return_clusterList())
