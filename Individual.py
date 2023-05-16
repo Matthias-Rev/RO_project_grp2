@@ -341,7 +341,7 @@ class Individual_algo_genetic:
             random_parcel_position = random_parcel.returnPosition()
             random_parcel_y = random.choice([-1,1])
             random_parcel_x = random.choice([1,-1])
-            if random_parcel_position[0]+random_parcel_x < 170 and random_parcel_position[1]+random_parcel_y < 70:
+            if random_parcel_position[0]+random_parcel_x < self.m_map.returnWidth() and random_parcel_position[1]+random_parcel_y < self.m_map.returnHeigth():
                 out_of_range = False
         return random_parcel_position,random_parcel_x,random_parcel_y,index_random_parcel
     
