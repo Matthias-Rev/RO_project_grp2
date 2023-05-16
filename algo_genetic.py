@@ -244,7 +244,7 @@ class Algo_genetic:
         #plt.show()
         # for i in self.m_pop:
         #     print(self.moyenne(i))
-        return self.m_pop
+        return self.m_pop, best
  
     def next_generation(self,list_input):
         for elite in self.m_listElitism:

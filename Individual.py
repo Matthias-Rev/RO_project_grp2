@@ -206,7 +206,7 @@ class Individual_algo_genetic:
 
         return 0
 
-    def draw_matrix(self):
+    def draw_matrix(self,name):
 
         # Define the dimensions of the map
         list_parcel_linear =  [element for row in self.m_GroupCluserList 
@@ -248,7 +248,7 @@ class Individual_algo_genetic:
         plt.imshow(data, cmap=cmap, interpolation="nearest")
         plt.axis("off")
         #plt.show()
-        plt.savefig("Individual_1000000.png")
+        plt.savefig(f"{name}.png")
 
     def min_dist_parcel(self,group_taken_parcel):
         min_distances = []

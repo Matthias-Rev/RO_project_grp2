@@ -15,9 +15,10 @@ if __name__ == "__main__":
         return matrix
 
     start_time = time.time()
-    test = Algo_genetic(3,100000 ,0.80,0,Instance_Map)
-    liste_pop =test.genetic_algorithm()
+    test = Algo_genetic(3,10000 ,0.80,0.20,Instance_Map)
+    liste_pop,best =test.genetic_algorithm()
     elapsed_time = time.time() - start_time
+    best.draw_matrix("without Electre")
 
     # afficher le temps d'exécution
     print(f"Le temps d'exécution est de {elapsed_time:.2f} secondes")
@@ -29,8 +30,10 @@ if __name__ == "__main__":
     score_matrix = build_matrix(liste_pop)
     ranking = electre.rank_solutions(score_matrix)
 
-    liste_pop[ranking[0]].draw_matrix()
-    Instance_Map.write_solution(liste_pop[ranking[0]].return_clusterList())
+    liste_pop[ranking[0]].draw_matrix("with Electre")
+    for parcel in best.return_clusterList():
+        print(parcel.returnPosition())
+    Instance_Map.write_solution(best.return_clusterList())
     
 
     #weights = [1, 1, 1]
