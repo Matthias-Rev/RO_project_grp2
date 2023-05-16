@@ -116,6 +116,7 @@ class Algo_genetic:
     
     def crossover(self,p1,p2,r_cross):
         return_list=[]
+        # autre proba pour permettre d'avoir 1 enfant ou 2
         if random.uniform(0, 1) < r_cross:
 
             parent_tupple1 = p1.return_clusterList()
@@ -218,15 +219,6 @@ class Algo_genetic:
                     children.append(c)
             end = time.time()
             print(f"it takes {end-begin} to create childs")
-
-            if gen == self.m_iter_max-1:
-                pareto = electre.pareto_frontier(self.build_matrix(self.m_pop))
-                print(f"il y a {len(pareto)} solutions trouvées")
-                print(pareto)
-                #for index in pareto:
-                    #self.m_pop[index].draw_matrix()
-                self.Plot3D(pareto)
-
             
             self.m_pop = children
             self.m_scores = []
@@ -263,7 +255,8 @@ class Algo_genetic:
         return 0
 
     def moyenne(self, indiv):
-        moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd())
+        moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd()) 
+        #penser à normaliser -> Electre
         if moyenne < 0:
             moyenne=abs(moyenne)
         else:
