@@ -261,7 +261,14 @@ class Individual_algo_genetic:
                     distances_p.append(distance)
             min_distances.append(min(distances_p))
             occur_nb = len(min_distances)
-        return min(min_distances)# / occur_nb
+        
+        distance = 0
+        if len(min_distances) > 0:
+            distance = min(min_distances)
+        else:
+            distance = 0
+
+        return distance# / occur_nb
 
     #Calculate the average score of an individual
     def moyenne(self):
@@ -424,20 +431,32 @@ class Individual_algo_genetic:
     def return_dic(self):
         return self.m_dic_pos
     
+    # def check_unicity(self, parcel1, parcel2):
+    #     seen= set()
+    #     counter = 0
+    #     liste_canditate = [parcel1,parcel2]
+    #     for new_parcel in liste_canditate:
+    #         while counter < len(new_parcel):
+    #             if new_parcel[counter] in seen:
+    #                 del new_parcel[counter]
+    #                 counter=counter-1
+    #             seen.add(new_parcel[counter])
+    #             counter+=1
+    #         counter=0
+    #     return liste_canditate[0],liste_canditate[1]
+    
     def check_unicity(self, parcel1, parcel2):
-        seen= set()
-        counter = 0
-        liste_canditate = [parcel1,parcel2]
-        for new_parcel in liste_canditate:
-            while counter < len(new_parcel):
-                if new_parcel[counter] in seen:
-                    del new_parcel[counter]
-                    counter=counter-1
-                seen.add(new_parcel[counter])
-                counter+=1
-            counter=0
-        return liste_canditate[0],liste_canditate[1]
-        
+        seen = set()
+        liste_candidat = [parcel1, parcel2]
+
+        for candidate_list in liste_candidat:
+            for i in range(len(candidate_list) - 1, -1, -1):
+                if candidate_list[i] in seen:
+                    del candidate_list[i]
+                else:
+                    seen.add(candidate_list[i])
+
+        return liste_candidat[0], liste_candidat[1]
         
     def check_unicity_Group(self,new_parcel1, new_parcel2):
         seen= set()

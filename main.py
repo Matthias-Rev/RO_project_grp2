@@ -15,7 +15,7 @@ if __name__ == "__main__":
         return matrix
 
     start_time = time.time()
-    test = Algo_genetic(3,100 ,0.80,0,Instance_Map)
+    test = Algo_genetic(3,100000 ,0.80,0,Instance_Map)
     liste_pop =test.genetic_algorithm()
     elapsed_time = time.time() - start_time
 
