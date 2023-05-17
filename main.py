@@ -4,7 +4,7 @@ import Individual
 from utils import *
 from PrometheeII import *
 import time
-import numpy as nps
+import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
         return matrix
 
     start_time = time.time()
-    test = Algo_genetic(1,10000 ,0.80,0.20,Instance_Map)
+    test = Algo_genetic(1,100,0.80,0.20,Instance_Map)
     liste_pop,best =test.genetic_algorithm()
     elapsed_time = time.time() - start_time
     best.draw_matrix("without Electre")
@@ -29,23 +29,48 @@ if __name__ == "__main__":
     concordance_index = 0.6
     discordance_index = 0.4
     electre = ELECTRE(weights, concordance_index, discordance_index)
-    score_matrix = build_matrix(liste_pop)
-    ranking = electre.rank_solutions(score_matrix)
+    #score_matrix = build_matrix(liste_pop)
+    #ranking = electre.rank_solutions(score_matrix)
 
-    liste_pop[ranking[0]].draw_matrix("with Electre")
+    #liste_pop[ranking[0]].draw_matrix("with Electre")
     for parcel in best.return_clusterList():
         print(parcel.returnPosition())
     Instance_Map.write_solution(best.return_clusterList())
 
 
-    def is_pareto_efficient(costs):
-        is_efficient = np.ones(costs.shape[0], dtype=bool)
-        for i, c in enumerate(costs):
-            if is_efficient[i]:
-                is_efficient[is_efficient] = np.any(costs[is_efficient] <= c, axis=1)  # Vérifie la domination
-        return is_efficient
+    def find_pareto_frontier_indices(points):
+        num_points = points.shape[0]
+        is_pareto_efficient = np.ones(num_points, dtype=bool)
 
-    # Générer des points aléatoires en 3D
+        for i in range(num_points):
+            if is_pareto_efficient[i]:
+                current_point = points[i]
+                is_pareto_efficient[is_pareto_efficient] = np.any(points[is_pareto_efficient] <= current_point, axis=1)
+
+        pareto_indices = np.where(is_pareto_efficient)[0]
+        return pareto_indices
+
+    def plot_pareto_frontier(points, pareto_indices):
+        pareto_points = points[pareto_indices]
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        #ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='blue', label='Frontière de Pareto')
+        #ax.scatter(pareto_points[:, 0], pareto_points[:, 2], pareto_points[:, 1], c='red', label='Frontière de Pareto')
+        ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
+        #ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
+        ax.set_xlabel('Compacity')
+        ax.set_ylabel('Production')
+        ax.set_zlabel('Habitation Dist')
+
+        # Changer l'échelle des axes
+        #ax.set_xlim(0, 0.2)
+        #ax.set_ylim(0.2, 0.6)
+        #ax.set_zlim(0, 0.8)
+
+        plt.legend()
+        plt.show()
+
+
     x,y,z=[],[],[]
     for indiv in liste_pop:
         x.append(indiv.return_totalComp())
@@ -57,20 +82,8 @@ if __name__ == "__main__":
 
     # Empiler les coordonnées pour former une matrice de points
     points = np.column_stack((x, y, z))
+    pointsN = electre.normalization(points)
+    pointsNW = pointsN *np.array([-1, 1, -1])
+    pareto_index = find_pareto_frontier_indices(pointsNW)
+    plot_pareto_frontier(points,pareto_index)
 
-    # Vérifier l'efficacité selon la frontière de Pareto
-    is_efficient = is_pareto_efficient(points)
-
-    # Extraire les points de la frontière de Pareto
-    pareto_points = points[is_efficient]
-
-    # Afficher les points en 3D
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z, c='blue', label='Points')
-    ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
-    plt.legend()
-    plt.show()
