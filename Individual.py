@@ -286,20 +286,9 @@ class Individual_algo_genetic:
         return sum(coeff_dist) / len(coeff_dist)
 
     def normalize(self):
-        if self.m_totalCompacity < utils.MIN_COMP:
-            utils.MIN_COMP = self.m_totalCompacity
-        elif self.m_totalCompacity > utils.MAX_COMP:
-            utils.MAX_COMP = self.m_totalCompacity
-
-        if self.m_minDistHabitation < utils.MIN_DIST:
-            utils.MIN_DIST = self.m_minDistHabitation
-        elif self.m_minDistHabitation > utils.MAX_DIST:
-            utils.MAX_DIST = self.m_minDistHabitation
-
-        if self.m_totalProd < utils.MIN_PROD:
-            utils.MIN_PROD = self.m_totalProd
-        elif self.m_totalProd > utils.MAX_PROD:
-            utils.MAX_PROD = self.m_totalProd
+        utils.Norm_Prod.append(self.m_totalProd)
+        utils.Norm_Dist.append(self.m_minDistHabitation)
+        utils.Norm_Comp.append(self.m_totalCompacity)
         return 0
         
     

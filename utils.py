@@ -7,13 +7,9 @@ mapfile = "./donnes_V3/Usage_map.txt"
 
 Parcel_listParcel = []
 costDic = {}
-#Normalization
-MAX_COMP=0
-MIN_COMP=100
-MIN_DIST=1000
-MAX_DIST=0
-MIN_PROD=1000
-MAX_PROD=0
+Norm_Prod = []
+Norm_Comp = []
+Norm_Dist = []
 
 # read costfile and prodfile
 def readFile(f):

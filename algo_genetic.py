@@ -74,24 +74,33 @@ class Algo_genetic:
                 self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
         print("end construct wheel")
         return 0
-
-     #def construct_wheel(self):
-     #   index = 0
-     #  for individual_score in self.m_scores:
-     #     prob=(individual_score/self.m_total_score)*1000
-     #       self.m_prob.append(prob)
-     #      if index == 1:
-     #          self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+prob)
-     #      else:
-     #          self.m_cumulative_prob.append(prob)
-     #      index=1
-     #  return 0
     
     def create_population(self,_):
         m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
         indiv_map = Individual.Individual_algo_genetic(self.m_mapfile)
         indiv_map.chooseCandidate(m_initial_doc_init)
         return indiv_map
+
+    def init_variable(self):
+        self.m_scores = []
+        self.m_cumulative_prob=[]
+        self.m_total_score=0
+        utils.Norm_Comp=[]
+        utils.Norm_Prod=[]
+        utils.Norm_Dist=[]
+        utils.Norm_Comp=[]
+        utils.Norm_Prod=[]
+        utils.Norm_Dist=[]
+    
+    def init_normalize(self):
+        print(utils.Norm_Comp)
+        self.mean_Comp = np.mean(np.array(utils.Norm_Comp))
+        self.mean_Prod = np.mean(np.array(utils.Norm_Prod))
+        self.mean_Dist = np.mean(np.array(utils.Norm_Dist))
+        self.std_dev_Comp = np.std(np.array(utils.Norm_Comp))
+        self.std_dev_Prod = np.std(np.array(utils.Norm_Prod))
+        self.std_dev_Dist = np.std(np.array(utils.Norm_Dist))
+        return 0
     
     def process_chunk(self, chunk_size):
         chunk_results = []
@@ -116,34 +125,38 @@ class Algo_genetic:
     
     def crossover(self,p1,p2,r_cross):
         return_list=[]
-        # autre proba pour permettre d'avoir 1 enfant ou 2
-        if random.uniform(0, 1) < r_cross:
+        m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
 
+        if random.uniform(0, 1) < r_cross:
             parent_tupple1 = p1.return_clusterList()
-            parent_tupple2 = p2.return_clusterList()
             parent_cluster1 = p1.return_cluserListGroup()
+            parent_tupple2 = p2.return_clusterList()
             parent_cluster2 = p2.return_cluserListGroup()
 
-            #mapfile1 = copy.deepcopy(self.m_mapfile)
-            #mapfile2 = copy.deepcopy(self.m_mapfile)
-            m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
             c1 = Individual.Individual_algo_genetic(self.m_mapfile)
-            c2 = Individual.Individual_algo_genetic(self.m_mapfile)
             c1.initiate_Cost_Dic(m_initial_doc_init)
-            c2.initiate_Cost_Dic(m_initial_doc_init)
-
             min_cluster = min(len(parent_cluster1), len(parent_cluster2))
             if min_cluster == 1:
                 min_parcel = min(len(parent_tupple1),len(parent_tupple2))
                 cut_gene_pt = random.randint(1, min_parcel-1)
                 c1.changeParcel(p1,p2,cut_gene_pt,parent_tupple1[:cut_gene_pt],parent_tupple2[cut_gene_pt:])
-                c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
-            else:
+            else: 
                 cut_gene_cluster = random.randint(1,min_cluster-1)
                 c1.change_clusterParcel(p1,p2,parent_cluster1[:cut_gene_cluster],parent_cluster2[cut_gene_cluster:])
-                c2.change_clusterParcel(p1,p2,parent_cluster2[:cut_gene_cluster],parent_cluster1[cut_gene_cluster:])
-
-            return_list = [c1,c2]
+            return_list.append(c1)
+            if random.uniform(0, 1) < r_cross:
+            #mapfile1 = copy.deepcopy(self.m_mapfile)
+            #mapfile2 = copy.deepcopy(self.m_mapfile)
+                c2 = Individual.Individual_algo_genetic(self.m_mapfile)
+                c2.initiate_Cost_Dic(m_initial_doc_init)
+                if min_cluster == 1:
+                    min_parcel = min(len(parent_tupple1),len(parent_tupple2))
+                    cut_gene_pt = random.randint(1, min_parcel-1)
+                    c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
+                else:
+                    cut_gene_cluster = random.randint(1,min_cluster-1)
+                    c2.change_clusterParcel(p1,p2,parent_cluster2[:cut_gene_cluster],parent_cluster1[cut_gene_cluster:])
+                return_list.append(c2)
 
             for child in return_list:
                 cost = child.return_totalCost()
@@ -166,10 +179,12 @@ class Algo_genetic:
         end = time.time()
         print(f"it takes {end-begin} to create population")
         
-        best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
+        #best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
 
         for gen in range(self.m_iter_max):
             score_matrix = self.build_matrix(self.m_pop)
+            self.init_normalize()
+            best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
             #ranking = electre.rank_solutions()
             #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
             #begin = time.time()
@@ -220,11 +235,9 @@ class Algo_genetic:
             end = time.time()
             print(f"it takes {end-begin} to create childs")
             
+            self.init_variable()
             self.m_pop = children
-            self.m_scores = []
-            self.m_cumulative_prob=[]
             self.m_n_pop = len(children)
-            self.m_total_score=0
             self.next_generation(children)
 
         fig, ax = plt.subplots()
@@ -255,7 +268,12 @@ class Algo_genetic:
         return 0
 
     def moyenne(self, indiv):
-        moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd()) 
+        moyenne_Dist=(indiv.return_minDistHabitation()-self.mean_Dist)/self.std_dev_Dist
+        moyenne_Comp=(indiv.return_totalComp()-self.mean_Comp)/self.std_dev_Comp
+        moyenne_Prod=(indiv.return_totalProd()-self.mean_Prod)/self.std_dev_Prod
+        moyenne=moyenne_Dist+moyenne_Comp+moyenne_Prod
+        print(moyenne)
+        #moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd()) 
         #penser à normaliser -> Electre
         if moyenne < 0:
             moyenne=abs(moyenne)
