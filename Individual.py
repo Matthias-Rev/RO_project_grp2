@@ -10,6 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib.collections import PolyCollection
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+import datetime
 
 BREAK = 0
 VALID = 1
@@ -82,7 +83,6 @@ class Individual_algo_genetic:
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
-        self.normalize()
 
         return 0
 
@@ -113,7 +113,6 @@ class Individual_algo_genetic:
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
-        self.normalize()
      
     #define the compacity
     def compacity(self, listParcels):
@@ -169,7 +168,6 @@ class Individual_algo_genetic:
         self.choosePosition()
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
-        self.normalize()
         #print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
         return self.m_CluserList
 
@@ -251,7 +249,9 @@ class Individual_algo_genetic:
         plt.imshow(data, cmap=cmap, interpolation="nearest")
         plt.axis("off")
         #plt.show()
-        plt.savefig(f"{name}.png")
+        date = datetime.datetime.now()
+        current_time = date.strftime("%H_%M_%S")
+        plt.savefig(f"{name}_{current_time}.png")
 
     def min_dist_parcel(self,group_taken_parcel):
         min_distances = []
@@ -273,23 +273,12 @@ class Individual_algo_genetic:
 
         return distance# / occur_nb
 
-    #Calculate the average score of an individual
-    def moyenne(self):
-        moy = (1*self.return_totalComp()+1*self.return_minDistHabitation()+2*self.return_totalProd())
-        return moy
-
     def moyenne_min_dist_parcel(self):
         coeff_dist = []
         for p in self.m_GroupCluserList:
             dist_p = self.min_dist_parcel(p)
             coeff_dist.append(dist_p)
         return sum(coeff_dist) / len(coeff_dist)
-
-    def normalize(self):
-        utils.Norm_Prod.append(self.m_totalProd)
-        utils.Norm_Dist.append(self.m_minDistHabitation)
-        utils.Norm_Comp.append(self.m_totalCompacity)
-        return 0
         
     
     #define if a parcel is checked
@@ -440,20 +429,6 @@ class Individual_algo_genetic:
     
     def return_dic(self):
         return self.m_dic_pos
-    
-    # def check_unicity(self, parcel1, parcel2):
-    #     seen= set()
-    #     counter = 0
-    #     liste_canditate = [parcel1,parcel2]
-    #     for new_parcel in liste_canditate:
-    #         while counter < len(new_parcel):
-    #             if new_parcel[counter] in seen:
-    #                 del new_parcel[counter]
-    #                 counter=counter-1
-    #             seen.add(new_parcel[counter])
-    #             counter+=1
-    #         counter=0
-    #     return liste_canditate[0],liste_canditate[1]
     
     def check_unicity(self, parcel1, parcel2):
         seen = set()
