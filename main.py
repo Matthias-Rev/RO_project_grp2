@@ -4,7 +4,7 @@ import Individual
 from utils import *
 from PrometheeII import *
 import time
-import numpy as np
+import numpy as nps
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
         return matrix
 
     start_time = time.time()
-    test = Algo_genetic(1,100,0.80,0.20,Instance_Map)
+    test = Algo_genetic(1,10000 ,0.80,0.20,Instance_Map)
     liste_pop,best =test.genetic_algorithm()
     elapsed_time = time.time() - start_time
     best.draw_matrix("without Electre")

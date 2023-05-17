@@ -4,7 +4,7 @@ import parcel
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import copy
+import utils
 import math
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -82,6 +82,7 @@ class Individual_algo_genetic:
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
+        self.normalize()
 
         return 0
 
@@ -112,6 +113,7 @@ class Individual_algo_genetic:
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
+        self.normalize()
      
     #define the compacity
     def compacity(self, listParcels):
@@ -167,6 +169,7 @@ class Individual_algo_genetic:
         self.choosePosition()
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
+        self.normalize()
         #print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
         return self.m_CluserList
 
@@ -281,6 +284,24 @@ class Individual_algo_genetic:
             dist_p = self.min_dist_parcel(p)
             coeff_dist.append(dist_p)
         return sum(coeff_dist) / len(coeff_dist)
+
+    def normalize(self):
+        if self.m_totalCompacity < utils.MIN_COMP:
+            utils.MIN_COMP = self.m_totalCompacity
+        elif self.m_totalCompacity > utils.MAX_COMP:
+            utils.MAX_COMP = self.m_totalCompacity
+
+        if self.m_minDistHabitation < utils.MIN_DIST:
+            utils.MIN_DIST = self.m_minDistHabitation
+        elif self.m_minDistHabitation > utils.MAX_DIST:
+            utils.MAX_DIST = self.m_minDistHabitation
+
+        if self.m_totalProd < utils.MIN_PROD:
+            utils.MIN_PROD = self.m_totalProd
+        elif self.m_totalProd > utils.MAX_PROD:
+            utils.MAX_PROD = self.m_totalProd
+        return 0
+        
     
     #define if a parcel is checked
     def putParcel(self, parcelCandidate):
