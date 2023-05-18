@@ -34,6 +34,7 @@ class Individual_algo_genetic:
 
     def initiate_Cost_Dic(self, dic_init):
         self.m_dic_pos = dic_init
+        return 0
 
     def change_cluster(self, parcel):
         self.m_CluserList = parcel
@@ -48,6 +49,7 @@ class Individual_algo_genetic:
         return 0
 
     def change_clusterGroup(self, new_parcel1, new_parcel2, cluster_state):
+        #add the cluster in the list
         if cluster_state == True:
             for element_1 in new_parcel1:
                 self.m_GroupCluserList.append(element_1)
@@ -59,7 +61,8 @@ class Individual_algo_genetic:
             self.m_GroupCluserList.append(new_parcel2)
         return 0
 
-    def change_clusterParcel(self, p1, p2, new_parcel1=[], new_parcel2=[]):
+    def change_clusterParcel(self,new_parcel1=[], new_parcel2=[]):
+        #if there are multiple clusters given by the parents
 
         self.m_totalCost = 0
         self.m_totalProd = 0
@@ -149,7 +152,7 @@ class Individual_algo_genetic:
         # Ajout de la jonction entre les deux parties
         junctionList = compacity.returnJunctionSurface(listObjet, AHSortList)
 
-        compacity_value = (compacity.returnSurface(listObjet,AHSortList,junctionList, draw)/self.m_totalArea)*100
+        compacity_value = (compacity.DrawSurface(listObjet,AHSortList,junctionList,draw)/self.m_totalArea)*100
 
         return compacity_value
     
@@ -381,34 +384,35 @@ class Individual_algo_genetic:
         return random_parcel_position, random_parcel_x, random_parcel_y, index_random_parcel
 
     def shift_positions(self):
+        #shift the cluster (mutation)
 
         debug = 0
         state = VALID
         list_cluster = self.return_cluserListGroup()
         list_of_parcels = random.choice(self.m_GroupCluserList)
         index_list = self.m_GroupCluserList.index(list_of_parcels)
-        # Décalage de 1 ou 2 unités en x et/ou y pour chaque parcelle
 
         parcel_moved_safely = False
         while parcel_moved_safely == False:
             debug = debug + 1
             if debug == 20:
+                #if the mutation is not possible, we break the mutation procedure
                 state = BREAK
                 break
-            i = random.randint(-2, 2)
+            i = random.randint(-2, 2)                                               #move the cluster by 2 maximum
             j = random.randint(-2, 2)
             liste_new_parcel = []
             for parcel in list_of_parcels:
                 col, row = parcel.returnPosition()
 
-                # vérification position hors des limites
+                #chack the border limit
                 if (i + col) < self.m_map.returnWidth() - 1 and (i + col) >= 0:
                     col += i
                 if (j + row) < self.m_map.returnHeigth() - 1 and (j + row) >= 0:
                     row += j
                 parcelCandidate = self.m_map.returnObject(row, col)
 
-                # Réinititalisation de la parcelle initiale
+                #re initiate the initial parcel
                 if str(parcel.returnCost()) in self.m_dic_pos:
                     self.m_dic_pos[str(parcel.returnCost())] += 1
                 elif str(parcel.returnCost()) not in self.m_dic_pos:
@@ -416,13 +420,13 @@ class Individual_algo_genetic:
                 self.m_totalCost -= parcel.returnCost()
                 self.m_totalProd -= parcel.returnProd()
 
-                # Vérification que la nouvelle position est valide (pas déjà occupée...)
+                #check if the new parcel is valid (not already taken, not a house/route)
                 if ((parcelCandidate.returnType() == ' ' and parcelCandidate not in list_of_parcels) and str(
                         parcelCandidate.returnCost()) in self.m_dic_pos.keys()
                         and self.putParcel(parcelCandidate)):
                     liste_new_parcel.append(parcelCandidate)
 
-                # On garde la parcelle initiale en cas d'echec du candidat
+                #keep the initial parcel if we can't move all cluster parcels in the same direction
                 else:
                     self.m_dic_pos[str(parcel.returnCost())] -= 1
                     if self.m_dic_pos[str(parcel.returnCost())] == 0:
@@ -471,6 +475,7 @@ class Individual_algo_genetic:
         return self.m_distance_cluster
 
     def check_unicity(self, parcel1, parcel2):
+        #check if there are duplicate parcel in the parents parcel list
         seen = set()
         liste_candidat = [parcel1, parcel2]
 
@@ -484,15 +489,16 @@ class Individual_algo_genetic:
         return liste_candidat[0], liste_candidat[1]
 
     def check_unicity_Group(self, new_parcel1, new_parcel2):
+        #check if there are duplicate parcel in the parents cluster list
         seen = set()
         liste_counter = 0
         liste_canditate = [new_parcel1, new_parcel2]
         for new_parcel in liste_canditate:
             while liste_counter < len(new_parcel):
                 i_counter = 0
-                while 0 <= i_counter < len(new_parcel[liste_counter]):
-                    if new_parcel[liste_counter][i_counter] in seen:
-                        del new_parcel[liste_counter][i_counter]
+                while 0 <= i_counter < len(new_parcel[liste_counter]):      #move in the list
+                    if new_parcel[liste_counter][i_counter] in seen:        #if already seen
+                        del new_parcel[liste_counter][i_counter]            #delete the parcel
                         i_counter -= 1
                     if len(new_parcel[liste_counter]) != 0:
                         seen.add(new_parcel[liste_counter][i_counter])
@@ -505,30 +511,33 @@ class Individual_algo_genetic:
         return liste_canditate[0], liste_canditate[1]
 
     def distance_cluster(self):
-        parcel_mean_x = []
-        parcel_mean_y = []
-        cluster_pos = []
-        distance_clusters = 0
-        num_points = len(self.m_GroupCluserList)
+        #calculate the distance between each cluster
+        #this distance helps to select parce that fits with our vision of compacity
+        #(see the presentation)
+        parcel_mean_x = []                                                  #contain the coordinate of each parcels,
+        parcel_mean_y = []                                                  #to calculate cluster centre
+        cluster_pos = []                                                    #coordinate of the cluster centre
+        distance_clusters = 0                                               #calculate the mean distance for each individual
+        num_clusters = len(self.m_GroupCluserList)                          #number of clusters
         for cluster in self.m_GroupCluserList:
-            if num_points == 1:
+            if num_clusters == 1:
                 return 0
             for parcel in cluster:
                 pos_parcel = parcel.returnPosition()
                 parcel_mean_x.append(pos_parcel[0])
-                parcel_mean_y.append(pos_parcel[1])
+                parcel_mean_y.append(pos_parcel[1])                        #calculate the cluster centre
             cluster_x = sum(parcel_mean_x) / len(parcel_mean_x)
             cluster_y = sum(parcel_mean_y) / len(parcel_mean_y)
             cluster_pos.append((cluster_y, cluster_x))
 
-        for parcel_first in range(num_points):
+        for parcel_first in range(num_clusters):                           #calculate the average distance btw each cluster
             x1, y1 = cluster_pos[parcel_first]
-            for second_parcel in range(parcel_first + 1, num_points):
-                x2, y2 = cluster_pos[second_parcel]
+            for parcel_second in range(parcel_first + 1, num_clusters):
+                x2, y2 = cluster_pos[parcel_second]
                 distance = self.mean_distance(x1, y1, x2, y2)
                 distance_clusters += distance
 
-        return distance_clusters / (num_points * (num_points - 1) / 2)
+        return distance_clusters / (num_clusters * (num_clusters - 1) / 2)
 
     def mean_distance(self, x1, y1, x2, y2):
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)

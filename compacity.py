@@ -123,7 +123,7 @@ def returnJunctionSurface(listObjA, listObjB):
 
 def returnSurface(listObjA, listObjB, listObjC):
     i=1
-    fig, ax = plt.subplots()
+    #fig, ax = plt.subplots()
     totalSurface = 0
     while i < len(listObjA) -1:
 
@@ -138,8 +138,8 @@ def returnSurface(listObjA, listObjB, listObjC):
         totalSurface += surface
 
         # Création du triangle
-        plt.Polygon(coords, color='blue', alpha=0.5)
-        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        #plt.Polygon(coords, color='blue', alpha=0.5)
+        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
     while i < len(listObjB) -1:
@@ -155,8 +155,8 @@ def returnSurface(listObjA, listObjB, listObjC):
         totalSurface += surface
 
         # Création du triangle
-        plt.Polygon(coords, color='blue', alpha=0.5)
-        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        #plt.Polygon(coords, color='blue', alpha=0.5)
+        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
     while i < len(listObjC) -1:
@@ -172,19 +172,20 @@ def returnSurface(listObjA, listObjB, listObjC):
         totalSurface += surface
 
         # Création du triangle
-        plt.Polygon(coords, color='blue', alpha=0.5)
-        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        #plt.Polygon(coords, color='blue', alpha=0.5)
+        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     # Affichage du triangle
-    plt.axis('equal')
-    plt.show()
+    #plt.axis('equal')
+    #plt.show()
     plt.close()
     # print("la surface totale est de :", totalSurface)
     return totalSurface
 
 def DrawSurface(listObjA, listObjB, listObjC, draw):
     i=1
-    fig, ax = plt.subplots()
+    if draw:
+        fig, ax = plt.subplots()
     totalSurface = 0
     while i < len(listObjA) -1:
 
@@ -199,8 +200,8 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
         totalSurface += surface
 
         # Création du triangle
-        plt.Polygon(coords, color='blue', alpha=0.5)
-        if draw == 'Draw':
+        if draw:
+            plt.Polygon(coords, color='blue', alpha=0.5)
             ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
@@ -217,8 +218,8 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
         totalSurface += surface
 
         # Création du triangle
-        plt.Polygon(coords, color='blue', alpha=0.5)
-        if draw == 'Draw':
+        if draw:
+            plt.Polygon(coords, color='blue', alpha=0.5)
             ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
@@ -235,14 +236,13 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
         totalSurface += surface
 
         # Création du triangle
-        plt.Polygon(coords, color='blue', alpha=0.5)
-        if draw == 'Draw':
+        if draw:
+            plt.Polygon(coords, color='blue', alpha=0.5)
             ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     # Affichage du triangle
-    if draw == 'Draw':
+    if draw:
         plt.axis('equal')
-        plt.show()
-        plt.close()
+        plt.savefig(f"{draw}_compacity.png")
     # print("la surface totale est de :", totalSurface)
     return totalSurface

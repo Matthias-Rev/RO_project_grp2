@@ -11,8 +11,8 @@ import os
 
 if __name__ == "__main__":
     Instance_Map=Map(constructMap(), costDic)
-    iter=8
-    pop_length=200000
+    iter=1
+    pop_length=10
 
     def build_matrix(instances):
         matrix = np.array([[p.return_totalComp(), p.return_totalProd(),p.return_minDistHabitation(), p.return_dcluster()] for p in instances])
@@ -39,9 +39,9 @@ if __name__ == "__main__":
     draw_name=f"./result/{current_time}/test_{pop_length}_{iter}_{current_time}"
 
     best.draw_matrix(draw_name)
-    for parcel in best.return_clusterList():
-        print(parcel.returnPosition())
+    print(liste_pop.index(best)," :index best")
     Instance_Map.write_solution(best.return_clusterList(),draw_name)
+    best.compacity(best.return_clusterList(), draw_name)
 
 
     x,y,z=[],[],[]
