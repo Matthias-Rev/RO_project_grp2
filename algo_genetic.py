@@ -40,10 +40,17 @@ class Algo_genetic:
         self.m_listElitism.append(elit_indiv)
     
     def build_matrix(self,instances):
-        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation()] for p in instances])
-        return matrix        
+        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation(),p.return_dcluster] for p in instances])
+        return matrix
 
-    def compute_selection_probs(rankings):
+    def build_matrix_score(self,instances):
+        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation(),p.return_dcluster()] for p in instances])
+        normalized_scores = np.zeros_like(matrix)
+        for i in range(matrix.shape[1]):
+            normalized_scores[:,i] = (matrix[:,i] - np.min(matrix[:,i])) / (np.max(matrix[:,i]) - np.min(matrix[:,i]))
+        return normalized_scores
+
+    def compute_selection_probs(self,rankings):
         n = len(rankings)
         weights = [n - i + 1 for i in range(1, n + 1)]
         total_weight = sum(weights)
@@ -74,18 +81,6 @@ class Algo_genetic:
                 self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
         print("end construct wheel")
         return 0
-
-     #def construct_wheel(self):
-     #   index = 0
-     #  for individual_score in self.m_scores:
-     #     prob=(individual_score/self.m_total_score)*1000
-     #       self.m_prob.append(prob)
-     #      if index == 1:
-     #          self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+prob)
-     #      else:
-     #          self.m_cumulative_prob.append(prob)
-     #      index=1
-     #  return 0
     
     def create_population(self,_):
         m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
@@ -116,44 +111,46 @@ class Algo_genetic:
     
     def crossover(self,p1,p2,r_cross):
         return_list=[]
-        # autre proba pour permettre d'avoir 1 enfant ou 2
-        if random.uniform(0, 1) < r_cross:
+        m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
 
+        if random.uniform(0, 1) < r_cross:
             parent_tupple1 = p1.return_clusterList()
-            parent_tupple2 = p2.return_clusterList()
             parent_cluster1 = p1.return_cluserListGroup()
+            parent_tupple2 = p2.return_clusterList()
             parent_cluster2 = p2.return_cluserListGroup()
 
-            #mapfile1 = copy.deepcopy(self.m_mapfile)
-            #mapfile2 = copy.deepcopy(self.m_mapfile)
-            m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
             c1 = Individual.Individual_algo_genetic(self.m_mapfile)
-            c2 = Individual.Individual_algo_genetic(self.m_mapfile)
             c1.initiate_Cost_Dic(m_initial_doc_init)
-            c2.initiate_Cost_Dic(m_initial_doc_init)
-
             min_cluster = min(len(parent_cluster1), len(parent_cluster2))
             if min_cluster == 1:
                 min_parcel = min(len(parent_tupple1),len(parent_tupple2))
                 cut_gene_pt = random.randint(1, min_parcel-1)
                 c1.changeParcel(p1,p2,cut_gene_pt,parent_tupple1[:cut_gene_pt],parent_tupple2[cut_gene_pt:])
-                c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
-            else:
+            else: 
                 cut_gene_cluster = random.randint(1,min_cluster-1)
                 c1.change_clusterParcel(p1,p2,parent_cluster1[:cut_gene_cluster],parent_cluster2[cut_gene_cluster:])
-                c2.change_clusterParcel(p1,p2,parent_cluster2[:cut_gene_cluster],parent_cluster1[cut_gene_cluster:])
+            return_list.append(c1)
+            if random.uniform(0, 1) < r_cross:
+                c2 = Individual.Individual_algo_genetic(self.m_mapfile)
+                c2.initiate_Cost_Dic(m_initial_doc_init)
+                if min_cluster == 1:
+                    min_parcel = min(len(parent_tupple1),len(parent_tupple2))
+                    cut_gene_pt = random.randint(1, min_parcel-1)
+                    c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
+                else:
+                    cut_gene_cluster = random.randint(1,min_cluster-1)
+                    c2.change_clusterParcel(p1,p2,parent_cluster2[:cut_gene_cluster],parent_cluster1[cut_gene_cluster:])
+                return_list.append(c2)
 
-            return_list = [c1,c2]
-
-            for child in return_list:
-                cost = child.return_totalCost()
-                if cost > 50:
-                    del return_list[return_list.index(child)]
+        for child in return_list:
+            cost = child.return_totalCost()
+            if cost > 50:
+                del return_list[return_list.index(child)]
         return return_list
 
     def genetic_algorithm(self):
         self.m_pop = list()
-        weights = [-0.5, 0.5, -0.5]
+        weights = [-0.5, 0.5, -0.5, -0.5]
         concordance_index = 0.6
         discordance_index = 0.4
         electre = ELECTRE(weights, concordance_index, discordance_index)
@@ -165,11 +162,10 @@ class Algo_genetic:
         self.m_pop = pool.map(self.create_population, range(self.m_n_pop))
         end = time.time()
         print(f"it takes {end-begin} to create population")
-        
-        best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
+        best_eval = 0
 
         for gen in range(self.m_iter_max):
-            score_matrix = self.build_matrix(self.m_pop)
+            #score_matrix = self.build_matrix(self.m_pop)
             #ranking = electre.rank_solutions()
             #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
             #begin = time.time()
@@ -181,13 +177,18 @@ class Algo_genetic:
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
 
+            i = 0
+            matrix_score = self.build_matrix_score(self.m_pop)
             for individual in self.m_pop:
-                score = self.moyenne(individual)
+                current_line =matrix_score[i]
+                score = (current_line[0] *-1) + current_line[1] + (current_line[2]*-1) - (0.5*current_line[3])
+                #score = self.moyenne(individual)
                 self.m_scores.append(score)
                 self.m_total_score += score
                 self.m_register_list.append(score)
+                i +=1
                 if self.m_scores[-1] > best_eval:
-                    best, best_eval = self.m_pop[-1], self.m_scores[-1]
+                    best, best_eval = individual, self.m_scores[-1]
                     self.add_elitism(best)
                     print(">%d, new best = %.3f" % (gen, best_eval))
 
@@ -219,6 +220,7 @@ class Algo_genetic:
                     children.append(c)
             end = time.time()
             print(f"it takes {end-begin} to create childs")
+
             
             self.m_pop = children
             self.m_scores = []
@@ -255,8 +257,9 @@ class Algo_genetic:
         return 0
 
     def moyenne(self, indiv):
-        moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd()) 
-        #penser à normaliser -> Electre
+        #print("distance =",indiv.return_dcluster())
+        #indiv.draw_matrix("ok")
+        moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd()-1*indiv.return_dcluster())
         if moyenne < 0:
             moyenne=abs(moyenne)
         else:
@@ -314,4 +317,3 @@ class Algo_genetic:
         plt.savefig("Pareto_1000000.png")
 
         return 0
-

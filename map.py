@@ -26,11 +26,11 @@ class Map:
         self.m_grid[i][j] = char
         return 0
 
-    def write_solution(self,list_pos):
+    def write_solution(self,list_pos,name):
         for i in list_pos:
             pos=i.returnPosition()
             self.m_grid[pos[1]][pos[0]].changeTypeElem("x")
-        with open("solution_1000000.txt", "w") as file:
+        with open(f"{name}_solut.txt", "w") as file:
             for element in self.m_grid:
                 for parcel in element:
                     file.write(parcel.returnType())

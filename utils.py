@@ -1,5 +1,8 @@
 from parcel import Parcel
 from map import Map
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 costfile = "./donnes_V3/Cost_map.txt"
 prodfile = "./donnes_V3/Production_map.txt"
@@ -77,4 +80,38 @@ def costParcelDic(cost):
         costDic[cost] +=1
     else:
         costDic[cost] = 1
+
+def plot_pareto_frontier(points, pareto_indices):
+    pareto_points = points[pareto_indices]
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    #ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='blue', label='Frontière de Pareto')
+    #ax.scatter(pareto_points[:, 0], pareto_points[:, 2], pareto_points[:, 1], c='red', label='Frontière de Pareto')
+    ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
+    #ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
+    ax.set_xlabel('Compacity')
+    ax.set_ylabel('Production')
+    ax.set_zlabel('Habitation Dist')
+
+    # Changer l'échelle des axes
+    #ax.set_xlim(0, 0.2)
+    #ax.set_ylim(0.2, 0.6)
+    #ax.set_zlim(0, 0.8)
+
+    plt.legend()
+    #plt.show()
+    plt.savefig("./result/pareto.png")
+
+
+def find_pareto_frontier_indices(points):
+    num_points = points.shape[0]
+    is_pareto_efficient = np.ones(num_points, dtype=bool)
+
+    for i in range(num_points):
+        if is_pareto_efficient[i]:
+            current_point = points[i]
+            is_pareto_efficient[is_pareto_efficient] = np.any(points[is_pareto_efficient] <= current_point, axis=1)
+
+    pareto_indices = np.where(is_pareto_efficient)[0]
+    return pareto_indices
 

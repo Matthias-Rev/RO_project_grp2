@@ -51,7 +51,7 @@ class ELECTRE:
 
     def pareto_frontier(self,matrix):
         # Triez la matrice par ordre décroissant de la deuxième colonne
-        matrix = np.multiply(matrix,np.array([-1,1,-1]))
+        matrix = np.multiply(matrix,np.array([-1,1,-1,-1]))
         matrix = matrix[np.argsort(-matrix[:, 1])]
 
         # Initialisez une liste pour stocker les points de la frontière de Pareto
@@ -64,6 +64,10 @@ class ELECTRE:
 
         # Convertissez la liste des points en une matrice numpy
         pareto_frontier = np.array(pareto_points)
-        pareto_frontier = np.multiply(pareto_frontier,np.array([-1,1,-1]))
+        pareto_frontier = np.multiply(pareto_frontier,np.array([-1,1,-1,-1]))
 
         return pareto_frontier
+
+    def change_weight(self,weight):
+        self.weights = weight
+        
