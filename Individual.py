@@ -281,8 +281,8 @@ class Individual_algo_genetic:
                     fontsize=10, color='black')
         plt.imshow(data, cmap=cmap, interpolation="nearest")
         plt.axis("off")
-        plt.show()
-        #plt.savefig(f"{name}.png")
+        #plt.show()
+        plt.savefig(f"{name}.png")
 
     def min_dist_parcel(self, group_taken_parcel):
         min_distances = []
