@@ -4,13 +4,13 @@ import parcel
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import utils
+import copy
 import math
+import datetime
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib.collections import PolyCollection
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import datetime
 
 BREAK = 0
 VALID = 1
@@ -23,6 +23,7 @@ class Individual_algo_genetic:
         self.m_totalCost = 0                        #must be <500.000
         self.m_totalProd = 0
         self.m_totalCompacity = 0
+        self.m_distance_cluster = 0
         
         self.m_listParcel = listParcel
         self.m_CluserList = []
@@ -83,6 +84,7 @@ class Individual_algo_genetic:
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
+        self.m_distance_cluster=self.distance_cluster()
 
         return 0
 
@@ -113,6 +115,7 @@ class Individual_algo_genetic:
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
+        self.m_distance_cluster=self.distance_cluster()
      
     #define the compacity
     def compacity(self, listParcels):
@@ -151,6 +154,8 @@ class Individual_algo_genetic:
     def chooseCandidate(self,init_doc):
 
         self.initiate_Cost_Dic(init_doc)
+        h = self.m_map.returnHeigth()
+        w = self.m_map.returnWidth()
 
         if len(self.m_listParcel) == 0:
             self.m_listParcel = []
@@ -159,8 +164,18 @@ class Individual_algo_genetic:
         while self.m_totalCost+int(next(iter(self.m_dic_pos))) <= 50 and len(self.m_listParcel) < randomNumber:
             candidateOk = False
             while not candidateOk:
-                i = random.randint(0, len(self.m_map.returnGrid())-1)
-                j = random.randint(0, len(self.m_map.returnGrid()[i])-1)
+                if len(self.m_listParcel)==0:
+                    i = random.randint(0, len(self.m_map.returnGrid())-1)
+                    j = random.randint(0, len(self.m_map.returnGrid()[i])-1)
+                else:
+                    i_prime = self.m_listParcel[0].returnPosition()[1]-20
+                    j_prime = self.m_listParcel[0].returnPosition()[0]-20
+                    i_prime2 = self.m_listParcel[0].returnPosition()[1]+20
+                    j_prime2 = self.m_listParcel[0].returnPosition()[0]+20
+                    i_prime, j_prime = self.in_grid(i_prime,j_prime,h,w)
+                    i_prime2, j_prime2 = self.in_grid(i_prime2,j_prime2,h,w)
+                    i = random.randint(i_prime, i_prime2)
+                    j = random.randint(j_prime,j_prime2)
                 randomCandidate = self.m_map.returnObject(i,j)
                 if randomCandidate.returnType() == ' ' and str(randomCandidate.returnCost()) in self.m_dic_pos.keys() and self.putParcel(randomCandidate):
                     candidateOk = True
@@ -168,8 +183,20 @@ class Individual_algo_genetic:
         self.choosePosition()
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
+        self.m_distance_cluster=self.distance_cluster()
         #print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
         return self.m_CluserList
+    
+    def in_grid(self,i,j,h,w):
+        if i > h:
+            i = h-1
+        elif i < 0:
+            i = 0
+        if j > w:
+            j = w-1
+        elif j < 0:
+            j = 0
+        return i,j        
 
     def choosePosition(self):
 
@@ -245,13 +272,13 @@ class Individual_algo_genetic:
 
         # Display the image
         plt.figure(figsize=(10, 5))
-        plt.figtext(0,0,f"C={self.return_totalComp()},P={self.return_totalProd()},D={self.return_minDistHabitation()}",fontsize=10,color='black')
+        plt.figtext(0,0,f"C={self.return_totalComp()},P={self.return_totalProd()},D={self.return_minDistHabitation()},DD={self.return_dcluster()}",fontsize=10,color='black')
         plt.imshow(data, cmap=cmap, interpolation="nearest")
         plt.axis("off")
-        #plt.show()
+        plt.show()
         date = datetime.datetime.now()
         current_time = date.strftime("%H_%M_%S")
-        plt.savefig(f"{name}_{current_time}.png")
+        #plt.savefig(f"{name}_{current_time}.png")
 
     def min_dist_parcel(self,group_taken_parcel):
         min_distances = []
@@ -262,16 +289,20 @@ class Individual_algo_genetic:
                 for h in hLine:
                     distance = math.sqrt((h[0] - p.returnPosition()[1])**2 + (h[1] -p.returnPosition()[0])**2)
                     distances_p.append(distance)
-            min_distances.append(min(distances_p))
-            occur_nb = len(min_distances)
+            min_distances.append(min(distances_p))#tester max
         
         distance = 0
         if len(min_distances) > 0:
-            distance = min(min_distances)
+            distance = sum(min_distances)/len(min_distances)
         else:
             distance = 0
 
         return distance# / occur_nb
+
+    #Calculate the average score of an individual
+    def moyenne(self):
+        moy = (1*self.return_totalComp()+1*self.return_minDistHabitation()+2*self.return_totalProd())
+        return moy
 
     def moyenne_min_dist_parcel(self):
         coeff_dist = []
@@ -279,7 +310,6 @@ class Individual_algo_genetic:
             dist_p = self.min_dist_parcel(p)
             coeff_dist.append(dist_p)
         return sum(coeff_dist) / len(coeff_dist)
-        
     
     #define if a parcel is checked
     def putParcel(self, parcelCandidate):
@@ -340,7 +370,7 @@ class Individual_algo_genetic:
             random_parcel_position = random_parcel.returnPosition()
             random_parcel_y = random.choice([-1,1])
             random_parcel_x = random.choice([1,-1])
-            if random_parcel_position[0]+random_parcel_x < self.m_map.returnWidth() and random_parcel_position[1]+random_parcel_y < self.m_map.returnHeigth():
+            if random_parcel_position[0]+random_parcel_x < 170 and random_parcel_position[1]+random_parcel_y < 70:
                 out_of_range = False
         return random_parcel_position,random_parcel_x,random_parcel_y,index_random_parcel
     
@@ -429,6 +459,9 @@ class Individual_algo_genetic:
     
     def return_dic(self):
         return self.m_dic_pos
+
+    def return_dcluster(self):
+        return self.m_distance_cluster
     
     def check_unicity(self, parcel1, parcel2):
         seen = set()
@@ -463,4 +496,36 @@ class Individual_algo_genetic:
                     i_counter+=1
                 liste_counter+=1
         return liste_canditate[0],liste_canditate[1]
+    
+    def distance_cluster(self):
+        parcel_mean_x=[]
+        parcel_mean_y=[]
+        cluster_pos = []
+        distance_clusters = 0
+        num_points=len(self.m_GroupCluserList)
+        for cluster in self.m_GroupCluserList:
+            if num_points==1:
+                return 0
+            for parcel in cluster:
+                pos_parcel = parcel.returnPosition()
+                parcel_mean_x.append(pos_parcel[0])
+                parcel_mean_y.append(pos_parcel[1])
+            cluster_x=sum(parcel_mean_x)/len(parcel_mean_x)
+            cluster_y=sum(parcel_mean_y)/len(parcel_mean_y)
+            cluster_pos.append((cluster_y,cluster_x))
+        
+        for parcel_first in range(num_points):
+            x1,y1 = cluster_pos[parcel_first]
+            for second_parcel in range(parcel_first+1,num_points):
+                x2,y2 = cluster_pos[second_parcel]
+                distance = self.mean_distance(x1,y1,x2,y2)
+                distance_clusters+=distance
+
+        return distance_clusters/(num_points*(num_points-1)/2)
+    
+    def mean_distance(self,x1,y1,x2,y2):
+        return math.sqrt((x1-x2)**2+(y1-y2)**2)
+        
+
+            
         

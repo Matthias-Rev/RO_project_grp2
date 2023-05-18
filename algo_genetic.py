@@ -40,7 +40,7 @@ class Algo_genetic:
         self.m_listElitism.append(elit_indiv)
     
     def build_matrix(self,instances):
-        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation()] for p in instances])
+        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation(),p.return_dcluster] for p in instances])
         return matrix        
 
     def compute_selection_probs(rankings):
@@ -155,6 +155,12 @@ class Algo_genetic:
 
     def genetic_algorithm(self):
         self.m_pop = list()
+        weights = [-0.5, 0.5, -0.5, -0.5]
+        concordance_index = 0.6
+        discordance_index = 0.4
+        electre = ELECTRE(weights, concordance_index, discordance_index)
+        #Initial doc
+        #peut être le crée pour les enfants à chaque fois ce serai pas mal
    
         begin = time.time()
         pool = multiprocessing.Pool(self.num_processes)
@@ -165,6 +171,14 @@ class Algo_genetic:
         best, best_eval = self.m_pop[0], self.moyenne(self.m_pop[0])
 
         for gen in range(self.m_iter_max):
+            #score_matrix = self.build_matrix(self.m_pop)
+            #ranking = electre.rank_solutions()
+            #TODO changer fonction pour utilisr une matrice autre qu'en recrént une instance
+            #begin = time.time()
+            #electre = ELECTRE(score_matrix, weights, concordance_index, discordance_index)
+            #ranking = electre.rank_solutions(score_matrix)
+            #end = time.time()
+            #print(f"it takes {end-begin} to do Electre")
 
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
@@ -179,16 +193,22 @@ class Algo_genetic:
                     self.add_elitism(best)
                     print(">%d, new best = %.3f" % (gen, best_eval))
 
+            #self.construct_wheel_electre(ranking)
             self.construct_wheel()
 
 
             selected=[]
             begin = time.time()
             selected = self.run_parallel()
+            #for _ in range(self.m_n_pop):
+                #selected.append(self.selection_wheel())
             end = time.time()
             print(f"it takes {end-begin} to make selection_wheel")
 
+
             begin = time.time()
+
+            
             children = list()
             for i in range(0, self.m_n_pop-1, 2):
                 p1, p2 = selected[i], selected[i+1]
@@ -201,6 +221,7 @@ class Algo_genetic:
                     children.append(c)
             end = time.time()
             print(f"it takes {end-begin} to create childs")
+
             
             self.m_pop = children
             self.m_scores = []
@@ -211,6 +232,13 @@ class Algo_genetic:
 
         fig, ax = plt.subplots()
 
+        # Plot the data as a line graph
+        #ax.plot(self.m_register_list)
+
+        # Show the plot
+        #plt.show()
+        # for i in self.m_pop:
+        #     print(self.moyenne(i))
         return self.m_pop, best
  
     def next_generation(self,list_input):
@@ -224,11 +252,15 @@ class Algo_genetic:
         # check if a random number is less than r_mut (nearly 20%)
         # if yes then we flip the gene (but in our case we take the line and take another parcelle)
         if random.uniform(0, 1) < r_mut:
+            #children.draw_matrix()
             children.shift_positions()
+            #children.draw_matrix()
         return 0
 
     def moyenne(self, indiv):
-        moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd()) 
+        #print("distance =",indiv.return_dcluster())
+        #indiv.draw_matrix("ok")
+        moyenne = (-1*indiv.return_totalComp()-1*indiv.return_minDistHabitation()+2*indiv.return_totalProd()-1*indiv.return_dcluster())
         if moyenne < 0:
             moyenne=abs(moyenne)
         else:
@@ -266,4 +298,24 @@ class Algo_genetic:
                     return self.m_pop[i]
         
         return -1
+
+    def Plot3D(self, points):
+
+        # créer un graph 3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        # ajouter les points à l'axe du graphique
+        ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='r', marker='o')
+
+        # ajouter des étiquettes d'axe
+        ax.set_xlabel('X Label')
+        ax.set_ylabel('Y Label')
+        ax.set_zlabel('Z Label')
+
+        # afficher le graphique
+        #plt.show()
+        plt.savefig("Pareto_1000000.png")
+
+        return 0
 
