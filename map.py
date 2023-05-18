@@ -30,7 +30,7 @@ class Map:
         for i in list_pos:
             pos=i.returnPosition()
             self.m_grid[pos[1]][pos[0]].changeTypeElem("x")
-        with open(f"solution{name}_.txt", "w") as file:
+        with open(f"{name}_solut.txt", "w") as file:
             for element in self.m_grid:
                 for parcel in element:
                     file.write(parcel.returnType())

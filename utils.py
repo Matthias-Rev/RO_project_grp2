@@ -81,18 +81,6 @@ def costParcelDic(cost):
     else:
         costDic[cost] = 1
 
-    def find_pareto_frontier_indices(points):
-        num_points = points.shape[0]
-        is_pareto_efficient = np.ones(num_points, dtype=bool)
-
-        for i in range(num_points):
-            if is_pareto_efficient[i]:
-                current_point = points[i]
-                is_pareto_efficient[is_pareto_efficient] = np.any(points[is_pareto_efficient] <= current_point, axis=1)
-
-        pareto_indices = np.where(is_pareto_efficient)[0]
-        return pareto_indices
-
 def plot_pareto_frontier(points, pareto_indices):
     pareto_points = points[pareto_indices]
     fig = plt.figure()
@@ -111,8 +99,8 @@ def plot_pareto_frontier(points, pareto_indices):
     #ax.set_zlim(0, 0.8)
 
     plt.legend()
-    plt.show()
-    plt.savefig("pareto.png")
+    #plt.show()
+    plt.savefig("./result/pareto.png")
 
 
 def find_pareto_frontier_indices(points):
@@ -126,3 +114,4 @@ def find_pareto_frontier_indices(points):
 
     pareto_indices = np.where(is_pareto_efficient)[0]
     return pareto_indices
+

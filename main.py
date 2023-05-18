@@ -6,18 +6,21 @@ from PrometheeII import *
 import time
 import numpy as nps
 from mpl_toolkits.mplot3d import Axes3D
+import datetime
+import os
 
 if __name__ == "__main__":
     Instance_Map=Map(constructMap(), costDic)
-    iter=2
-    pop_length=30
+    iter=8
+    pop_length=200000
 
     def build_matrix(instances):
-        matrix = np.array([[p.return_totalComp(),p.return_minDistHabitation(), p.return_totalProd()] for p in instances])
+        matrix = np.array([[p.return_totalComp(), p.return_totalProd(),p.return_minDistHabitation(), p.return_dcluster()] for p in instances])
         return matrix
 
+
     start_time = time.time()
-    test = Algo_genetic(iter, pop_length,0.80,0.20,Instance_Map)
+    test = Algo_genetic(iter, pop_length,0.80,0.35,Instance_Map)
     liste_pop,best =test.genetic_algorithm()
     elapsed_time = time.time() - start_time
 
@@ -28,13 +31,18 @@ if __name__ == "__main__":
     concordance_index = 0.6
     discordance_index = 0.4
 
-    draw_name=f"test_{pop_length}_{iter}"
+    date = datetime.datetime.now()
+    current_time = date.strftime("%H_%M_%S")
+    os.mkdir(f"./result/{current_time}")
+
+
+    draw_name=f"./result/{current_time}/test_{pop_length}_{iter}_{current_time}"
 
     best.draw_matrix(draw_name)
     for parcel in best.return_clusterList():
         print(parcel.returnPosition())
     Instance_Map.write_solution(best.return_clusterList(),draw_name)
-    
+
 
     x,y,z=[],[],[]
     for indiv in liste_pop:
@@ -51,8 +59,17 @@ if __name__ == "__main__":
     pointsN = electre.normalization(points)
     pointsNW = pointsN *np.array([-1, 1, -1])
     pareto_index = utils.find_pareto_frontier_indices(pointsNW)
+    print(pareto_index)
     utils.plot_pareto_frontier(points,pareto_index)
 
-    score_matrix = build_matrix(liste_pop)
+    pop = []
+    for indiv_index in pareto_index:
+        pop.append(liste_pop[indiv_index])
+
+    weights = [-0.5, 0.6, -0.5,-0.1]
+    draw_name_Elec=f"./result/{current_time}/testElectre_{pop_length}_{iter}_{current_time}"
+    score_matrix = build_matrix(pop)
+    electre.change_weight(weights)
     ranking = electre.rank_solutions(score_matrix)
-    liste_pop[ranking[0]].draw_matrix("with Electre")
+    liste_pop[ranking[0]].draw_matrix(draw_name_Elec)
+    Instance_Map.write_solution(liste_pop[ranking[0]].return_clusterList(),draw_name_Elec)
