@@ -41,9 +41,16 @@ class Algo_genetic:
     
     def build_matrix(self,instances):
         matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation(),p.return_dcluster] for p in instances])
-        return matrix        
+        return matrix
 
-    def compute_selection_probs(rankings):
+    def build_matrix_score(self,instances):
+        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation(),p.return_dcluster()] for p in instances])
+        normalized_scores = np.zeros_like(matrix)
+        for i in range(matrix.shape[1]):
+            normalized_scores[:,i] = (matrix[:,i] - np.min(matrix[:,i])) / (np.max(matrix[:,i]) - np.min(matrix[:,i]))
+        return normalized_scores
+
+    def compute_selection_probs(self,rankings):
         n = len(rankings)
         weights = [n - i + 1 for i in range(1, n + 1)]
         total_weight = sum(weights)
@@ -74,18 +81,6 @@ class Algo_genetic:
                 self.m_cumulative_prob.append(self.m_cumulative_prob[-1] + rank_prob)
         print("end construct wheel")
         return 0
-
-     #def construct_wheel(self):
-     #   index = 0
-     #  for individual_score in self.m_scores:
-     #     prob=(individual_score/self.m_total_score)*1000
-     #       self.m_prob.append(prob)
-     #      if index == 1:
-     #          self.m_cumulative_prob.append(self.m_cumulative_prob[-1]+prob)
-     #      else:
-     #          self.m_cumulative_prob.append(prob)
-     #      index=1
-     #  return 0
     
     def create_population(self,_):
         m_initial_doc_init = copy.deepcopy(self.m_initial_doc)
@@ -183,11 +178,15 @@ class Algo_genetic:
             print(f"=========== {gen} generation ===========")
             print(f"population: {self.m_n_pop}")
 
+            i = 0
+            matrix_score = self.build_matrix_score(self.m_pop)
             for individual in self.m_pop:
-                score = self.moyenne(individual)
+                current_line =matrix_score[i]
+                score = (current_line[0] *-1) + current_line[1] + (current_line[2]*-1) - (0.5*current_line[3])
                 self.m_scores.append(score)
                 self.m_total_score += score
                 self.m_register_list.append(score)
+                i +=1
                 if self.m_scores[-1] > best_eval:
                     best, best_eval = self.m_pop[-1], self.m_scores[-1]
                     self.add_elitism(best)
