@@ -123,7 +123,7 @@ def returnJunctionSurface(listObjA, listObjB):
 
 def returnSurface(listObjA, listObjB, listObjC):
     i=1
-    #fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     totalSurface = 0
     while i < len(listObjA) -1:
 
@@ -139,7 +139,7 @@ def returnSurface(listObjA, listObjB, listObjC):
 
         # Création du triangle
         plt.Polygon(coords, color='blue', alpha=0.5)
-        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
     while i < len(listObjB) -1:
@@ -156,7 +156,7 @@ def returnSurface(listObjA, listObjB, listObjC):
 
         # Création du triangle
         plt.Polygon(coords, color='blue', alpha=0.5)
-        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     i=1
     while i < len(listObjC) -1:
@@ -173,11 +173,76 @@ def returnSurface(listObjA, listObjB, listObjC):
 
         # Création du triangle
         plt.Polygon(coords, color='blue', alpha=0.5)
-        #ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
     # Affichage du triangle
-    #plt.axis('equal')
-    #plt.show()
-    #plt.close()
+    plt.axis('equal')
+    plt.show()
+    plt.close()
+    # print("la surface totale est de :", totalSurface)
+    return totalSurface
+
+def DrawSurface(listObjA, listObjB, listObjC, draw):
+    i=1
+    fig, ax = plt.subplots()
+    totalSurface = 0
+    while i < len(listObjA) -1:
+
+        coords = [listObjA[0], listObjA[i], listObjA[i+1]]
+
+        # Calcul de l'aire du triangle
+        a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
+        b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
+        c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
+        p = (a+b+c)/2
+        surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
+        totalSurface += surface
+
+        # Création du triangle
+        plt.Polygon(coords, color='blue', alpha=0.5)
+        if draw == 'Draw':
+            ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        i+=1
+    i=1
+    while i < len(listObjB) -1:
+
+        coords = [listObjB[0], listObjB[i], listObjB[i+1]]
+
+        # Calcul de l'aire du triangle
+        a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
+        b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
+        c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
+        p = (a+b+c)/2
+        surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
+        totalSurface += surface
+
+        # Création du triangle
+        plt.Polygon(coords, color='blue', alpha=0.5)
+        if draw == 'Draw':
+            ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        i+=1
+    i=1
+    while i < len(listObjC) -1:
+
+        coords = [listObjC[0], listObjC[i], listObjC[i+1]]
+
+        # Calcul de l'aire du triangle
+        a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
+        b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
+        c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
+        p = (a+b+c)/2
+        surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
+        totalSurface += surface
+
+        # Création du triangle
+        plt.Polygon(coords, color='blue', alpha=0.5)
+        if draw == 'Draw':
+            ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
+        i+=1
+    # Affichage du triangle
+    if draw == 'Draw':
+        plt.axis('equal')
+        plt.show()
+        plt.close()
     # print("la surface totale est de :", totalSurface)
     return totalSurface

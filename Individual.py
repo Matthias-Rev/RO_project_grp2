@@ -114,7 +114,7 @@ class Individual_algo_genetic:
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
      
     #define the compacity
-    def compacity(self, listParcels):
+    def compacity(self, listParcels, draw=0):
         listObjet = compacity.recoveryCoords(listParcels)
         #Maj de l'emplacement dans le sens anti-horlogique par partitionnement
         AHSortList = compacity.Partitionning(listObjet)
@@ -144,7 +144,9 @@ class Individual_algo_genetic:
         #Ajout de la jonction entre les deux parties
         junctionList = compacity.returnJunctionSurface(listObjet,AHSortList)
 
-        return (compacity.returnSurface(listObjet,AHSortList,junctionList)/self.m_totalArea)*100
+        compacity_value = (compacity.returnSurface(listObjet,AHSortList,junctionList, draw)/self.m_totalArea)*100
+
+        return compacity_value
     
     #create our individual
     def chooseCandidate(self,init_doc):
