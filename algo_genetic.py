@@ -44,7 +44,7 @@ class Algo_genetic:
         return matrix
 
     def build_matrix_score(self,instances):
-        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation()] for p in instances])#,p.return_dcluster()
+        matrix = np.array([[p.return_totalComp(), p.return_totalProd(), p.return_minDistHabitation(),p.return_dcluster()] for p in instances])
         normalized_scores = np.zeros_like(matrix)
         for i in range(matrix.shape[1]):
             normalized_scores[:,i] = (matrix[:,i] - np.min(matrix[:,i])) / (np.max(matrix[:,i]) - np.min(matrix[:,i]))
@@ -181,7 +181,7 @@ class Algo_genetic:
             matrix_score = self.build_matrix_score(self.m_pop)
             for individual in self.m_pop:
                 current_line =matrix_score[i]
-                score = (current_line[0] *-1) + current_line[1] + (current_line[2]*-1)# - (0.5*current_line[3])
+                score = (current_line[0] *-1) + current_line[1] + (current_line[2]*-1) - (0.5*current_line[3])
                 #score = self.moyenne(individual)
                 self.m_scores.append(score)
                 self.m_total_score += score
