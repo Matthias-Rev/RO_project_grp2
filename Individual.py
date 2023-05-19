@@ -496,9 +496,9 @@ class Individual_algo_genetic:
         for new_parcel in liste_canditate:
             while liste_counter < len(new_parcel):
                 i_counter = 0
-                while 0 <= i_counter < len(new_parcel[liste_counter]):      #move in the list
-                    if new_parcel[liste_counter][i_counter] in seen:        #if already seen
-                        del new_parcel[liste_counter][i_counter]            #delete the parcel
+                while 0 <= i_counter < len(new_parcel[liste_counter]):       #move in the list
+                    if new_parcel[liste_counter][i_counter] in seen:         #if already seen
+                        del new_parcel[liste_counter][i_counter]             #delete the parcel
                         i_counter -= 1
                     if len(new_parcel[liste_counter]) != 0:
                         seen.add(new_parcel[liste_counter][i_counter])
