@@ -1,0 +1,41 @@
+it takes 32.95606350898743 to create population
+=========== 0 generation ===========
+population: 20000
+>0, new best = 0.273
+>0, new best = 0.390
+>0, new best = 0.488
+>0, new best = 0.615
+>0, new best = 0.740
+>0, new best = 0.814
+>0, new best = 0.845
+>0, new best = 0.894
+it takes 36.14743518829346 to make selection_wheel
+it takes 11.871260166168213 to create childs
+=========== 1 generation ===========
+population: 9405
+it takes 8.302155256271362 to make selection_wheel
+it takes 6.4369871616363525 to create childs
+=========== 2 generation ===========
+population: 4433
+it takes 5.23831033706665 to make selection_wheel
+it takes 3.8071236610412598 to create childs
+=========== 3 generation ===========
+population: 2489
+it takes 4.734244346618652 to make selection_wheel
+it takes 2.3738324642181396 to create childs
+=========== 4 generation ===========
+population: 1469
+it takes 3.9790236949920654 to make selection_wheel
+it takes 0.8623397350311279 to create childs
+=========== 5 generation ===========
+population: 893
+it takes 3.5802855491638184 to make selection_wheel
+it takes 0.5719599723815918 to create childs
+Le temps d'exécution est de 121.82 secondes
+(67, 50)
+580  :index best
+[ 11  20  21  28  30  37  41  45  46  52  56  59  61  66  83  86  94 112
+ 113 120 126 131 138 139 142 148 153 155 168 219 232 247 248 251 275 296
+ 300 306 308 317 326 333 341 342 377 378 392 393 407 408 412 417 420 438
+ 445 451 452 463 474 481 482 515 518 530 535 542 544 550 551 557 560 565
+ 573 576 577 578 579 580]

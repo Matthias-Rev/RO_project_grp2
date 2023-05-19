@@ -1,0 +1,15 @@
+it takes 164.40268635749817 to create population
+=========== 0 generation ===========
+population: 100000
+>0, new best = 0.157
+>0, new best = 0.247
+>0, new best = 0.276
+>0, new best = 0.312
+>0, new best = 0.489
+>0, new best = 0.571
+>0, new best = 0.601
+>0, new best = 0.619
+>0, new best = 0.672
+>0, new best = 0.719
+>0, new best = 0.784
+>0, new best = 0.848

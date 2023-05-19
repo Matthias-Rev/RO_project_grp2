@@ -11,8 +11,8 @@ import os
 
 if __name__ == "__main__":
     Instance_Map=Map(constructMap(), costDic)
-    iter=12
-    pop_length=200000
+    iter=15
+    pop_length=100000
 
     def check_prod(indiv,instance_map):
         prod = 0
@@ -86,7 +86,9 @@ if __name__ == "__main__":
     #electre.change_weight(weights)
     ranking = electre.rank_solutions(score_matrix)
     pop[ranking[0]].draw_matrix(draw_name_Elec)
-    Instance_Map.write_solution(liste_pop[ranking[0]].return_clusterList(),draw_name_Elec)
+    Instance_Map.write_solution(pop[ranking[0]].return_clusterList(),draw_name_Elec)
+    pop[ranking[0]].compacity(pop[ranking[0]].return_clusterList(), draw_name_Elec)
+    print(check_prod(pop[ranking[0]],Instance_Map),"elec prod")
 
     #print("Pareto candidate")
     #for indiv in pop:

@@ -1,0 +1,39 @@
+it takes 34.47190856933594 to create population
+=========== 0 generation ===========
+population: 20000
+>0, new best = 0.213
+>0, new best = 0.315
+>0, new best = 0.553
+>0, new best = 0.614
+>0, new best = 0.668
+>0, new best = 0.702
+>0, new best = 0.765
+>0, new best = 0.783
+>0, new best = 0.792
+>0, new best = 0.811
+it takes 35.40895676612854 to make selection_wheel
+it takes 13.932163000106812 to create childs
+=========== 1 generation ===========
+population: 9429
+it takes 9.268926858901978 to make selection_wheel
+it takes 6.656991958618164 to create childs
+=========== 2 generation ===========
+population: 4438
+it takes 4.007675647735596 to make selection_wheel
+it takes 3.825634717941284 to create childs
+=========== 3 generation ===========
+population: 2934
+it takes 4.420818567276001 to make selection_wheel
+it takes 2.0188677310943604 to create childs
+=========== 4 generation ===========
+population: 2164
+it takes 5.002749443054199 to make selection_wheel
+it takes 1.2857317924499512 to create childs
+=========== 5 generation ===========
+population: 1660
+it takes 3.9542856216430664 to make selection_wheel
+it takes 0.9173626899719238 to create childs
+Le temps d'exécution est de 126.09 secondes
+(68, 50)
+1284  :index best
+[1030 1277 1278 1279 1280 1281 1282 1283 1284]
