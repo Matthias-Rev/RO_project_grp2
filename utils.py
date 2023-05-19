@@ -4,9 +4,9 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
-costfile = "./donnes_V3/Cost_map.txt"
-prodfile = "./donnes_V3/Production_map.txt"
-mapfile = "./donnes_V3/Usage_map.txt"
+costfile = "./donnes_V2/Cost_map.txt"
+prodfile = "./donnes_V2/Production_map.txt"
+mapfile = "./donnes_V2/Usage_map.txt"
 
 Parcel_listParcel = []
 costDic = {}
@@ -81,17 +81,17 @@ def costParcelDic(cost):
     else:
         costDic[cost] = 1
 
-def plot_pareto_frontier(points, pareto_indices):
+def plot_pareto_frontier(points, pareto_indices,best_list,pop):
     pareto_points = points[pareto_indices]
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    #ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='blue', label='Frontière de Pareto')
-    #ax.scatter(pareto_points[:, 0], pareto_points[:, 2], pareto_points[:, 1], c='red', label='Frontière de Pareto')
+    #ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='green', label='Pop')
     ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
-    #ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
-    ax.set_xlabel('Compacity')
+    #ax.scatter(best_list[0], best_list[1], best_list[2], c='blue', label='best from pop')
+    #ax.set_xlabel('Compacity')
     ax.set_ylabel('Production')
     ax.set_zlabel('Habitation Dist')
+    ax.set_xlabel('Distance cluster')
 
     # Changer l'échelle des axes
     #ax.set_xlim(0, 0.2)
@@ -110,7 +110,7 @@ def find_pareto_frontier_indices(points):
     for i in range(num_points):
         if is_pareto_efficient[i]:
             current_point = points[i]
-            is_pareto_efficient[is_pareto_efficient] = np.any(points[is_pareto_efficient] <= current_point, axis=1)
+            is_pareto_efficient[is_pareto_efficient] = np.any(points[is_pareto_efficient] >= current_point, axis=1)
 
     pareto_indices = np.where(is_pareto_efficient)[0]
     return pareto_indices

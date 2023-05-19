@@ -541,3 +541,49 @@ class Individual_algo_genetic:
 
     def mean_distance(self, x1, y1, x2, y2):
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    
+
+    def draw_matrix2(self):
+
+        # Define the dimensions of the map
+        list_parcel_linear = [element for row in self.m_GroupCluserList
+                              for element in row]
+        matrix = self.m_map.returnGrid()
+
+        y = len(matrix)
+        x = len(matrix[0])
+
+        # Define the colors for each letter
+        colors = {
+            "R": "grey",
+            "C": "white",
+            "x": "red",
+            " ": "black"
+        }
+
+        # Define the colormap
+        cmap = matplotlib.colors.ListedColormap(list(colors.values()))
+
+        # Create the image array
+        data = np.zeros((y, x), dtype=int)
+        for i in range(y):
+            for j in range(x):
+                char = matrix[i][j].returnType()
+                parcel = matrix[i][j]
+                if char != 'x':
+                    color = list(colors.keys()).index(char) + 1
+                    data[i, j] = color
+                else:
+                    data[i, j] = "4"
+
+        for instane_parcel in list_parcel_linear:
+            data[instane_parcel.returnPosition()[1], instane_parcel.returnPosition()[0]] = 3
+
+        # Display the image
+        plt.figure(figsize=(10, 5))
+        plt.figtext(0, 0,
+                    f"C={self.return_totalComp()},P={self.return_totalProd()},D={self.return_minDistHabitation()},DD={self.return_dcluster()}",
+                    fontsize=10, color='black')
+        plt.imshow(data, cmap=cmap, interpolation="nearest")
+        plt.axis("off")
+        plt.show()
