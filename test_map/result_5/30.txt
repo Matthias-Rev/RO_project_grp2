@@ -1,0 +1,51 @@
+it takes 34.010053873062134 to create population
+=========== 0 generation ===========
+population: 20000
+>0, new best = 0.017
+>0, new best = 0.048
+>0, new best = 0.208
+>0, new best = 0.268
+>0, new best = 0.279
+>0, new best = 0.295
+>0, new best = 0.299
+>0, new best = 0.361
+>0, new best = 0.383
+>0, new best = 0.408
+>0, new best = 0.626
+>0, new best = 0.632
+>0, new best = 0.729
+>0, new best = 0.782
+>0, new best = 0.849
+it takes 33.64025902748108 to make selection_wheel
+it takes 11.76713252067566 to create childs
+=========== 1 generation ===========
+population: 9405
+it takes 5.573515892028809 to make selection_wheel
+it takes 5.5157551765441895 to create childs
+=========== 2 generation ===========
+population: 4566
+it takes 4.20888614654541 to make selection_wheel
+it takes 2.2928175926208496 to create childs
+=========== 3 generation ===========
+population: 3223
+it takes 3.813174247741699 to make selection_wheel
+it takes 2.4839956760406494 to create childs
+=========== 4 generation ===========
+population: 2516
+it takes 4.222895860671997 to make selection_wheel
+it takes 1.3620710372924805 to create childs
+=========== 5 generation ===========
+population: 1885
+it takes 3.608393430709839 to make selection_wheel
+it takes 0.9917144775390625 to create childs
+=========== 6 generation ===========
+population: 1461
+it takes 3.688833236694336 to make selection_wheel
+it takes 0.9600560665130615 to create childs
+Le temps d'exécution est de 120.04 secondes
+(69, 50)
+1111  :index best
+[<parcel.Parcel object at 0x7fb903698b50>, <parcel.Parcel object at 0x7fb903698bb0>, <parcel.Parcel object at 0x7fb9036f0b50>, <parcel.Parcel object at 0x7fb9036f0bb0>, <parcel.Parcel object at 0x7fb9036f0af0>, <parcel.Parcel object at 0x7fb903698af0>, <parcel.Parcel object at 0x7fb903668af0>, <parcel.Parcel object at 0x7fb903698a90>, <parcel.Parcel object at 0x7fb903610a90>, <parcel.Parcel object at 0x7fb9036f0a30>, <parcel.Parcel object at 0x7fb902e14bb0>, <parcel.Parcel object at 0x7fb902e14b50>, <parcel.Parcel object at 0x7fb9036f0a90>]
+[ 476  527  675  733  889 1107 1109 1110 1111]
+(69, 50) elec prod
+[<parcel.Parcel object at 0x7fb903698b50>, <parcel.Parcel object at 0x7fb903698bb0>, <parcel.Parcel object at 0x7fb9036f0b50>, <parcel.Parcel object at 0x7fb9036f0bb0>, <parcel.Parcel object at 0x7fb9036f0af0>, <parcel.Parcel object at 0x7fb903698af0>, <parcel.Parcel object at 0x7fb903668af0>, <parcel.Parcel object at 0x7fb903698a90>, <parcel.Parcel object at 0x7fb903610a90>, <parcel.Parcel object at 0x7fb9036f0a30>, <parcel.Parcel object at 0x7fb902e14bb0>, <parcel.Parcel object at 0x7fb902e14b50>, <parcel.Parcel object at 0x7fb9036f0a90>]

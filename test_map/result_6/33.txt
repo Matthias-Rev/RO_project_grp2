@@ -1,0 +1,46 @@
+it takes 32.37493014335632 to create population
+=========== 0 generation ===========
+population: 20000
+>0, new best = 0.163
+>0, new best = 0.201
+>0, new best = 0.255
+>0, new best = 0.434
+>0, new best = 0.459
+>0, new best = 0.533
+>0, new best = 0.574
+>0, new best = 0.589
+>0, new best = 0.813
+>0, new best = 0.849
+it takes 36.07431983947754 to make selection_wheel
+it takes 15.537638664245605 to create childs
+=========== 1 generation ===========
+population: 9361
+it takes 7.289949655532837 to make selection_wheel
+it takes 6.222410678863525 to create childs
+=========== 2 generation ===========
+population: 4628
+it takes 4.12963604927063 to make selection_wheel
+it takes 2.667975664138794 to create childs
+=========== 3 generation ===========
+population: 3179
+it takes 3.485847234725952 to make selection_wheel
+it takes 1.8674519062042236 to create childs
+=========== 4 generation ===========
+population: 2311
+it takes 3.3625566959381104 to make selection_wheel
+it takes 1.4619710445404053 to create childs
+=========== 5 generation ===========
+population: 1605
+it takes 3.1688971519470215 to make selection_wheel
+it takes 1.0860655307769775 to create childs
+=========== 6 generation ===========
+population: 1160
+it takes 3.2554891109466553 to make selection_wheel
+it takes 0.8332557678222656 to create childs
+Le temps d'exécution est de 123.70 secondes
+(70, 50)
+843  :index best
+[<parcel.Parcel object at 0x7f1dba4e5d50>, <parcel.Parcel object at 0x7f1dba4c5db0>, <parcel.Parcel object at 0x7f1dba4c5cf0>, <parcel.Parcel object at 0x7f1dba4c5e10>, <parcel.Parcel object at 0x7f1dba4c5c90>, <parcel.Parcel object at 0x7f1dba4b1c30>, <parcel.Parcel object at 0x7f1dba4e5db0>, <parcel.Parcel object at 0x7f1dba4b1db0>, <parcel.Parcel object at 0x7f1dba4b1cf0>, <parcel.Parcel object at 0x7f1dba4c5d50>, <parcel.Parcel object at 0x7f1dba4b1c90>, <parcel.Parcel object at 0x7f1dba4e5e10>, <parcel.Parcel object at 0x7f1db9dca710>]
+[415 834 838 839 841 842 843]
+(64, 50) elec prod
+[<parcel.Parcel object at 0x7f1de0bc58d0>, <parcel.Parcel object at 0x7f1de0bc5930>, <parcel.Parcel object at 0x7f1de09fd870>, <parcel.Parcel object at 0x7f1de0bc5990>, <parcel.Parcel object at 0x7f1de0bb1930>, <parcel.Parcel object at 0x7f1de0bb1990>, <parcel.Parcel object at 0x7f1de0bd9990>, <parcel.Parcel object at 0x7f1de0a118d0>, <parcel.Parcel object at 0x7f1de0be9a50>, <parcel.Parcel object at 0x7f1de09fd810>, <parcel.Parcel object at 0x7f1de0a11810>, <parcel.Parcel object at 0x7f1de0bd9ab0>, <parcel.Parcel object at 0x7f1de0bd9930>, <parcel.Parcel object at 0x7f1de0a99540>]
