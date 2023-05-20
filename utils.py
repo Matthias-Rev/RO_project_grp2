@@ -5,8 +5,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 costfile = "./donnes_V2/Cost_map.txt"
-prodfile = "./donnes_V2/Production_map.txt"
-mapfile = "./donnes_V2/Usage_map.txt"
+prodfile = "./donnes_V3/Production_map.txt"
+mapfile = "./donnes_V3/Usage_map.txt"
 
 Parcel_listParcel = []
 costDic = {}
@@ -87,8 +87,6 @@ def plot_pareto_frontier(points, pareto_indices,best_list,pop):
     ax = fig.add_subplot(111, projection='3d')
     #ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='green', label='Pop')
     ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
-    #ax.scatter(best_list[0], best_list[1], best_list[2], c='blue', label='best from pop')
-    #ax.set_xlabel('Compacity')
     ax.set_ylabel('Production')
     ax.set_zlabel('Habitation Dist')
     ax.set_xlabel('Distance cluster')

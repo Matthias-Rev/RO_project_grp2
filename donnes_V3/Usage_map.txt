@@ -1,7 +1,7 @@
          RR   CC                                                                     R                                 R                                             R    
           RR CCCC                                                                   R                                  R                                             R    
            RRRRRR                            C  C C                              RRR                                   R                                             RC   
-                 RRRR                        C  C                               RR                                     R                                             RC   
+                 RRRR                        C      C                           RR                                     R                                             RC   
                     RR                       C  C C                             R                                      R                                             RC   
                      R               CC                                         R                                       R                                            R    
                      RRR             CC                                        RR                                       R                                            R    

@@ -1,18 +1,15 @@
-import random
+import utils
 from algo_genetic import *
-import Individual
 from utils import *
-from PrometheeII import *
+from Elcetree import *
 import time
-import numpy as nps
-from mpl_toolkits.mplot3d import Axes3D
 import datetime
 import os
 
 if __name__ == "__main__":
     Instance_Map=Map(constructMap(), costDic)
-    iter=15
-    pop_length=100000
+    iter=3
+    pop_length=1000
 
     def check_prod(indiv,instance_map):
         prod = 0
@@ -67,7 +64,7 @@ if __name__ == "__main__":
 
     # Empiler les coordonnées pour former une matrice de points
     points = np.column_stack((x, y, z))
-    electre = ELECTRE(weights, concordance_index, discordance_index)
+    electre = ELECTREE(weights, concordance_index, discordance_index)
     pointsN = electre.normalization(points)
     pointsNW = pointsN *np.array([-1, 1, -1])
     pareto_index = utils.find_pareto_frontier_indices(pointsNW)
@@ -92,4 +89,4 @@ if __name__ == "__main__":
 
     #print("Pareto candidate")
     #for indiv in pop:
-    #    indiv.draw_matrix2()
+    #indiv.draw_matrix2()

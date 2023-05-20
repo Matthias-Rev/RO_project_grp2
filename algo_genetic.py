@@ -1,15 +1,8 @@
 import random
 import copy
 import Individual
-import utils
-import map
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import colors
 import bisect
-
-from ElcetreII import *
-from Electre import *
+import numpy as np
 import time
 import multiprocessing
 
