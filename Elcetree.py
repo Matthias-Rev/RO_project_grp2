@@ -52,19 +52,19 @@ class ELECTREE:
         return ranking
 
     def pareto_frontier(self,matrix):
-        # Triez la matrice par ordre décroissant de la deuxième colonne
+        # Sort the matrix
         matrix = np.multiply(matrix,np.array([-1,1,-1,-1]))
         matrix = matrix[np.argsort(-matrix[:, 1])]
 
-        # Initialisez une liste pour stocker les points de la frontière de Pareto
+        # Inizialise list for Pareto frontier
         pareto_points = [matrix[0]]
 
-        # Parcourez la matrice, en ajoutant les points à la liste s'ils sont sur la frontière de Pareto
+        # Read the matrix and take the point on the Pareto frontier 
         for i in range(1, matrix.shape[0]):
             if matrix[i, 2] <= pareto_points[-1][2]:
                 pareto_points.append(matrix[i])
 
-        # Convertissez la liste des points en une matrice numpy
+        # Convert list on numpy matrix
         pareto_frontier = np.array(pareto_points)
         pareto_frontier = np.multiply(pareto_frontier,np.array([-1,1,-1,-1]))
 

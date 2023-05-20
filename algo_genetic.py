@@ -59,12 +59,14 @@ class Algo_genetic:
         indiv_map.chooseCandidate(m_initial_doc_init)
         return indiv_map
     
+    #run faster selection_wheel function with created process
     def process_chunk(self, chunk_size):
         chunk_results = []
         for _ in range(chunk_size):
             chunk_results.append(self.selection_wheel())
         return chunk_results
     
+    #creat mutliple process as possible for run faster function
     def run_parallel(self):
         chunk_size = self.m_n_pop // self.num_processes
         with multiprocessing.Pool(self.num_processes) as pool:

@@ -41,6 +41,7 @@ def readFile(f):
         elif f == prodfile:
             print("Error : costfile_path wrong")
 
+# read data of given  mapfile
 def readMapFile(f):
     try:
         with open(f, "r") as file:
@@ -64,7 +65,8 @@ def readMapFile(f):
     except FileNotFoundError:
         if f == mapfile:
             print("Error : mapfile_path wrong")
-    
+
+# construct map's object
 def constructMap():
     Parcel_listParcel = []
     costDic = {}
@@ -72,15 +74,18 @@ def constructMap():
     readFile(prodfile)
     return readMapFile(mapfile)
 
+# return number of parcel on the map
 def returnNbParcel():
     return len(Parcel_listParcel)
 
+# identify how much parcel with cost n
 def costParcelDic(cost):
     if cost in costDic.keys():
         costDic[cost] +=1
     else:
         costDic[cost] = 1
 
+# creat pareto frontier
 def plot_pareto_frontier(points, pareto_indices,best_list,pop):
     pareto_points = points[pareto_indices]
     fig = plt.figure()

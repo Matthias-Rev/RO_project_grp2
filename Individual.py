@@ -33,10 +33,12 @@ class Individual_algo_genetic:
         self.m_dic_pos = {}
 
     def initiate_Cost_Dic(self, dic_init):
+        #Initialize the object in the curent map
         self.m_dic_pos = dic_init
         return 0
 
     def change_cluster(self, parcel):
+        #Modify cluster
         self.m_CluserList = parcel
         return 0
 
@@ -123,35 +125,41 @@ class Individual_algo_genetic:
      
     #define the compacity
     def compacity(self, listParcels, draw=0):
+
+        # return objects in lists
         listObjet = compacity.recoveryCoords(listParcels)
-        # Maj de l'emplacement dans le sens anti-horlogique par partitionnement
+
+        # Shift location counterclockwise by partitioning
         AHSortList = compacity.Partitionning(listObjet)
 
+        # Delete duble object
         listObjet = set(listObjet)
         AHSortList = set(AHSortList)
         listObjet.difference_update(AHSortList)
         listObjet = list(listObjet)
         AHSortList = list(AHSortList)
 
-        # Tri des listes par ligne
+        # Sort line by line
         listObjet = compacity.returnSortLineList(listObjet)
 
+        # recovery list for AHSortList
         if len(AHSortList) > 0:
             recoveryElem = AHSortList[0]
             AHSortList[0] = listObjet[0]
             AHSortList.append(recoveryElem)
         AHSortList = compacity.returnSortLineList(AHSortList)
 
-        # Tri des partitions de liste par colones
+        # Sort partition'lists by colon
         listObjet = compacity.returnPartialColSort2(listObjet, 'L')
         AHSortList = compacity.returnPartialColSort2(AHSortList, 'R')
 
         compacity.returnVisitedPoint(listObjet)
         compacity.returnVisitedPoint(AHSortList)
 
-        # Ajout de la jonction entre les deux parties
+        # Add junction between partitions
         junctionList = compacity.returnJunctionSurface(listObjet, AHSortList)
 
+        # Compute compacity & draw
         compacity_value = (compacity.DrawSurface(listObjet,AHSortList,junctionList,draw)/self.m_totalArea)*100
 
         return compacity_value
@@ -206,7 +214,7 @@ class Individual_algo_genetic:
         return i, j
 
     def choosePosition(self):
-
+    # take object near of random object yet in listParcel for create cluster
         allCluster = []
         i = 0
 
@@ -243,7 +251,7 @@ class Individual_algo_genetic:
         return 0
 
     def draw_matrix(self, name):
-
+    #Draw the map
         # Define the dimensions of the map
         list_parcel_linear = [element for row in self.m_GroupCluserList
                               for element in row]
@@ -379,6 +387,7 @@ class Individual_algo_genetic:
             random_parcel_position = random_parcel.returnPosition()
             random_parcel_y = random.choice([-1, 1])
             random_parcel_x = random.choice([1, -1])
+            print(self.map.returnWidth(), self.map.returnHeigth())
             if random_parcel_position[0] + random_parcel_x < 170 and random_parcel_position[1] + random_parcel_y < 70:
                 out_of_range = False
         return random_parcel_position, random_parcel_x, random_parcel_y, index_random_parcel

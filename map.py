@@ -1,4 +1,6 @@
 import numpy as np
+
+#Map object correspond to the given file of the representation map
 class Map:
     def __init__(self, grid, dictionnary):
         self.m_grid = grid
