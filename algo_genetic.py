@@ -109,19 +109,17 @@ class Algo_genetic:
                 c2.initiate_Cost_Dic(m_initial_doc_init)
                 if min_cluster == 1:
                     min_parcel = min(len(parent_tupple1),len(parent_tupple2))
-                    cut_gene_pt = random.randint(1, min_parcel-1)
                     c2.changeParcel(p1,p2,cut_gene_pt,parent_tupple2[:cut_gene_pt],parent_tupple1[cut_gene_pt:])
                 else:
-                    cut_gene_cluster = random.randint(1,min_cluster-1)
                     c2.change_clusterParcel(parent_cluster2[:cut_gene_cluster],parent_cluster1[cut_gene_cluster:])
                 return_list.append(c2)
 
+        return_child_list = []
         #if a children is not valid, we kill it
         for child in return_list:
-            cost = child.return_totalCost()
-            if cost > 50:
-                del return_list[return_list.index(child)]
-        return return_list
+            if 40 < child.return_totalCost() <= 50:
+                return_child_list.append(child)
+        return return_child_list
 
     #main function
     def genetic_algorithm(self):
@@ -131,6 +129,7 @@ class Algo_genetic:
         pool = multiprocessing.Pool(self.num_processes)
         self.m_pop = pool.map(self.create_population, range(self.m_n_pop))  #use multi process to create our first gene.
         end = time.time()
+        
         print(f"it takes {end-begin} to create population")
         best_eval = 0                                                       #initiate the best score
 
@@ -172,6 +171,7 @@ class Algo_genetic:
                         continue
                     self.mutation(c, self.m_r_mut)                        #mutate a child
                     children.append(c)
+                    
             end = time.time()
             print(f"it takes {end-begin} to create childs")
             

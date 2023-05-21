@@ -86,24 +86,22 @@ def costParcelDic(cost):
         costDic[cost] = 1
 
 # creat pareto frontier
-def plot_pareto_frontier(points, pareto_indices,best_list,pop):
+def plot_pareto_frontier(points, pareto_indices):
     pareto_points = points[pareto_indices]
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    #ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='green', label='Pop')
     ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
+    ax.set_xlabel('Compacity')
     ax.set_ylabel('Production')
     ax.set_zlabel('Habitation Dist')
-    ax.set_xlabel('Distance cluster')
 
     # Changer l'échelle des axes
-    #ax.set_xlim(0, 0.2)
-    #ax.set_ylim(0.2, 0.6)
-    #ax.set_zlim(0, 0.8)
+    ax.set_ylim(0, 100)
 
     plt.legend()
-    #plt.show()
-    plt.savefig("./result/pareto.png")
+    plt.show()
+    #plt.savefig("./result/pareto.png")
+
 
 
 def find_pareto_frontier_indices(points):

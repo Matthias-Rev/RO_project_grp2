@@ -84,6 +84,9 @@ class Individual_algo_genetic:
             self.m_totalCost += parcel.returnCost()
             self.m_totalProd += parcel.returnProd()
 
+        if self.m_totalCost > 50:
+            return 0
+
         if self.m_totalCost < 50:
             self.list_choice()
 
@@ -93,6 +96,7 @@ class Individual_algo_genetic:
         self.m_distance_cluster = self.distance_cluster()
 
         return 0
+
 
     def changeParcel(self, p1, p2, cut_gene, new_parcel1=[], new_parcel2=[]):
 
@@ -110,18 +114,30 @@ class Individual_algo_genetic:
             self.m_totalCost += parcel.returnCost()
             self.m_totalProd += parcel.returnProd()
 
-        while cut_gene + 1 < len(p1.return_clusterList()) and self.m_totalCost + p1.return_clusterList()[
-            cut_gene + 1].returnCost() <= 50:
-            parcel_add = p1.return_clusterList()[cut_gene + 1]
-            self.m_GroupCluserList[0].insert(0, parcel_add)
-            self.m_totalProd += parcel_add.returnProd()
-            self.m_totalCost += parcel_add.returnCost()
-            self.m_dic_pos[str(parcel_add.returnCost())] -= 1
-            cut_gene += 1
-        
+        if self.m_totalCost > 50:
+            self.m_to_be_killed = 1
+            return 0
+
+
+        for parcel_p1 in p1.return_clusterList()[cut_gene:]:
+            if self.m_totalCost + parcel_p1.returnCost() <= 50 :
+                self.m_GroupCluserList[0].insert(0, parcel_p1)
+                self.m_totalProd += parcel_p1.returnProd()
+                self.m_totalCost += parcel_p1.returnCost()
+                self.m_dic_pos[str(parcel_p1.returnCost())] -= 1
+        for parcel_p2 in p2.return_clusterList()[:cut_gene]:
+            if self.m_totalCost + parcel_p2.returnCost() <= 50 :
+                self.m_GroupCluserList[1].insert(0, parcel_p2)
+                self.m_totalProd += parcel_p2.returnProd()
+                self.m_totalCost += parcel_p2.returnCost()
+                self.m_dic_pos[str(parcel_p2.returnCost())] -= 1
+
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
+        self.m_distance_cluster = self.distance_cluster()
+
+        return 0
      
     #define the compacity
     def compacity(self, listParcels, draw=0):
@@ -292,7 +308,7 @@ class Individual_algo_genetic:
         # Display the image
         plt.figure(figsize=(10, 5))
         plt.figtext(0, 0,
-                    f"C={self.return_totalComp()},P={self.return_totalProd()},D={self.return_minDistHabitation()},DD={self.return_dcluster()}",
+                    f"C={self.return_totalComp()},P={self.return_totalProd()},D={self.return_minDistHabitation()},DD={self.return_dcluster()}, Cost={self.return_totalCost()}",
                     fontsize=10, color='black')
         plt.imshow(data, cmap=cmap, interpolation="nearest")
         plt.axis("off")
@@ -361,13 +377,13 @@ class Individual_algo_genetic:
                 if position_init[0] > 1:
                     down = (position_init[0] - 1, position_init[1])
                     liste_possible.append(down)
-                if position_init[0] < 168:
+                if position_init[0] < self.m_map.returnWidth()-2:
                     up = (position_init[0] + 1, position_init[1])
                     liste_possible.append(up)
                 if position_init[1] > 1:
                     left = (position_init[0], position_init[1] - 1)
                     liste_possible.append(left)
-                if position_init[1] < 68:
+                if position_init[1] < self.m_map.returnHeigth()-2:
                     right = (position_init[0], position_init[1] + 1)
                     liste_possible.append(right)
                 for try_position in liste_possible:
@@ -378,8 +394,8 @@ class Individual_algo_genetic:
                         self.m_totalCost += parcel_candidate.returnCost()
                         self.m_totalProd += parcel_candidate.returnProd()
                         self.m_GroupCluserList[self.m_GroupCluserList.index(cluster_list)].append(parcel_candidate)
-                        return 0
         return 0
+
 
     def random_choice(self):
         out_of_range = True
@@ -390,7 +406,7 @@ class Individual_algo_genetic:
             random_parcel_position = random_parcel.returnPosition()
             random_parcel_y = random.choice([-1, 1])
             random_parcel_x = random.choice([1, -1])
-            if random_parcel_position[0] + random_parcel_x < 170 and random_parcel_position[1] + random_parcel_y < 70:
+            if random_parcel_position[0] + random_parcel_x < self.m_map.returnWidth() and random_parcel_position[1] + random_parcel_y < self.m_map.returnHeigth():
                 out_of_range = False
         return random_parcel_position, random_parcel_x, random_parcel_y, index_random_parcel
 
@@ -402,10 +418,16 @@ class Individual_algo_genetic:
         list_cluster = self.return_cluserListGroup()
         list_of_parcels = random.choice(self.m_GroupCluserList)
         index_list = self.m_GroupCluserList.index(list_of_parcels)
+        old_Prod = copy.deepcopy(self.m_totalProd)
+        old_Cost = copy.deepcopy(self.m_totalCost)
+        old_list = copy.deepcopy(self.m_CluserList)
 
         parcel_moved_safely = False
         while parcel_moved_safely == False:
             debug = debug + 1
+            self.m_totalCost = old_Cost
+            self.m_totalProd = old_Prod
+            self.m_CluserList = old_list
             if debug == 20:
                 #if the mutation is not possible, we break the mutation procedure
                 state = BREAK
@@ -430,7 +452,6 @@ class Individual_algo_genetic:
                     self.m_dic_pos[str(parcel.returnCost())] = 1
                 self.m_totalCost -= parcel.returnCost()
                 self.m_totalProd -= parcel.returnProd()
-
                 #check if the new parcel is valid (not already taken, not a house/route)
                 if ((parcelCandidate.returnType() == ' ' and parcelCandidate not in list_of_parcels) and str(
                         parcelCandidate.returnCost()) in self.m_dic_pos.keys()
@@ -452,6 +473,9 @@ class Individual_algo_genetic:
             list_cluster[index_list] = liste_new_parcel
             self.change_clusterSingleGroup(list_cluster)
             self.change_clusterList()
+            self.m_minDistHabitation = self.moyenne_min_dist_parcel()
+            self.m_totalCompacity = self.compacity(self.m_CluserList)
+            self.m_distance_cluster = self.distance_cluster()
         return 0
 
     # ALL RETURN_FUNCTION

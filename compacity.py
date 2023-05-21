@@ -237,6 +237,3 @@ def returnVisitedPoint(listObj):
         listPoint.append(listObj[-1])
     return listPoint
 
-
-
-
