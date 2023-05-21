@@ -166,7 +166,7 @@ class Individual_algo_genetic:
     
     #create our individual
     def chooseCandidate(self,init_doc):
-
+        # take dictionary of different parcel
         self.initiate_Cost_Dic(init_doc)
         h = self.m_map.returnHeigth()
         w = self.m_map.returnWidth()
@@ -174,7 +174,9 @@ class Individual_algo_genetic:
         if len(self.m_listParcel) == 0:
             self.m_listParcel = []
 
+        # define how many cluster we could have
         randomNumber = random.randint(1, 5)
+        # check if we are under stress
         while self.m_totalCost + int(next(iter(self.m_dic_pos))) <= 50 and len(self.m_listParcel) < randomNumber:
             candidateOk = False
             while not candidateOk:
@@ -191,15 +193,16 @@ class Individual_algo_genetic:
                     i = random.randint(i_prime, i_prime2 - 1)
                     j = random.randint(j_prime, j_prime2 - 1)
                 randomCandidate = self.m_map.returnObject(i, j)
+                # check if we can considering the potential candidate 
                 if randomCandidate.returnType() == ' ' and str(
                         randomCandidate.returnCost()) in self.m_dic_pos.keys() and self.putParcel(randomCandidate):
                     candidateOk = True
                     self.m_listParcel.append(randomCandidate)
+        # go to create cluster function
         self.choosePosition()
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_distance_cluster = self.distance_cluster()
-        # print(f"valeur production = {self.m_totalProd}, valeur cout = {self.m_totalCost}")
         return self.m_CluserList
 
     def in_grid(self, i, j, h, w):
@@ -387,7 +390,6 @@ class Individual_algo_genetic:
             random_parcel_position = random_parcel.returnPosition()
             random_parcel_y = random.choice([-1, 1])
             random_parcel_x = random.choice([1, -1])
-            print(self.map.returnWidth(), self.map.returnHeigth())
             if random_parcel_position[0] + random_parcel_x < 170 and random_parcel_position[1] + random_parcel_y < 70:
                 out_of_range = False
         return random_parcel_position, random_parcel_x, random_parcel_y, index_random_parcel

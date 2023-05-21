@@ -26,7 +26,7 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
 
         coords = [listObjA[0], listObjA[i], listObjA[i+1]]
 
-        # Calcul de l'aire du triangle
+        # Calculation of the area of a triangle
         a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
@@ -34,7 +34,7 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
         surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
         totalSurface += surface
 
-        # Création du triangle
+        # Creating the triangle
         if draw:
             plt.Polygon(coords, color='blue', alpha=0.5)
             ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
@@ -44,7 +44,7 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
 
         coords = [listObjB[0], listObjB[i], listObjB[i+1]]
 
-        # Calcul de l'aire du triangle
+        # Calculation of the area of a triangle
         a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
@@ -52,7 +52,7 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
         surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
         totalSurface += surface
 
-        # Création du triangle
+        # Creating the triangle
         if draw:
             plt.Polygon(coords, color='blue', alpha=0.5)
             ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
@@ -62,7 +62,7 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
 
         coords = [listObjC[0], listObjC[i], listObjC[i+1]]
 
-        # Calcul de l'aire du triangle
+        # Calculation of the area of a triangle
         a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
@@ -70,12 +70,12 @@ def DrawSurface(listObjA, listObjB, listObjC, draw):
         surface = np.sqrt(abs(p*(p-a)*(p-b)*(p-c)))
         totalSurface += surface
 
-        # Création du triangle
+        # Creating the triangle
         if draw:
             plt.Polygon(coords, color='blue', alpha=0.5)
             ax.add_patch(plt.Polygon(coords, color='blue', alpha=0.5))
         i+=1
-    # Affichage du triangle
+    # Show triangle
     if draw:
         plt.axis('equal')
         plt.savefig(f"{draw}_compacity.png")
@@ -89,7 +89,7 @@ def returnSurface(listObjA, listObjB, listObjC):
 
         coords = [listObjA[0], listObjA[i], listObjA[i+1]]
 
-        # Calcul de l'aire du triangle
+        # Calculation of the area of a triangle
         a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
@@ -103,7 +103,7 @@ def returnSurface(listObjA, listObjB, listObjC):
 
         coords = [listObjB[0], listObjB[i], listObjB[i+1]]
 
-        # Calcul de l'aire du triangle
+        # Calculation of the area of a triangle
         a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
@@ -117,7 +117,7 @@ def returnSurface(listObjA, listObjB, listObjC):
 
         coords = [listObjC[0], listObjC[i], listObjC[i+1]]
 
-        # Calcul de l'aire du triangle
+        # Calculation of the area of a triangle
         a = np.linalg.norm(np.array(coords[0]) - np.array(coords[1]))
         b = np.linalg.norm(np.array(coords[1]) - np.array(coords[2]))
         c = np.linalg.norm(np.array(coords[2]) - np.array(coords[0]))
