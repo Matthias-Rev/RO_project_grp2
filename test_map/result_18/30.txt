@@ -1,0 +1,55 @@
+it takes 31.413036346435547 to create population
+=========== 0 generation ===========
+population: 20000
+>0, new best = 0.080
+>0, new best = 0.218
+>0, new best = 0.349
+>0, new best = 0.392
+>0, new best = 0.393
+>0, new best = 0.403
+>0, new best = 0.520
+>0, new best = 0.524
+>0, new best = 0.584
+>0, new best = 0.624
+>0, new best = 0.676
+>0, new best = 0.735
+>0, new best = 0.739
+>0, new best = 0.804
+it takes 33.93970513343811 to make selection_wheel
+it takes 12.118443489074707 to create childs
+=========== 1 generation ===========
+population: 9352
+it takes 8.12503695487976 to make selection_wheel
+it takes 6.370458364486694 to create childs
+=========== 2 generation ===========
+population: 4460
+it takes 4.356088638305664 to make selection_wheel
+it takes 2.5425891876220703 to create childs
+=========== 3 generation ===========
+population: 3115
+it takes 6.069656133651733 to make selection_wheel
+it takes 2.3418803215026855 to create childs
+=========== 4 generation ===========
+population: 1719
+>4, new best = 0.825
+it takes 3.5083374977111816 to make selection_wheel
+it takes 1.2320711612701416 to create childs
+=========== 5 generation ===========
+population: 833
+>5, new best = 0.837
+it takes 4.048936367034912 to make selection_wheel
+it takes 0.5534663200378418 to create childs
+=========== 6 generation ===========
+population: 493
+it takes 3.9056239128112793 to make selection_wheel
+it takes 0.2845582962036133 to create childs
+Le temps d'exécution est de 121.81 secondes
+(83, 72)
+312  :index best
+[(19, 16), (18, 16), (19, 15), (19, 17), (17, 16), (18, 15), (22, 10), (25, 9), (25, 10), (24, 9), (24, 11), (23, 10), (25, 11), (24, 8), (26, 11)]
+[  2   4  22  23  24  27  29  35  36  53  59  84  88  91  92 102 103 112
+ 140 141 155 163 165 166 168 170 179 180 208 219 220 229 233 235 237 244
+ 248 252 261 275 279 281 283 287 298 300 302 303 304 305 306 307 308 309
+ 310 311 312]
+(73, 66) elec prod
+[(19, 16), (18, 16), (19, 15), (19, 17), (17, 22), (18, 21), (17, 21), (16, 22), (18, 16), (19, 15), (18, 15), (19, 14), (17, 16), (13, 34)]

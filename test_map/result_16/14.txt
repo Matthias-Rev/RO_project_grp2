@@ -1,0 +1,48 @@
+it takes 33.88836717605591 to create population
+=========== 0 generation ===========
+population: 20000
+>0, new best = 0.165
+>0, new best = 0.260
+>0, new best = 0.443
+>0, new best = 0.445
+>0, new best = 0.458
+>0, new best = 0.484
+>0, new best = 0.528
+>0, new best = 0.633
+>0, new best = 0.670
+>0, new best = 0.732
+>0, new best = 0.819
+>0, new best = 0.826
+it takes 34.43391442298889 to make selection_wheel
+it takes 13.979377269744873 to create childs
+=========== 1 generation ===========
+population: 9433
+it takes 6.962174415588379 to make selection_wheel
+it takes 6.311298847198486 to create childs
+=========== 2 generation ===========
+population: 4543
+it takes 4.715875864028931 to make selection_wheel
+it takes 3.6825175285339355 to create childs
+=========== 3 generation ===========
+population: 3222
+it takes 4.857491970062256 to make selection_wheel
+it takes 2.4332118034362793 to create childs
+=========== 4 generation ===========
+population: 2378
+it takes 4.904665470123291 to make selection_wheel
+it takes 1.35927152633667 to create childs
+=========== 5 generation ===========
+population: 1729
+it takes 4.315315008163452 to make selection_wheel
+it takes 1.250354290008545 to create childs
+=========== 6 generation ===========
+population: 1330
+it takes 5.1225221157073975 to make selection_wheel
+it takes 0.7519261837005615 to create childs
+Le temps d'exécution est de 129.89 secondes
+(72, 50)
+982  :index best
+[(17, 52), (18, 53), (18, 54), (19, 53), (19, 55), (19, 52), (17, 54), (18, 52), (19, 51), (20, 50), (17, 53), (19, 54), (18, 51), (18, 55), (16, 53), (18, 56)]
+[184 883 975 976 977 978 979 980 981 982]
+(67, 50) elec prod
+[(67, 57), (67, 56), (67, 55), (68, 55), (69, 54), (68, 54), (68, 56), (69, 55), (70, 53), (70, 55), (70, 54), (70, 59), (71, 54), (73, 60)]

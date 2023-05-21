@@ -5,8 +5,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 costfile = "./donnes_V2/Cost_map.txt"
-prodfile = "./donnes_V3/Production_map.txt"
-mapfile = "./donnes_V3/Usage_map.txt"
+prodfile = "./donnes_V2/Production_map.txt"
+mapfile = "./donnes_V2/Usage_map.txt"
 
 Parcel_listParcel = []
 costDic = {}
