@@ -69,6 +69,7 @@ class Individual_algo_genetic:
         self.m_totalCost = 0
         self.m_totalProd = 0
 
+        #check if there are duplicate parcels in the parent list
         parcel_u, parcel2_u = self.check_unicity_Group(new_parcel1, new_parcel2)
 
         parcel1 = [element for row in parcel_u for element in row]
@@ -77,6 +78,7 @@ class Individual_algo_genetic:
         self.change_cluster(parcel1 + parcel2)
         self.change_clusterGroup(parcel_u, parcel2_u, True)
 
+        #build the arguments children
         for p_parcel in self.m_CluserList:
             x, y = p_parcel.returnPosition()
             parcel = self.m_map.returnObject(y, x)
@@ -84,9 +86,11 @@ class Individual_algo_genetic:
             self.m_totalCost += parcel.returnCost()
             self.m_totalProd += parcel.returnProd()
 
+        #kill the child if its cost is over 50 cost
         if self.m_totalCost > 50:
             return 0
 
+        #add parents parcels if the cost is under 50
         if self.m_totalCost < 50:
             self.list_choice()
 
@@ -99,14 +103,17 @@ class Individual_algo_genetic:
 
 
     def changeParcel(self, p1, p2, cut_gene, new_parcel1=[], new_parcel2=[]):
+        #if there only one cluster, and many parcels
 
         self.m_totalCost = 0
         self.m_totalProd = 0
 
+        #check if there are duplicate parcels in the parent list
         parcel1, parcel2 = self.check_unicity(new_parcel1, new_parcel2)
         self.change_cluster(parcel1 + parcel2)
         self.change_clusterGroup(parcel1, parcel2, False)
 
+        #build the arguments children
         for p_parcel in self.m_CluserList:
             x, y = p_parcel.returnPosition()
             parcel = self.m_map.returnObject(y, x)
@@ -114,11 +121,12 @@ class Individual_algo_genetic:
             self.m_totalCost += parcel.returnCost()
             self.m_totalProd += parcel.returnProd()
 
+        #kill the child if its cost is over 50 cost
         if self.m_totalCost > 50:
             self.m_to_be_killed = 1
             return 0
 
-
+        #add parents parcels if the cost is under 50
         for parcel_p1 in p1.return_clusterList()[cut_gene:]:
             if self.m_totalCost + parcel_p1.returnCost() <= 50 :
                 self.m_GroupCluserList[0].insert(0, parcel_p1)
@@ -132,6 +140,7 @@ class Individual_algo_genetic:
                 self.m_totalCost += parcel_p2.returnCost()
                 self.m_dic_pos[str(parcel_p2.returnCost())] -= 1
 
+        #change the arguments
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
@@ -271,7 +280,6 @@ class Individual_algo_genetic:
 
     def draw_matrix(self, name):
     #Draw the map
-        # Define the dimensions of the map
         list_parcel_linear = [element for row in self.m_GroupCluserList
                               for element in row]
         matrix = self.m_map.returnGrid()
@@ -279,7 +287,6 @@ class Individual_algo_genetic:
         y = len(matrix)
         x = len(matrix[0])
 
-        # Define the colors for each letter
         colors = {
             "R": "grey",
             "C": "white",
@@ -287,10 +294,8 @@ class Individual_algo_genetic:
             " ": "black"
         }
 
-        # Define the colormap
         cmap = matplotlib.colors.ListedColormap(list(colors.values()))
 
-        # Create the image array
         data = np.zeros((y, x), dtype=int)
         for i in range(y):
             for j in range(x):
@@ -305,14 +310,12 @@ class Individual_algo_genetic:
         for instane_parcel in list_parcel_linear:
             data[instane_parcel.returnPosition()[1], instane_parcel.returnPosition()[0]] = 3
 
-        # Display the image
         plt.figure(figsize=(10, 5))
         plt.figtext(0, 0,
                     f"C={self.return_totalComp()},P={self.return_totalProd()},D={self.return_minDistHabitation()},DD={self.return_dcluster()}, Cost={self.return_totalCost()}",
                     fontsize=10, color='black')
         plt.imshow(data, cmap=cmap, interpolation="nearest")
         plt.axis("off")
-        #plt.show()
         plt.savefig(f"{name}.png")
 
     def min_dist_parcel(self, group_taken_parcel):
@@ -332,13 +335,9 @@ class Individual_algo_genetic:
         else:
             distance = 0
 
-        return distance  # / occur_nb
+        return distance
 
-    # Calculate the average score of an individual
-    def moyenne(self):
-        moy = (1 * self.return_totalComp() + 1 * self.return_minDistHabitation() + 2 * self.return_totalProd())
-        return moy
-
+    #calculate the mean distance between the clusters and the habitation
     def moyenne_min_dist_parcel(self):
         coeff_dist = []
         for p in self.m_GroupCluserList:
@@ -358,20 +357,12 @@ class Individual_algo_genetic:
             # if constraints are not met
         return False
 
-    def check_map(self):
-        count = 0
-        count_S = 0
-        for row in self.m_map.returnGrid():
-            for i in row:
-                if i.returnType() not in ["R", "C", "x"]:
-                    count = count + 1
-                if i.returnPutState() == False:
-                    count_S += 1
-        return count, count_S
-
     def list_choice(self):
+        #check if we can add a parcel to a uncomplete cost parcel,
+        #we take parcels that are neighbours with the studied parcel
         for cluster_list in self.m_GroupCluserList:
             for parcel in cluster_list:
+                #check if the parcel is near a border
                 liste_possible = []
                 position_init = parcel.returnPosition()
                 if position_init[0] > 1:
@@ -395,20 +386,6 @@ class Individual_algo_genetic:
                         self.m_totalProd += parcel_candidate.returnProd()
                         self.m_GroupCluserList[self.m_GroupCluserList.index(cluster_list)].append(parcel_candidate)
         return 0
-
-
-    def random_choice(self):
-        out_of_range = True
-        while out_of_range == True:
-            random_list = random.choice(self.m_GroupCluserList)
-            random_parcel = random.choice(random_list)
-            index_random_parcel = self.m_GroupCluserList.index(random_list)
-            random_parcel_position = random_parcel.returnPosition()
-            random_parcel_y = random.choice([-1, 1])
-            random_parcel_x = random.choice([1, -1])
-            if random_parcel_position[0] + random_parcel_x < self.m_map.returnWidth() and random_parcel_position[1] + random_parcel_y < self.m_map.returnHeigth():
-                out_of_range = False
-        return random_parcel_position, random_parcel_x, random_parcel_y, index_random_parcel
 
     def shift_positions(self):
         #shift the cluster (mutation)
@@ -438,7 +415,7 @@ class Individual_algo_genetic:
             for parcel in list_of_parcels:
                 col, row = parcel.returnPosition()
 
-                #chack the border limit
+                #check the border limit
                 if (i + col) < self.m_map.returnWidth() - 1 and (i + col) >= 0:
                     col += i
                 if (j + row) < self.m_map.returnHeigth() - 1 and (j + row) >= 0:
@@ -452,6 +429,7 @@ class Individual_algo_genetic:
                     self.m_dic_pos[str(parcel.returnCost())] = 1
                 self.m_totalCost -= parcel.returnCost()
                 self.m_totalProd -= parcel.returnProd()
+
                 #check if the new parcel is valid (not already taken, not a house/route)
                 if ((parcelCandidate.returnType() == ' ' and parcelCandidate not in list_of_parcels) and str(
                         parcelCandidate.returnCost()) in self.m_dic_pos.keys()
@@ -524,7 +502,7 @@ class Individual_algo_genetic:
         return liste_candidat[0], liste_candidat[1]
 
     def check_unicity_Group(self, new_parcel1, new_parcel2):
-        #check if there are duplicate parcel in the parents cluster list
+        #check if there are duplicate parcels in the parents cluster list
         seen = set()
         liste_counter = 0
         liste_canditate = [new_parcel1, new_parcel2]
@@ -574,51 +552,6 @@ class Individual_algo_genetic:
 
         return distance_clusters / (num_clusters * (num_clusters - 1) / 2)
 
+    #calculate the distance btw points
     def mean_distance(self, x1, y1, x2, y2):
         return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-    
-
-    def draw_matrix2(self):
-
-        # Define the dimensions of the map
-        list_parcel_linear = [element for row in self.m_GroupCluserList
-                              for element in row]
-        matrix = self.m_map.returnGrid()
-
-        y = len(matrix)
-        x = len(matrix[0])
-
-        # Define the colors for each letter
-        colors = {
-            "R": "grey",
-            "C": "white",
-            "x": "red",
-            " ": "black"
-        }
-
-        # Define the colormap
-        cmap = matplotlib.colors.ListedColormap(list(colors.values()))
-
-        # Create the image array
-        data = np.zeros((y, x), dtype=int)
-        for i in range(y):
-            for j in range(x):
-                char = matrix[i][j].returnType()
-                parcel = matrix[i][j]
-                if char != 'x':
-                    color = list(colors.keys()).index(char) + 1
-                    data[i, j] = color
-                else:
-                    data[i, j] = "4"
-
-        for instane_parcel in list_parcel_linear:
-            data[instane_parcel.returnPosition()[1], instane_parcel.returnPosition()[0]] = 3
-
-        # Display the image
-        plt.figure(figsize=(10, 5))
-        plt.figtext(0, 0,
-                    f"C={self.return_totalComp()},P={self.return_totalProd()},D={self.return_minDistHabitation()},DD={self.return_dcluster()}",
-                    fontsize=10, color='black')
-        plt.imshow(data, cmap=cmap, interpolation="nearest")
-        plt.axis("off")
-        plt.show()

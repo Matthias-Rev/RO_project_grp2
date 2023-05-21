@@ -85,7 +85,7 @@ def costParcelDic(cost):
     else:
         costDic[cost] = 1
 
-# creat pareto frontier
+# create pareto frontier
 def plot_pareto_frontier(points, pareto_indices):
     pareto_points = points[pareto_indices]
     fig = plt.figure()
@@ -95,12 +95,10 @@ def plot_pareto_frontier(points, pareto_indices):
     ax.set_ylabel('Production')
     ax.set_zlabel('Habitation Dist')
 
-    # Changer l'échelle des axes
     ax.set_ylim(0, 100)
 
     plt.legend()
-    plt.show()
-    #plt.savefig("./result/pareto.png")
+    plt.savefig("./result/pareto.png")
 
 
 
