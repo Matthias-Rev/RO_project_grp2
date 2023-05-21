@@ -327,7 +327,7 @@ class Individual_algo_genetic:
                 for h in hLine:
                     distance = math.sqrt((h[0] - p.returnPosition()[1]) ** 2 + (h[1] - p.returnPosition()[0]) ** 2)
                     distances_p.append(distance)
-            min_distances.append(min(distances_p))  # tester max
+            min_distances.append(min(distances_p))
 
         distance = 0
         if len(min_distances) > 0:

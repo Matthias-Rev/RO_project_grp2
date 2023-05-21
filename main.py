@@ -27,7 +27,7 @@ if __name__ == "__main__":
     iter=7
     pop_length=20000
     liste_electre_final = []
-    for _ in range(14):
+    for _ in range(2):
 
         #call genetic algorithm
         start_time = time.time()
@@ -39,8 +39,8 @@ if __name__ == "__main__":
         print(f"Le temps d'exécution est de {elapsed_time:.2f} secondes")
     
         #weight for Electre
-        weights = [-0.7, 0.5, -0.7]
-        concordance_index = 0.6
+        weights = [-0.6, 0.8, -0.6]
+        concordance_index = 0.8
         discordance_index = 0.4
     
         #check the time to create the folder for each tests
