@@ -110,7 +110,6 @@ class Individual_algo_genetic:
             self.m_totalCost += parcel.returnCost()
             self.m_totalProd += parcel.returnProd()
 
-        # pq pas faire parent aléatoire ?
         while cut_gene + 1 < len(p1.return_clusterList()) and self.m_totalCost + p1.return_clusterList()[
             cut_gene + 1].returnCost() <= 50:
             parcel_add = p1.return_clusterList()[cut_gene + 1]
@@ -119,6 +118,7 @@ class Individual_algo_genetic:
             self.m_totalCost += parcel_add.returnCost()
             self.m_dic_pos[str(parcel_add.returnCost())] -= 1
             cut_gene += 1
+        
         self.change_clusterList()
         self.m_totalCompacity = self.compacity(self.m_CluserList)
         self.m_minDistHabitation = self.moyenne_min_dist_parcel()
