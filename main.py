@@ -19,13 +19,13 @@ def check_prod(indiv,instance_map):
 
 #build the matrix for Electre
 def build_matrix(instances):
-    matrix = np.array([[p.return_totalComp(),p.return_totalProd(),p.return_minDistHabitation()] for p in instances])
+    matrix = np.array([[p.return_totalComp(),p.return_totalProd(),p.return_minDistHabitation(),p.return_dcluster()] for p in instances])
     return matrix
 
 if __name__ == "__main__":
     Instance_Map=Map(constructMap(), costDic)   #instance that help to store the cost,Production,value of each parcel
-    iter=7
-    pop_length=20000
+    iter=1
+    pop_length=1000
     liste_electre_final = []
     for _ in range(2):
 
@@ -39,8 +39,8 @@ if __name__ == "__main__":
         print(f"Le temps d'exécution est de {elapsed_time:.2f} secondes")
     
         #weight for Electre
-        weights = [-0.6, 0.8, -0.6]
-        concordance_index = 0.8
+        weights = [-0.5, 1.2, -0.8, -0.8]
+        concordance_index = 0.6
         discordance_index = 0.4
     
         #check the time to create the folder for each tests
@@ -67,12 +67,18 @@ if __name__ == "__main__":
         pareto_index = find_pareto_frontier_indices(pointsNW)
         matrix = np.array([[p.return_totalComp(),p.return_totalProd(),p.return_minDistHabitation()] for p in liste_pop])
         matrix_normaliser = electre.normalization(matrix)
+        points = np.column_stack((x, y, z))
         plot_pareto_frontier(points,pareto_index)
-    
-        #optimal point from pareto
+
         pop = []
         for indiv_index in pareto_index:
             pop.append(liste_pop[indiv_index])
+    
+        #optimal point from pareto
+            #print("=====================")
+            #print(liste_pop[indiv_index].return_totalProd(),"prod")
+            #print(liste_pop[indiv_index].return_totalCost(),"Cost")
+
 
         #select the best indivdual of the Pareto optimal point
         draw_name_Elec=f"./result/{current_time}/testElectre_{pop_length}_{iter}_{current_time}"

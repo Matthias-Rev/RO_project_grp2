@@ -15,24 +15,30 @@ class ELECTREE:
             normalized_scores[:,i] = (score_matrix[:,i] - np.min(score_matrix[:,i])) / (np.max(score_matrix[:,i]) - np.min(score_matrix[:,i]))
         return  normalized_scores
 
-    def calculate_concordance(self,score_matrix,normalized_scores):
-        # Method to calculate the concordance matrix
+    def calculate_concordance(self, score_matrix, normalized_scores):
         concordance_matrix = np.zeros((score_matrix.shape[0], score_matrix.shape[0]))
         for i in range(score_matrix.shape[0]):
             for j in range(score_matrix.shape[0]):
                 if i == j:
                     continue
-                concordance_matrix[i][j] = sum([self.weights[k] * (normalized_scores[i][k] >= normalized_scores[j][k]) for k in range(score_matrix.shape[1])])
+                criteria_count = score_matrix.shape[1]
+                count = np.sum(
+                    [self.weights[k] * (normalized_scores[i][k] >= normalized_scores[j][k]) for k in range(criteria_count)]
+                )
+                concordance_matrix[i, j] = count / criteria_count
         return concordance_matrix
 
-    def calculate_discordance(self,score_matrix,normalized_scores):
-        # Method to calculate the discordance matrix
+    def calculate_discordance(self, score_matrix, normalized_scores):
         discordance_matrix = np.zeros((score_matrix.shape[0], score_matrix.shape[0]))
         for i in range(score_matrix.shape[0]):
             for j in range(score_matrix.shape[0]):
                 if i == j:
                     continue
-                discordance_matrix[i][j] = sum([self.weights[k] * (normalized_scores[j][k] - normalized_scores[i][k]) for k in range(score_matrix.shape[1])])
+                criteria_count = score_matrix.shape[1]
+                diff = np.sum(
+                    [self.weights[k] * (normalized_scores[j][k] - normalized_scores[i][k]) for k in range(criteria_count)]
+                )
+                discordance_matrix[i, j] = diff / criteria_count
         return discordance_matrix
 
     def calculate_net_flow(self,score_matrix):
