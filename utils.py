@@ -88,17 +88,25 @@ def costParcelDic(cost):
 # create pareto frontier
 def plot_pareto_frontier(points, pareto_indices):
     pareto_points = points[pareto_indices]
+
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(pareto_points[:, 0], pareto_points[:, 1], pareto_points[:, 2], c='red', label='Frontière de Pareto')
+    for point in points:
+        if any((point == x).all() for x in pareto_points):
+            ax.scatter(point[0], point[1], point[2], c='red')
+        else:
+            ax.scatter(point[0], point[1], point[2], c='blue')
+    #ax.scatter(points[:, 0], points[:, 1], points[:, 2], c='blue', label='Population')
     ax.set_xlabel('Compacity')
     ax.set_ylabel('Production')
     ax.set_zlabel('Habitation Dist')
 
-    ax.set_ylim(0, 100)
+    ax.set_ylim(20, 80)
 
     plt.legend()
     plt.savefig("./result/pareto.png")
+    #plt.show()
 
 
 

@@ -24,7 +24,7 @@ def build_matrix(instances):
 
 if __name__ == "__main__":
     Instance_Map=Map(constructMap(), costDic)   #instance that help to store the cost,Production,value of each parcel
-    iter=1
+    iter=3
     pop_length=1000
     liste_electre_final = []
     for _ in range(2):
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         print(f"Le temps d'exécution est de {elapsed_time:.2f} secondes")
     
         #weight for Electre
-        weights = [-0.5, 1.2, -0.8, -0.8]
+        weights = [-0.5, 1.2, -0.8, -1]
         concordance_index = 0.6
         discordance_index = 0.4
     
